@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors, typography, spacing } from '../style/theme';
+import { colors, typography, spacing, common } from '../style';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -18,7 +18,7 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={common.screenContainer}>
         <Text style={[typography.h2, { color: colors.text, marginBottom: spacing.md }]}>
           Sign In
         </Text>
@@ -26,7 +26,7 @@ export default function LoginScreen({ navigation }: Props) {
           Enter your credentials to access your account
         </Text>
         <TextInput
-          style={styles.input}
+          style={common.input}
           placeholder="name@example.com"
           placeholderTextColor={colors.stroke}
           value={email}
@@ -35,7 +35,7 @@ export default function LoginScreen({ navigation }: Props) {
           autoCapitalize="none"
         />
         <TextInput
-          style={styles.input}
+          style={common.input}
           placeholder="Password"
           placeholderTextColor={colors.stroke}
           value={password}
@@ -44,8 +44,8 @@ export default function LoginScreen({ navigation }: Props) {
         />
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.accent }]}
-          onPress={handleLogin}
+          style={[common.button, { backgroundColor: colors.accent }]}
+               onPress={() => navigation.navigate('AddPet')}
         >
           <Text style={[typography.body, { color: colors.background }]}>Sign In</Text>
         </TouchableOpacity>
@@ -64,30 +64,6 @@ export default function LoginScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
-  input: {
-    width: '90%',
-    height: 48,
-    borderColor: colors.stroke,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: spacing.xl,
-    marginBottom: spacing.lg,
-    color: colors.text,
-  },
-  button: {
-    width: '90%',
-    height: 48,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   backContainer: {
     backgroundColor: colors.background,
     paddingBottom: spacing.md,

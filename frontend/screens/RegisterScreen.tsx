@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { colors, typography, spacing } from '../style/theme';
+import { colors, typography, spacing, common } from '../style';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -19,12 +19,9 @@ export default function RegisterScreen({ navigation }: Props) {
     console.log('Register', email, password);
   };
 
-  const handleLogin = () => {
-    console.log('Login pressed');
-  };
 
   return (
-    <View style={styles.container}>
+    <View style={common.screenContainer}>
       <Text style={[typography.h2, { color: colors.text, marginBottom: spacing.md }]}>
         Create an account
       </Text>
@@ -32,7 +29,7 @@ export default function RegisterScreen({ navigation }: Props) {
         Enter your email below to create an account
       </Text>
       <TextInput
-        style={styles.input}
+        style={common.input}
         placeholder="name@example.com"
         placeholderTextColor={colors.stroke}
         value={email}
@@ -41,7 +38,7 @@ export default function RegisterScreen({ navigation }: Props) {
         autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
+        style={common.input}
         placeholder="Password"
         placeholderTextColor={colors.stroke}
         value={password}
@@ -49,7 +46,7 @@ export default function RegisterScreen({ navigation }: Props) {
         secureTextEntry
       />
       <TextInput
-        style={styles.input}
+        style={common.input}
         placeholder="Confirm Password"
         placeholderTextColor={colors.stroke}
         value={confirmPassword}
@@ -58,7 +55,7 @@ export default function RegisterScreen({ navigation }: Props) {
       />
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: colors.accent }]}
+        style={[common.button, { backgroundColor: colors.accent }]}
         onPress={handleRegister}
       >
         <Text style={[typography.body, { color: colors.background }]}>Sign Up</Text>
@@ -73,7 +70,7 @@ export default function RegisterScreen({ navigation }: Props) {
         <View style={styles.line} />
       </View>
       <TouchableOpacity
-        style={[styles.button, { borderColor: colors.accent, borderWidth: 1 }]}
+        style={[common.button, { borderColor: colors.accent, borderWidth: 1 }]}
         onPress={() => navigation.navigate('Login')}
       >
         <Text style={[typography.body, { color: colors.accent }]}>Sign In</Text>
@@ -83,30 +80,6 @@ export default function RegisterScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
-  input: {
-    width: '90%',
-    height: 48,
-    borderColor: colors.stroke,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: spacing.xl,
-    marginBottom: spacing.lg,
-    color: colors.text,
-  },
-  button: {
-    width: '90%',
-    height: 48,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   separator: {
     flexDirection: 'row',
     alignItems: 'center',

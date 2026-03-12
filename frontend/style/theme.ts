@@ -1,6 +1,5 @@
-import { TextStyle, ViewStyle, Platform } from 'react-native';
+import { StyleSheet, TextStyle} from 'react-native';
 
-// ─── Colors ──────────────────────────────────────────────
 export const colors = {
   accent: '#E83306',
 
@@ -8,11 +7,13 @@ export const colors = {
 
   text: '#3C3A3A',
   stroke: '#7C7B73',
+  outline: '#D4D3D0',
 
   success: '#28A745',
   warning: '#FFC107',
   error: '#DC3545',
   info: '#17A2B8',
+  inactive: '#B6B6B6',
 
   overlay: 'rgba(0, 0, 0, 0.5)',
 } as const;
@@ -47,35 +48,4 @@ export const typography: Record<string, TextStyle> = {
   },
 };
 
-export const shadows: Record<string, ViewStyle> = {
-  sm: Platform.select({
-    ios: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
-    },
-    android: { elevation: 2 },
-    default: {},
-  }) as ViewStyle,
-  md: Platform.select({
-    ios: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 6,
-    },
-    android: { elevation: 4 },
-    default: {},
-  }) as ViewStyle,
-  lg: Platform.select({
-    ios: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 12,
-    },
-    android: { elevation: 8 },
-    default: {},
-  }) as ViewStyle,
-};
+
