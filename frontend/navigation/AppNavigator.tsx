@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoadingScreen from '../screens/LoadingScreen';
-import RegisterScreen from '../screens/RegisterScreen';
+import { LoadingScreen, RegisterScreen, LoginScreen } from '../screens';
 
 export type RootStackParamList = {
   Loading: undefined;
   Register: undefined;
+  Login: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -17,6 +17,7 @@ export default function AppNavigator() {
     >
       <Stack.Screen name="Loading" component={LoadingScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
     </Stack.Navigator>
   );
 }
