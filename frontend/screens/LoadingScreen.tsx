@@ -1,18 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Circle } from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors, spacing } from '../style/theme';
 import Logo from '../components/Logo';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 const GLOW_SIZE = 90;
 const SPLASH_DURATION = 3000;
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Loading'>;
-
-export default function LoadingScreen({ navigation }: Props) {
+export default function LoadingScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const pulse = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -57,10 +57,7 @@ export default function LoadingScreen({ navigation }: Props) {
         <AnimatedSvg
           width={GLOW_SIZE}
           height={GLOW_SIZE}
-          style={[
-            styles.glow,
-            { transform: [{ scale: glowScale }], opacity: glowOpacity },
-          ]}
+          style={[styles.glow, { transform: [{ scale: glowScale }], opacity: glowOpacity }]}
         >
           <Defs>
             <RadialGradient id="glow" cx="50%" cy="50%" r="50%">
