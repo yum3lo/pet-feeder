@@ -1,10 +1,14 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { LoadingScreen, RegisterScreen, LoginScreen } from '../screens';
+import { LoadingScreen, RegisterScreen, LoginScreen, AddPetScreen, AddPetPhotoScreen, SetFeedingScreen, HomeScreen } from '../screens';
 
 export type RootStackParamList = {
   Loading: undefined;
   Register: undefined;
   Login: undefined;
+  AddPet: undefined;
+  AddPetPhoto: undefined;
+  SetFeeding: undefined;
+  Home: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -18,6 +22,10 @@ export default function AppNavigator() {
       <Stack.Screen name="Loading" component={LoadingScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="AddPet" component={AddPetScreen} />
+      <Stack.Screen name="AddPetPhoto" component={AddPetPhotoScreen} />
+      <Stack.Screen name="SetFeeding" component={SetFeedingScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
     </Stack.Navigator>
   );
 }

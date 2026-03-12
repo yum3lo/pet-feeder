@@ -1,0 +1,73 @@
+import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, typography, spacing } from '../style';
+import BottomNavBar from '../components/BottomNavBar';
+
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+export default function HomeScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
+  const [activeTab, setActiveTab] = useState('feed');
+
+  return (
+    <View style={styles.container}>
+      <Text style={[typography.h3, styles.title, { marginTop: insets.top + spacing.xxl }]}>
+        Smart Pet Feeder
+      </Text>
+
+      <View style={styles.content}>
+        <TouchableOpacity style={styles.feedButton} onPress={() => console.log('Feed pressed')}>
+             <MaterialIcons
+              name="pets"
+              size={86}
+              color={colors.accent}
+            />
+          <Text style={styles.feedText}>Feed</Text>
+        </TouchableOpacity>
+      </View>
+
+      <BottomNavBar activeTab={activeTab} onTabPress={setActiveTab} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.accent,
+  },
+  title: {
+    color: colors.background,
+    textAlign: 'center',
+    marginBottom: spacing.lg,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  feedButton: {
+    width: 200,
+    height: 200,
+    borderRadius: 115,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  feedText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.accent,
+  },
+});
