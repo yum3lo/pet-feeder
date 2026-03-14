@@ -36,7 +36,9 @@ export const typography: Record<string, TextStyle> = {
   h1: { fontSize: 32, fontWeight: '700', lineHeight: 38 },
   h2: { fontSize: 24, fontWeight: '600', lineHeight: 30 },
   h3: { fontSize: 20, fontWeight: '600', lineHeight: 28 },
+  h4: { fontSize: 18, fontWeight: '600', lineHeight: 26 },
   body: { fontSize: 16, fontWeight: '400', lineHeight: 24 },
+  bodyBold: { fontSize: 16, fontWeight: '700', lineHeight: 24 },
   bodySmall: { fontSize: 14, fontWeight: '400', lineHeight: 21 },
   caption: { fontSize: 12, fontWeight: '400', lineHeight: 18 },
   label: {

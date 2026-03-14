@@ -5,3 +5,6 @@ export { default as AddPetScreen } from './AddPetScreen';
 export { default as AddPetPhotoScreen } from './AddPetPhotoScreen';
 export { default as SetFeedingScreen } from './SetFeedingScreen';
 export { default as HomeScreen } from './HomeScreen';
+export { default as ScheduleScreen } from './ScheduleScreen';
+export { default as HistoryScreen } from './HistoryScreen';
+export { default as SettingsScreen } from './SettingsScreen';

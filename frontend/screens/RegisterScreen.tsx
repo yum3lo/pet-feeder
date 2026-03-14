@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { colors, typography, spacing, common } from '../style';
+import { colors, typography, spacing, common } from '@/style';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -22,10 +22,10 @@ export default function RegisterScreen({ navigation }: Props) {
 
   return (
     <View style={common.screenContainer}>
-      <Text style={[typography.h2, { color: colors.text, marginBottom: spacing.md }]}>
+      <Text style={[typography.h2, common.title]}>
         Create an account
       </Text>
-      <Text style={[typography.bodySmall, { color: colors.stroke, marginBottom: spacing.lg }]}>
+      <Text style={[typography.bodySmall, common.subtitle]}>
         Enter your email below to create an account
       </Text>
       <TextInput
@@ -58,22 +58,22 @@ export default function RegisterScreen({ navigation }: Props) {
         style={[common.button, { backgroundColor: colors.accent }]}
         onPress={handleRegister}
       >
-        <Text style={[typography.body, { color: colors.background }]}>Sign Up</Text>
+        <Text style={[typography.bodyBold, { color: colors.background }]}>Sign Up</Text>
       </TouchableOpacity>
       <View style={styles.separator}>
         <View style={styles.line} />
         <Text
-          style={[typography.bodySmall, { color: colors.stroke, marginHorizontal: spacing.sm }]}
+          style={[typography.bodySmall, styles.separatorText]}
         >
           Already have an account?
         </Text>
         <View style={styles.line} />
       </View>
       <TouchableOpacity
-        style={[common.button, { borderColor: colors.accent, borderWidth: 1 }]}
+        style={[common.buttonSecondary]}
         onPress={() => navigation.navigate('Login')}
       >
-        <Text style={[typography.body, { color: colors.accent }]}>Sign In</Text>
+        <Text style={[typography.bodyBold, { color: colors.accent }]}>Sign In</Text>
       </TouchableOpacity>
     </View>
   );
@@ -90,5 +90,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 1,
     backgroundColor: colors.stroke,
+  },
+  separatorText: {
+    color: colors.stroke,
+    marginHorizontal: spacing.sm,
   },
 });

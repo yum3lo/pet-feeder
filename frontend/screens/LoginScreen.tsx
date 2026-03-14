@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors, typography, spacing, common } from '../style';
+import { colors, typography, spacing, common } from '@/style';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -19,10 +19,10 @@ export default function LoginScreen({ navigation }: Props) {
   return (
     <>
       <View style={common.screenContainer}>
-        <Text style={[typography.h2, { color: colors.text, marginBottom: spacing.md }]}>
+        <Text style={[typography.h2, common.title]}>
           Sign In
         </Text>
-        <Text style={[typography.bodySmall, { color: colors.stroke, marginBottom: spacing.lg }]}>
+        <Text style={[typography.bodySmall, common.subtitle]}>
           Enter your credentials to access your account
         </Text>
         <TextInput
@@ -47,7 +47,7 @@ export default function LoginScreen({ navigation }: Props) {
           style={[common.button, { backgroundColor: colors.accent }]}
                onPress={() => navigation.navigate('AddPet')}
         >
-          <Text style={[typography.body, { color: colors.background }]}>Sign In</Text>
+          <Text style={[typography.bodyBold, { color: colors.background }]}>Sign In</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.backContainer]}>
@@ -56,7 +56,7 @@ export default function LoginScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('Register')}
         >
             <MaterialIcons name="keyboard-backspace" size={24} color={colors.accent} />
-          <Text style={[typography.bodySmall, { color: colors.accent }]}>Go Back</Text>
+          <Text style={[typography.bodySmall, { color: colors.accent, fontWeight: "500" }]}>Go Back</Text>
         </TouchableOpacity>
       </View>
     </>

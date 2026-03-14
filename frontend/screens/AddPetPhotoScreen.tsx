@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { colors, typography, spacing, common, radius } from '../style';
+import { colors, typography, spacing, common, radius } from '@/style';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddPetPhoto'>;
 
@@ -28,10 +28,10 @@ export default function AddPetPhotoScreen({ navigation }: Props) {
   return (
     <>
       <View style={common.screenContainer}>
-        <Text style={[typography.h2, { color: colors.text, marginBottom: spacing.md }]}>
+        <Text style={[typography.h2, common.title]}>
           Add a photo
         </Text>
-        <Text style={[typography.bodySmall, { color: colors.stroke, marginBottom: spacing.lg }]}>
+        <Text style={[typography.bodySmall, common.subtitle]}>
          Choose a photo of your pet for your pet’s profile
         </Text>
 
@@ -53,13 +53,13 @@ export default function AddPetPhotoScreen({ navigation }: Props) {
             style={[common.button, styles.buttonHalf]}
             onPress={() => navigation.navigate('SetFeeding')}
           >
-            <Text style={[typography.body, { color: colors.accent }]}>Skip</Text>
+            <Text style={[typography.bodyBold, { color: colors.accent }]}>Skip</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[common.button, styles.buttonHalf, { backgroundColor: colors.accent }]}
             onPress={() => navigation.navigate('SetFeeding')}
           >
-            <Text style={[typography.body, { color: colors.background }]}>Add</Text>
+            <Text style={[typography.bodyBold, { color: colors.background }]}>Add</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -90,10 +90,10 @@ const styles = StyleSheet.create({
   buttonRow: {
     width: '90%',
     flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: spacing.md,
   },
   buttonHalf: {
-    flex: 1,
-    width: undefined,
+    width: 110,
   },
 });
