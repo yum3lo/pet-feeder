@@ -1,27 +1,19 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors, typography, spacing, common } from '../style';
-import Dropdown from '../components/Dropdown';
+import { colors, typography, spacing, common } from '@/style';
+import Dropdown from '@/components/Dropdown';
+import breedOptions from '@/data/breeds.json';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddPet'>;
 
 export default function AddPetScreen({ navigation }: Props) {
   const [pet, setPet] = useState({petName: '', petWeight: '', petAge: '', petBreed:''});
   const [ageUnit, setAgeUnit] = useState<'months' | 'years'>('months');
-
-  const breedOptions = [
-    { label: 'Just a cute cat', value: 'cute_cat' },
-    { label: 'Siamese', value: 'siamese' },
-    { label: 'British Shorthair', value: 'british_shorthair' },
-    { label: 'Scottish Fold', value: 'scottish_fold' },
-    { label: 'Sphynx', value: 'sphynx' },
-    { label: 'Persian', value: 'persian' },
-    { label: 'Other', value: 'other' },
-  ];
 
   const petFields = [
     { key: 'petName', placeholder: 'Pet Name' },
@@ -34,10 +26,10 @@ export default function AddPetScreen({ navigation }: Props) {
   return (
     <>
       <View style={common.screenContainer}>
-        <Text style={[typography.h2, { color: colors.text, marginBottom: spacing.md }]}>
+        <Text style={[typography.h2, common.title]}>
           Add your pet
         </Text>
-        <Text style={[typography.bodySmall, { color: colors.stroke, marginBottom: spacing.lg }]}>
+        <Text style={[typography.bodySmall, common.subtitle]}>
          If you have multiple pets, choose one to start with
         </Text>
         {petFields.map((field) => (
@@ -95,7 +87,7 @@ export default function AddPetScreen({ navigation }: Props) {
           style={[common.button, { backgroundColor: colors.accent }]}
            onPress={() => navigation.navigate('AddPetPhoto')}
         >
-          <Text style={[typography.body, { color: colors.background }]}>Add Pet</Text>
+          <Text style={[typography.bodyBold, { color: colors.background }]}>Add Pet</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.backContainer]}>
@@ -104,7 +96,7 @@ export default function AddPetScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('Login')}
         >
             <MaterialIcons name="keyboard-backspace" size={24} color={colors.accent} />
-          <Text style={[typography.bodySmall, { color: colors.accent }]}>Go Back</Text>
+          <Text style={[typography.bodySmall, { color: colors.accent, fontWeight: "500" }]}>Go Back</Text>
         </TouchableOpacity>
       </View>
     </>

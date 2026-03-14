@@ -10,6 +10,14 @@ export const common = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.lg,
   },
+  title: { 
+    color: colors.text, 
+    marginBottom: spacing.md 
+  },
+  subtitle: {
+    color: colors.stroke,
+    marginBottom: spacing.lg,
+  },
   input: {
     width: '90%',
     height: 48,
@@ -27,4 +35,12 @@ export const common = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  buttonSecondary: {
+    width: '90%',
+    height: 48,
+    borderRadius: radius.input,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: colors.accent,
+    borderWidth: 1 }
 });

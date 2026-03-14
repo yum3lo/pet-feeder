@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { LoadingScreen, RegisterScreen, LoginScreen, AddPetScreen, AddPetPhotoScreen, SetFeedingScreen, HomeScreen } from '../screens';
+import { LoadingScreen, RegisterScreen, LoginScreen, AddPetScreen, AddPetPhotoScreen, SetFeedingScreen, HomeScreen, ScheduleScreen, HistoryScreen, SettingsScreen } from '@/screens';
 
 export type RootStackParamList = {
   Loading: undefined;
@@ -9,6 +9,9 @@ export type RootStackParamList = {
   AddPetPhoto: undefined;
   SetFeeding: undefined;
   Home: undefined;
+  Schedule: undefined;
+  History: undefined;
+  Settings: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -26,6 +29,9 @@ export default function AppNavigator() {
       <Stack.Screen name="AddPetPhoto" component={AddPetPhotoScreen} />
       <Stack.Screen name="SetFeeding" component={SetFeedingScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Schedule" component={ScheduleScreen} />
+      <Stack.Screen name="History" component={HistoryScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>
   );
 }

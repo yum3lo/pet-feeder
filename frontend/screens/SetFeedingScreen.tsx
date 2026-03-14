@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors, typography, spacing, common, radius } from '../style';
+import { colors, typography, spacing, common, radius } from '@/style';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SetFeeding'>;
 
@@ -15,35 +15,43 @@ const presetTimes = [
   '09:00',
   '10:00',
   '11:00',
-  '18:00',
-  '20:00',
 ];
 
 export default function SetFeedingScreen({ navigation }: Props) {
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
   const [customTime, setCustomTime] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
 
-  const toggleTime = (time: string) => {
-    setSelected((prev) =>
-      prev.includes(time) ? prev.filter((t) => t !== time) : [...prev, time],
-    );
+  const isCustom = selected !== null && !presetTimes.includes(selected);
+
+  const selectTime = (time: string) => {
+    setSelected((prev) => (prev === time ? null : time));
+    setShowCustomInput(false);
+    setCustomTime('');
   };
 
   const addCustomTime = () => {
     const trimmed = customTime.trim();
-    if (/^\d{2}:\d{2}$/.test(trimmed) && !selected.includes(trimmed)) {
-      setSelected((prev) => [...prev, trimmed]);
+    if (/^\d{2}:\d{2}$/.test(trimmed)) {
+      setSelected(trimmed);
       setCustomTime('');
+      setShowCustomInput(false);
     }
+  };
+
+  const clearCustom = () => {
+    setSelected(null);
+    setCustomTime('');
+    setShowCustomInput(false);
   };
 
   return (
     <>
       <View style={common.screenContainer}>
-        <Text style={[typography.h2, { color: colors.text, marginBottom: spacing.md }]}>
-          Set feeding times
+        <Text style={[typography.h2, common.title]}>
+          Set feeding time
         </Text>
-        <Text style={[typography.bodySmall, { color: colors.stroke, marginBottom: spacing.xl }]}>
+        <Text style={[typography.bodySmall, common.subtitle]}>
           Choose your pet's first feeding time
         </Text>
 
@@ -51,68 +59,81 @@ export default function SetFeedingScreen({ navigation }: Props) {
           {presetTimes.map((time) => (
             <TouchableOpacity
               key={time}
-              style={[styles.timeButton, selected.includes(time) && styles.timeButtonActive]}
-              onPress={() => toggleTime(time)}
+              style={[styles.timeButton, selected === time && styles.timeButtonActive]}
+              onPress={() => selectTime(time)}
             >
               <Text
-                style={[styles.timeText, selected.includes(time) && styles.timeTextActive]}
+                style={[styles.timeText, selected === time && styles.timeTextActive]}
               >
                 {time}
               </Text>
             </TouchableOpacity>
           ))}
+
+          {isCustom ? (
+            <TouchableOpacity
+              style={[styles.timeButton, styles.timeButtonActive, styles.customChip]}
+              onPress={clearCustom}
+            >
+              <Text style={[styles.timeText, styles.timeTextActive]}>{selected}</Text>
+              <MaterialIcons name="close" size={16} color={colors.background} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.timeButton, styles.addButton]}
+              onPress={() => setShowCustomInput(true)}
+            >
+              <MaterialIcons name="add" size={22} color={colors.accent} />
+              <Text style={[styles.timeText, { color: colors.accent }]}>Custom</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View style={styles.customRow}>
-          <TextInput
-            style={[common.input, styles.customInput]}
-            placeholder="HH:MM"
-            placeholderTextColor={colors.stroke}
-            value={customTime}
-            onChangeText={setCustomTime}
-            keyboardType="numeric"
-            maxLength={5}
-          />
-          <TouchableOpacity
-            style={[styles.timeButton, styles.addButton]}
-            onPress={addCustomTime}
-          >
-            <MaterialIcons name="add" size={22} color={colors.accent} />
-            <Text style={[styles.timeText, { color: colors.accent }]}>Custom</Text>
-          </TouchableOpacity>
-        </View>
+        {showCustomInput && !isCustom && (
+          <View style={styles.customRow}>
+            <TextInput
+              style={[common.input, styles.customInput]}
+              placeholder="HH:MM"
+              placeholderTextColor={colors.stroke}
+              value={customTime}
+              onChangeText={setCustomTime}
+              keyboardType="numeric"
+              maxLength={5}
+              autoFocus
+            />
+            <TouchableOpacity
+              style={[common.button, styles.confirmButton, { backgroundColor: colors.accent }]}
+              onPress={addCustomTime}
+            >
+              <Text style={[typography.bodyBold, { color: colors.background }]}>Add</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
-        {selected.length > 0 && (
+        {selected !== null && (
           <View style={styles.selectedContainer}>
-            <Text style={[typography.bodySmall, { color: colors.stroke, marginBottom: spacing.sm }]}>
-              Selected: {selected.sort().join(', ')}
+            <Text style={[typography.bodySmall, { color: colors.stroke }]}>
+              Selected: {selected}
             </Text>
           </View>
         )}
 
+      </View>
+      <View style={styles.bottomContainer}>
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={[common.button, styles.buttonHalf]}
             onPress={() => navigation.navigate('Home')}
           >
-            <Text style={[typography.body, { color: colors.accent }]}>Skip</Text>
+            <Text style={[typography.bodyBold, { color: colors.accent }]}>Skip</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[common.button, styles.buttonHalf, { backgroundColor: colors.accent }]}
             onPress={() => navigation.navigate('Home')}
           >
-            <Text style={[typography.body, { color: colors.background }]}>Done</Text>
+            <Text style={[typography.bodyBold, { color: colors.background }]}>Done</Text>
           </TouchableOpacity>
         </View>
-      </View>
-      <View style={styles.backContainer}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.navigate('AddPetPhoto')}
-        >
-          <MaterialIcons name="keyboard-backspace" size={24} color={colors.accent} />
-          <Text style={[typography.bodySmall, { color: colors.accent }]}>Go Back</Text>
-        </TouchableOpacity>
       </View>
     </>
   );
@@ -120,13 +141,12 @@ export default function SetFeedingScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   buttonRow: {
-    width: '90%',
     flexDirection: 'row',
-    gap: spacing.md,
+    justifyContent: 'space-between',
+    gap: spacing.xxl,
   },
   buttonHalf: {
-    flex: 1,
-    width: undefined,
+    width: 110,
   },
   grid: {
     width: '90%',
@@ -168,25 +188,28 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 0,
   },
+  confirmButton: {
+    paddingHorizontal: spacing.lg,
+    width: undefined,
+    marginBottom: 0,
+  },
   addButton: {
     flexDirection: 'row',
     gap: spacing.xs,
     borderColor: colors.accent,
     borderStyle: 'dashed',
   },
-  selectedContainer: {
-    width: '90%',
-    marginBottom: spacing.lg,
-  },
-  backContainer: {
-    backgroundColor: colors.background,
-    paddingBottom: spacing.md,
-    paddingLeft: spacing.xxl,
-  },
-  backButton: {
+  customChip: {
     flexDirection: 'row',
-    gap: spacing.sm,
-    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  selectedContainer: {
+    width: '80%',
     marginBottom: spacing.lg,
+  },
+  bottomContainer: {
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.xxl,
+    paddingBottom: spacing.lg,
   },
 });

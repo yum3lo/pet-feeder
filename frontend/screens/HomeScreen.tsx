@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, typography, spacing } from '../style';
-import BottomNavBar from '../components/BottomNavBar';
+import { colors, typography, spacing } from '@/style';
+import BottomNavBar from '@/components/BottomNavBar';
+import MealCard from '@/components/MealCard';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -16,22 +18,29 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={[typography.h3, styles.title, { marginTop: insets.top + spacing.xxl }]}>
+      <Text style={[typography.h3, styles.title, { marginTop: insets.top + spacing.xl }]}>
         Smart Pet Feeder
       </Text>
-
       <View style={styles.content}>
         <TouchableOpacity style={styles.feedButton} onPress={() => console.log('Feed pressed')}>
              <MaterialIcons
               name="pets"
-              size={86}
+              size={96}
               color={colors.accent}
             />
           <Text style={styles.feedText}>Feed</Text>
         </TouchableOpacity>
       </View>
-
-      <BottomNavBar activeTab={activeTab} onTabPress={setActiveTab} />
+      <MealCard />
+      <BottomNavBar
+        activeTab={activeTab}
+        onTabPress={(key) => {
+          setActiveTab(key);
+          if (key === 'schedule') navigation.navigate('Schedule');
+          if (key === 'history') navigation.navigate('History');
+          if (key === 'settings') navigation.navigate('Settings');
+        }}
+      />
     </View>
   );
 }
@@ -53,9 +62,9 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   feedButton: {
-    width: 200,
-    height: 200,
-    borderRadius: 115,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
     backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',

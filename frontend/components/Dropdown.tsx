@@ -8,8 +8,7 @@ import {
   View,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors, spacing } from '../style';
-import { radius } from '../style';
+import { colors, spacing, radius } from '@/style';
 
 interface DropdownOption {
   label: string;
