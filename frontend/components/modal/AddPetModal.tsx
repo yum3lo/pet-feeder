@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing, common, radius } from '@/style';
 import Dropdown from '@/components/dropdown/Dropdown';
+import ActionButtons from '@/components/actions/ActionButtons';
 import breeds from '@/data/breeds.json';
 
 export type PetData = {
@@ -104,17 +105,12 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
             <Text style={styles.unit}>kg</Text>
           </View>
 
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={[typography.body, { color: colors.accent, fontWeight: '600' }]}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[common.button, styles.saveButton, { backgroundColor: colors.accent }]}
-              onPress={handleSave}
-            >
-              <Text style={[typography.body, { color: colors.background, fontWeight: '600' }]}>Save</Text>
-            </TouchableOpacity>
-          </View>
+          <ActionButtons
+            leftLabel="Cancel"
+            rightLabel="Save"
+            onLeft={onClose}
+            onRight={handleSave}
+          />
         </View>
       </KeyboardAvoidingView>
     </Modal>

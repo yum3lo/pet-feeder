@@ -5,6 +5,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing, common } from '@/style';
+import ActionButtons from '@/components/actions/ActionButtons';
 
 export type MealModalData = {
   id?: string;
@@ -109,17 +110,12 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
 
           <View style={styles.divider} />
 
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={[typography.bodyBold, { color: colors.accent }]}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[common.button, styles.saveButton, { backgroundColor: colors.accent }]}
-              onPress={handleSave}
-            >
-              <Text style={[typography.bodyBold, { color: colors.background }]}>Save</Text>
-            </TouchableOpacity>
-          </View>
+          <ActionButtons
+            leftLabel="Cancel"
+            rightLabel="Save"
+            onLeft={onClose}
+            onRight={handleSave}
+          />
         </View>
       </View>
     </Modal>

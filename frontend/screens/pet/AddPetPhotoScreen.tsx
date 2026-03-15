@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, typography, spacing, common, radius } from '@/style';
+import ActionButtons from '@/components/actions/ActionButtons';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -48,20 +49,13 @@ export default function AddPetPhotoScreen({ navigation }: Props) {
           )}
         </TouchableOpacity>
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={[common.button, styles.buttonHalf]}
-            onPress={() => navigation.navigate('SetFeeding')}
-          >
-            <Text style={[typography.bodyBold, { color: colors.accent }]}>Skip</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[common.button, styles.buttonHalf, { backgroundColor: colors.accent }]}
-            onPress={() => navigation.navigate('SetFeeding')}
-          >
-            <Text style={[typography.bodyBold, { color: colors.background }]}>Add</Text>
-          </TouchableOpacity>
-        </View>
+        <ActionButtons
+          variant="row"
+          leftLabel="Skip"
+          rightLabel="Add"
+          onLeft={() => navigation.navigate('SetFeeding')}
+          onRight={() => navigation.navigate('SetFeeding')}
+        />
       </View>
     </>
   );
