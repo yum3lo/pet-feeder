@@ -20,14 +20,15 @@ interface DropdownProps {
   options: DropdownOption[];
   value: string;
   onSelect: (value: string) => void;
+  style?: object;
 }
 
-export default function Dropdown({ placeholder = 'Select', options, value, onSelect }: DropdownProps) {
+export default function Dropdown({ placeholder = 'Select', options, value, onSelect, style }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const selectedLabel = options.find((o) => o.value === value)?.label;
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, style]}>
       <TouchableOpacity style={styles.trigger} onPress={() => setOpen(true)} activeOpacity={0.7}>
         <Text style={[styles.triggerText, !selectedLabel && styles.placeholder]}>
           {selectedLabel || placeholder}

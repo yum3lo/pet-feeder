@@ -5,8 +5,9 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing } from '@/style';
-import BottomNavBar from '@/components/BottomNavBar';
-import MealModal, { type MealModalData } from '@/components/MealModal';
+import BottomNavBar from '@/components/nav/BottomNavBar';
+import MealModal, { type MealModalData } from '@/components/modal/MealModal';
+import { usePets } from '@/contexts/PetsContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -15,15 +16,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Schedule'>;
 
 type Meal = { id: string; time: string; amount: string };
 
-const initialMeals: Meal[] = [
-  { id: '1', time: '10:00', amount: '80 g' },
-  { id: '2', time: '17:00', amount: '80 g' },
-];
-
 export default function ScheduleScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const [scheduleEnabled, setScheduleEnabled] = useState(true);
-  const [meals, setMeals] = useState<Meal[]>(initialMeals);
+  const { pets, activePetIndex, updateSchedule, toggleSchedule } = usePets();
+  const activePet = pets[activePetIndex];
+  const scheduleEnabled = activePet?.scheduleEnabled ?? true;
+  const meals: Meal[] = activePet?.meals ?? [];
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingMeal, setEditingMeal] = useState<MealModalData | null>(null);
@@ -40,18 +38,18 @@ export default function ScheduleScreen({ navigation }: Props) {
 
   const handleSave = (data: MealModalData) => {
     const formatted = `${data.amount} g`;
+    let updated: Meal[];
     if (data.id) {
-      setMeals((prev) =>
-        prev.map((m) => m.id === data.id ? { ...m, time: data.time, amount: formatted } : m)
-      );
+      updated = meals.map((m) => m.id === data.id ? { ...m, time: data.time, amount: formatted } : m);
     } else {
-      setMeals((prev) => [...prev, { id: Date.now().toString(), time: data.time, amount: formatted }]);
+      updated = [...meals, { id: Date.now().toString(), time: data.time, amount: formatted }];
     }
+    updateSchedule(activePetIndex, updated);
     setModalVisible(false);
   };
 
   const handleDelete = (id: string) => {
-    setMeals((prev) => prev.filter((m) => m.id !== id));
+    updateSchedule(activePetIndex, meals.filter((m) => m.id !== id));
     setModalVisible(false);
   };
 
@@ -60,6 +58,9 @@ export default function ScheduleScreen({ navigation }: Props) {
       <Text style={[typography.h2, styles.title, { marginTop: insets.top + spacing.xl }]}>
         Schedule
       </Text>
+      {activePet && (
+        <Text style={[typography.body, styles.petName]}>{activePet.name}</Text>
+      )}
 
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
         <View style={styles.toggleRow}>
@@ -67,7 +68,7 @@ export default function ScheduleScreen({ navigation }: Props) {
           <Text style={[typography.bodyBold, styles.toggleLabel]}>Schedule</Text>
           <Switch
             value={scheduleEnabled}
-            onValueChange={setScheduleEnabled}
+            onValueChange={(val) => toggleSchedule(activePetIndex, val)}
             trackColor={{ false: colors.outline, true: colors.accent }}
             thumbColor={colors.background}
           />
@@ -135,6 +136,12 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     textAlign: 'center',
+    marginBottom: spacing.xs,
+  },
+  petName: {
+    color: colors.accent,
+    textAlign: 'center',
+    fontWeight: '600',
     marginBottom: spacing.xl,
   },
   toggleRow: {

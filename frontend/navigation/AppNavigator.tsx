@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { LoadingScreen, RegisterScreen, LoginScreen, AddPetScreen, AddPetPhotoScreen, SetFeedingScreen, HomeScreen, ScheduleScreen, HistoryScreen, SettingsScreen } from '@/screens';
+import { LoadingScreen, RegisterScreen, LoginScreen, AddPetScreen, AddPetPhotoScreen, SetFeedingScreen, HomeScreen, ScheduleScreen, HistoryScreen, SettingsScreen, CatRecognitionScreen, TrainModelScreen } from '@/screens';
 
 export type RootStackParamList = {
   Loading: undefined;
@@ -12,6 +12,8 @@ export type RootStackParamList = {
   Schedule: undefined;
   History: undefined;
   Settings: undefined;
+  CatRecognition: { petNames: string[]; currentIndex: number };
+  TrainModel: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -32,6 +34,8 @@ export default function AppNavigator() {
       <Stack.Screen name="Schedule" component={ScheduleScreen} />
       <Stack.Screen name="History" component={HistoryScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="CatRecognition" component={CatRecognitionScreen} />
+      <Stack.Screen name="TrainModel" component={TrainModelScreen} />
     </Stack.Navigator>
   );
 }

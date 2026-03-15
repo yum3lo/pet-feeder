@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing, common } from '@/style';
-import Dropdown from '@/components/Dropdown';
+import Dropdown from '@/components/dropdown/Dropdown';
 import breedOptions from '@/data/breeds.json';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';

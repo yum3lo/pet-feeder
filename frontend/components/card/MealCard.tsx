@@ -3,13 +3,24 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from "react-native";
 import { colors, spacing, typography } from "@/style";
 
-export default function MealCard() {
+type Props = {
+  catName: string;
+  time?: string;
+  amount?: number;
+};
+
+export default function MealCard({ catName, time, amount }: Props) {
+  const hasSchedule = time != null && time !== '—';
   return (
     <View style={styles.card}>
       <MaterialIcons name="access-time" size={36} color={colors.accent} />
       <View style={styles.cardText}>
-        <Text style={[typography.h4, { color: colors.text }]}>Next meal</Text>
-        <Text style={[typography.bodySmall, { color: colors.stroke }]}>14:00 - 80g</Text>
+        <Text style={[typography.h4, { color: colors.text }]}>{catName}</Text>
+        {hasSchedule ? (
+          <Text style={[typography.bodySmall, { color: colors.stroke }]}>Next meal · {time} · {amount}g</Text>
+        ) : (
+          <Text style={[typography.bodySmall, { color: colors.inactive }]}>No meals scheduled yet</Text>
+        )}
       </View>
     </View>
   );
