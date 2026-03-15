@@ -7,6 +7,7 @@ import BottomNavBar from '@/components/nav/BottomNavBar';
 import AddPetModal, { type PetData } from '@/components/modal/AddPetModal';
 import { usePets } from '@/contexts/PetsContext';
 import breeds from '@/data/breeds.json';
+import ActionButtons from '@/components/actions/ActionButtons';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -185,26 +186,19 @@ export default function SettingsScreen({ navigation }: Props) {
             <Text style={[typography.body, styles.modalBody]}>
               Would you like to start cat recognition training to help your feeder distinguish between your cats?
             </Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.laterButton}
-                onPress={() => setRecognitionModalVisible(false)}
-              >
-                <Text style={[typography.body, { color: colors.text }]}>Later</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.startRecognitionButton}
-                onPress={() => {
-                  setRecognitionModalVisible(false);
-                  navigation.navigate('CatRecognition', {
-                    petNames: pets.map((p) => p.name),
-                    currentIndex: 0,
-                  });
-                }}
-              >
-                <Text style={[typography.bodyBold, { color: '#fff' }]}>Start Recognition</Text>
-              </TouchableOpacity>
-            </View>
+            <ActionButtons
+              variant="compact"
+              leftLabel="Later"
+              rightLabel="Start Recognition"
+              onLeft={() => setRecognitionModalVisible(false)}
+              onRight={() => {
+                setRecognitionModalVisible(false);
+                navigation.navigate('CatRecognition', {
+                  petNames: pets.map((p) => p.name),
+                  currentIndex: 0,
+                });
+              }}
+            />
           </View>
         </View>
       </Modal>

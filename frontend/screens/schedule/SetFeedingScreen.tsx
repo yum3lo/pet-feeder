@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing, common, radius } from '@/style';
+import ActionButtons from '@/components/actions/ActionButtons';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -120,20 +121,13 @@ export default function SetFeedingScreen({ navigation }: Props) {
 
       </View>
       <View style={styles.bottomContainer}>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={[common.button, styles.buttonHalf]}
-            onPress={() => navigation.navigate('Home')}
-          >
-            <Text style={[typography.bodyBold, { color: colors.accent }]}>Skip</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[common.button, styles.buttonHalf, { backgroundColor: colors.accent }]}
-            onPress={() => navigation.navigate('Home')}
-          >
-            <Text style={[typography.bodyBold, { color: colors.background }]}>Done</Text>
-          </TouchableOpacity>
-        </View>
+        <ActionButtons
+          variant="row"
+          leftLabel="Skip"
+          rightLabel="Done"
+          onLeft={() => navigation.navigate('Home')}
+          onRight={() => navigation.navigate('Home')}
+        />
       </View>
     </>
   );
