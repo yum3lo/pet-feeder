@@ -1,12 +1,13 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 import { useState, useEffect } from 'react';
 import {
   StyleSheet, Text, View, TouchableOpacity, Modal,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { MaterialIcons } from '@expo/vector-icons';
-import { colors, typography, spacing, common } from '@/style';
-import ActionButtons from '@/components/actions/ActionButtons';
-import { useToast } from '@/contexts/ToastContext';
+
+import { ActionButtons } from '@/components';
+import { useToast } from '@/contexts';
+import { colors, typography, spacing } from '@/style';
 
 export type MealModalData = {
   id?: string;

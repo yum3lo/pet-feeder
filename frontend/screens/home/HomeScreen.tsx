@@ -1,37 +1,42 @@
-import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { PagingCarousel, BottomNavBar, MealCard } from '@/components';
+import { usePets } from '@/contexts';
+import { useGetPets, useGetCatSchedules } from '@/services';
 import { colors, typography, spacing } from '@/style';
-import { PagingCarousel,   BottomNavBar, MealCard } from '@/components';
-import { usePets } from '@/contexts/PetsContext';
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/types';
 import type { PagingCarouselHandle } from '@/components/list/types';
+import type { RootStackParamList } from '@/types';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
+function MealCardWithSchedule({ catId, catName }: { catId: number; catName: string }) {
+  const { data: schedules = [] } = useGetCatSchedules(catId);
+  const nextMeal = schedules.length > 0 ? schedules[0] : null;
+  return (
+    <MealCard
+      catName={catName}
+      time={nextMeal?.time ?? '—'}
+      amount={nextMeal?.amount}
+    />
+  );
+}
+
 export default function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('feed');
-  const { pets, activePetIndex, setActivePetIndex } = usePets();
+  const { data: pets = [] } = useGetPets();
+  const { activePetIndex, setActivePetIndex } = usePets();
   const carouselRef = useRef<PagingCarouselHandle>(null);
   const [foodWeight] = useState(245); //grams
 
   const navBarHeight = 12 + 26 + 4 + 18 + Math.max(insets.bottom, spacing.md);
-
-  useEffect(() => {
-    if (activePetIndex > 0 && pets.length > activePetIndex) {
-      const t = setTimeout(() => {
-        carouselRef.current?.scrollToIndex(activePetIndex);
-      }, 50);
-      return () => clearTimeout(t);
-    }
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -58,21 +63,14 @@ export default function HomeScreen({ navigation }: Props) {
         <PagingCarousel
           ref={carouselRef}
           data={pets}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.id)}
           itemWidth={SCREEN_WIDTH}
           onIndexChange={setActivePetIndex}
-          renderItem={(item) => {
-            const nextMeal = item.meals.length > 0 ? item.meals[0] : null;
-            return (
-              <View style={{ width: SCREEN_WIDTH }}>
-                <MealCard
-                  catName={item.name}
-                  time={nextMeal?.time ?? '—'}
-                  amount={nextMeal ? parseInt(nextMeal.amount) : undefined}
-                />
-              </View>
-            );
-          }}
+          renderItem={(item) => (
+            <View style={{ width: SCREEN_WIDTH }}>
+              <MealCardWithSchedule catId={item.id} catName={item.name} />
+            </View>
+          )}
         />
       </View>
 

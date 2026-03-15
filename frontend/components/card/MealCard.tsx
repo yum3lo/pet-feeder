@@ -1,7 +1,9 @@
 
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from "react-native";
+
 import { colors, spacing, typography } from "@/style";
+import { toCapitalize } from '@/utils';
 
 type Props = {
   catName: string;
@@ -15,7 +17,7 @@ export default function MealCard({ catName, time, amount }: Props) {
     <View style={styles.card}>
       <MaterialIcons name="access-time" size={36} color={colors.accent} />
       <View style={styles.cardText}>
-        <Text style={[typography.h4, { color: colors.text }]}>{catName}</Text>
+        <Text style={[typography.h4, { color: colors.text }]}>{toCapitalize(catName)}</Text>
         {hasSchedule ? (
           <Text style={[typography.bodySmall, { color: colors.stroke }]}>Next meal · {time} · {amount}g</Text>
         ) : (

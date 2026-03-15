@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   FlatList,
@@ -7,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+
 import { colors, spacing, radius } from '@/style';
 
 interface DropdownOption {

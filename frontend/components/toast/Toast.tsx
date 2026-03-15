@@ -1,9 +1,10 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useToast } from '@/contexts';
 import { colors, typography, spacing, radius } from '@/style';
-import { useToast } from '@/contexts/ToastContext';
 
 export default function Toast() {
   const { toast } = useToast();

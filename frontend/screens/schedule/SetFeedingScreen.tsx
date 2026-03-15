@@ -1,12 +1,12 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
 
-import { colors, typography, spacing, common, radius } from '@/style';
 import { ActionButtons } from '@/components';
+import { colors, typography, spacing, common, radius } from '@/style';
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/types';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SetFeeding'>;
 

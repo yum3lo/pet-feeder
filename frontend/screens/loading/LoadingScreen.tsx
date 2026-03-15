@@ -1,13 +1,13 @@
+import { useNavigation } from '@react-navigation/native';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Circle } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
 
-import { colors, spacing } from '@/style';
 import { Logo } from '@/components';
+import { colors, spacing } from '@/style';
 
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/types';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 const GLOW_SIZE = 90;

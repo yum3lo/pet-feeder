@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 
+import { useToast } from '@/contexts';
+import { useRegister } from '@/services';
 import { colors, typography, spacing, common } from '@/style';
-import { useRegister } from '@/services/auth';
-import { useToast } from '@/contexts/ToastContext';
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/types';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 

@@ -5,6 +5,7 @@ import {
   type ReactElement,
 } from 'react';
 import { FlatList} from 'react-native';
+
 import { type PagingCarouselHandle, type PagingCarouselProps } from './types';
 
 type Props<T> = PagingCarouselProps<T>;

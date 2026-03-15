@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, type ViewStyle } from 'react-native';
+
 import { colors, typography, spacing, radius } from '@/style';
 
 type Variant = 'modal' | 'compact' | 'row';
@@ -92,7 +93,6 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
     gap: spacing.md,
-    width: '90%',
   },
   outlinedHalf: {
     flex: 1,

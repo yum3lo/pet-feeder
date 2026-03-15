@@ -1,19 +1,20 @@
-import { useState, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, Modal, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
+import { useState, useRef, useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, Modal, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, typography, spacing } from '@/style';
-import { setAuthToken } from '@/services/api';
 import {AddPetModal, BottomNavBar, type PetData, PagingCarousel, ActionButtons} from '@/components';
-import { useGetPets, useCreateCat, useUploadPetImage } from '@/services/pets';
+import { useToast, usePets } from '@/contexts';
 import breeds from '@/data/breeds.json';
-import { useToast } from '@/contexts/ToastContext';
+import { useGetPets, useCreateCat, useUploadPetImage, setAuthToken  } from '@/services';
+import { colors, typography, spacing } from '@/style';
+import { toCapitalize } from '@/utils';
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/types';
 import type {PagingCarouselHandle} from '@/components/list/types';
+import type { RootStackParamList } from '@/types';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -25,7 +26,7 @@ const getBreedLabel = (value: string) =>
 export default function SettingsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { data: pets = [], isLoading } = useGetPets();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { activePetIndex: currentIndex, setActivePetIndex: setCurrentIndex } = usePets();
   const carouselRef = useRef<PagingCarouselHandle>(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -35,6 +36,13 @@ export default function SettingsScreen({ navigation }: Props) {
   const { mutate: uploadImage } = useUploadPetImage();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    if (currentIndex > 0 && pets.length > currentIndex) {
+      const t = setTimeout(() => carouselRef.current?.scrollToIndex(currentIndex), 50);
+      return () => clearTimeout(t);
+    }
+  }, [pets.length]);
 
   const currentPet = pets[currentIndex];
 
@@ -116,7 +124,7 @@ export default function SettingsScreen({ navigation }: Props) {
 
                 <View style={styles.avatarSpacer} />
 
-                <Text style={[typography.h3, styles.petName]}>{item.name}</Text>
+                <Text style={[typography.h3, styles.petName]}>{toCapitalize(item.name)}</Text>
 
                 {pets.length > 1 && (
                   <View style={styles.dots}>

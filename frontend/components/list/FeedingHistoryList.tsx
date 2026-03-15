@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, SectionList } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, SectionList } from 'react-native';
+
 import { colors, typography, spacing } from '@/style';
+
 import type { FeedingProps } from './types';
 
 export default function FeedingHistoryList({ sections, query, onQueryChange, onRefresh }: FeedingProps) {
