@@ -1,19 +1,31 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+
 import { colors, typography, spacing, common } from '@/style';
+import { useLogin } from '@/services/auth';
+import { useToast } from '@/contexts/ToastContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { mutate: login, isPending } = useLogin();
+  const { showToast } = useToast();
 
   const handleLogin = () => {
-    console.log('Login pressed');
+    login(
+      { email, password },
+      {
+        onSuccess: (data) => navigation.navigate((data.user.cats?.length ?? 0) === 0 ? 'AddPet' : 'Home'),
+        onError: (err: any) =>
+          showToast(err?.response?.data?.message ?? 'Login failed', 'error'),
+      },
+    );
   };
 
   return (
@@ -45,9 +57,12 @@ export default function LoginScreen({ navigation }: Props) {
 
         <TouchableOpacity
           style={[common.button, { backgroundColor: colors.accent }]}
-               onPress={() => navigation.navigate('AddPet')}
+          onPress={handleLogin}
+          disabled={isPending}
         >
-          <Text style={[typography.bodyBold, { color: colors.background }]}>Sign In</Text>
+          <Text style={[typography.bodyBold, { color: colors.background }]}>
+            {isPending ? 'Signing in…' : 'Sign In'}
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.backContainer]}>

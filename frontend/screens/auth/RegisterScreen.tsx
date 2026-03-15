@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+
 import { colors, typography, spacing, common } from '@/style';
+import { useRegister } from '@/services/auth';
+import { useToast } from '@/contexts/ToastContext';
+
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -10,13 +14,22 @@ export default function RegisterScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const { mutate: register, isPending } = useRegister();
+  const { showToast } = useToast();
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
-      alert('Passwords do not match!');
+      showToast('Passwords do not match!', 'error');
       return;
     }
-    console.log('Register', email, password);
+    register(
+      { email, password },
+      {
+        onSuccess: () => navigation.navigate('AddPet'),
+        onError: (err: any) =>
+          showToast(err?.response?.data?.message ?? 'Registration failed', 'error'),
+      },
+    );
   };
 
 
@@ -57,8 +70,11 @@ export default function RegisterScreen({ navigation }: Props) {
       <TouchableOpacity
         style={[common.button, { backgroundColor: colors.accent }]}
         onPress={handleRegister}
+        disabled={isPending}
       >
-        <Text style={[typography.bodyBold, { color: colors.background }]}>Sign Up</Text>
+        <Text style={[typography.bodyBold, { color: colors.background }]}>
+          {isPending ? 'Signing up…' : 'Sign Up'}
+        </Text>
       </TouchableOpacity>
       <View style={styles.separator}>
         <View style={styles.line} />

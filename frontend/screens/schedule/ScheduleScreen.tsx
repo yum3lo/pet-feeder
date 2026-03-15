@@ -4,14 +4,14 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { colors, typography, spacing } from '@/style';
-import BottomNavBar from '@/components/nav/BottomNavBar';
-import MealModal, { type MealModalData } from '@/components/modal/MealModal';
-import MealList, { type MealItem } from '@/components/list/MealList';
+import {BottomNavBar, MealModal, type MealModalData, MealList  } from '@/components';
 import { usePets } from '@/contexts/PetsContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
+import { type MealItem } from "@/components/list/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Schedule'>;
 

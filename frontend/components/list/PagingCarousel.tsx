@@ -4,19 +4,10 @@ import {
   useRef,
   type ReactElement,
 } from 'react';
-import { FlatList, type FlatListProps } from 'react-native';
+import { FlatList} from 'react-native';
+import { type PagingCarouselHandle, type PagingCarouselProps } from './types';
 
-export type PagingCarouselHandle = {
-  scrollToIndex: (index: number, animated?: boolean) => void;
-};
-
-type Props<T> = {
-  data: T[];
-  keyExtractor: (item: T) => string;
-  renderItem: (item: T, index: number) => ReactElement;
-  itemWidth: number;
-  onIndexChange?: (index: number) => void;
-} & Omit<FlatListProps<T>, 'data' | 'keyExtractor' | 'renderItem' | 'horizontal' | 'pagingEnabled'>;
+type Props<T> = PagingCarouselProps<T>;
 
 function PagingCarouselInner<T>(
   { data, keyExtractor, renderItem, itemWidth, onIndexChange, ...rest }: Props<T>,

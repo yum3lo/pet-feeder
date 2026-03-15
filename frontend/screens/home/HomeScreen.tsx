@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { colors, typography, spacing } from '@/style';
-import BottomNavBar from '@/components/nav/BottomNavBar';
-import MealCard from '@/components/card/MealCard';
-import { PagingCarousel, type PagingCarouselHandle } from '@/components/list/PagingCarousel';
+import { PagingCarousel,   BottomNavBar, MealCard } from '@/components';
 import { usePets } from '@/contexts/PetsContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
+import type { PagingCarouselHandle } from '@/components/list/types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 

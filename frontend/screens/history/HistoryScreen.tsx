@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { colors, typography, spacing } from '@/style';
-import BottomNavBar from '@/components/nav/BottomNavBar';
-import FeedingHistoryList from '@/components/list/FeedingHistoryList';
+import { BottomNavBar, FeedingHistoryList } from '@/components';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'History'>;
 

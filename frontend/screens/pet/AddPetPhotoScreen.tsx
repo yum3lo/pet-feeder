@@ -2,16 +2,22 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+
 import { colors, typography, spacing, common, radius } from '@/style';
-import ActionButtons from '@/components/actions/ActionButtons';
+import { ActionButtons } from '@/components';
+import { useUploadPetImage } from '@/services/pets';
+import { useToast } from '@/contexts/ToastContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddPetPhoto'>;
 
-export default function AddPetPhotoScreen({ navigation }: Props) {
+export default function AddPetPhotoScreen({ navigation, route }: Props) {
+  const { petId } = route.params;
   const [image, setImage] = useState<string | null>(null);
+  const { mutate: uploadImage, isPending } = useUploadPetImage();
+  const { showToast } = useToast();
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -24,6 +30,21 @@ export default function AddPetPhotoScreen({ navigation }: Props) {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const handleAdd = () => {
+    if (!image) {
+      navigation.navigate('SetFeeding');
+      return;
+    }
+    uploadImage(
+      { id: petId, uri: image },
+      {
+        onSuccess: () => navigation.navigate('SetFeeding'),
+        onError: (err: any) =>
+          showToast(err?.response?.data?.message ?? 'Failed to upload photo', 'error'),
+      },
+    );
   };
 
   return (
@@ -52,9 +73,9 @@ export default function AddPetPhotoScreen({ navigation }: Props) {
         <ActionButtons
           variant="row"
           leftLabel="Skip"
-          rightLabel="Add"
+          rightLabel={isPending ? 'Uploading…' : 'Add'}
           onLeft={() => navigation.navigate('SetFeeding')}
-          onRight={() => navigation.navigate('SetFeeding')}
+          onRight={handleAdd}
         />
       </View>
     </>

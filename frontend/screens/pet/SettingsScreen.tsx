@@ -1,76 +1,81 @@
-import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, Modal } from 'react-native';
+import { useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, Modal, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { colors, typography, spacing } from '@/style';
-import BottomNavBar from '@/components/nav/BottomNavBar';
-import AddPetModal, { type PetData } from '@/components/modal/AddPetModal';
-import { PagingCarousel, type PagingCarouselHandle } from '@/components/list/PagingCarousel';
-import { usePets } from '@/contexts/PetsContext';
+import { setAuthToken } from '@/services/api';
+import {AddPetModal, BottomNavBar, type PetData, PagingCarousel, ActionButtons} from '@/components';
+import { useGetPets, useCreateCat, useUploadPetImage } from '@/services/pets';
 import breeds from '@/data/breeds.json';
-import ActionButtons from '@/components/actions/ActionButtons';
+import { useToast } from '@/contexts/ToastContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
+import type {PagingCarouselHandle} from '@/components/list/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
-const CARD_WIDTH = Dimensions.get('window').width - 48; // screen - 2 * paddingHorizontal
+const CARD_WIDTH = Dimensions.get('window').width - 48;
 
 const getBreedLabel = (value: string) =>
   breeds.find((b) => b.value === value)?.label ?? value;
 
 export default function SettingsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { pets, addPet, updatePet, activePetIndex, setActivePetIndex } = usePets();
-  const currentIndex = activePetIndex;
-  const setCurrentIndex = setActivePetIndex;
+  const { data: pets = [], isLoading } = useGetPets();
+  const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef<PagingCarouselHandle>(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [recognitionModalVisible, setRecognitionModalVisible] = useState(false);
   const [cardHeight, setCardHeight] = useState(0);
-
-  // Restore scroll position when navigating back
-  useEffect(() => {
-    if (activePetIndex > 0 && pets.length > activePetIndex) {
-      const t = setTimeout(() => {
-        carouselRef.current?.scrollToIndex(activePetIndex);
-      }, 50);
-      return () => clearTimeout(t);
-    }
-  }, []);
+  const { mutate: createCat } = useCreateCat();
+  const { mutate: uploadImage } = useUploadPetImage();
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const currentPet = pets[currentIndex];
 
   const handleAddPet = (data: PetData) => {
-    const newPet = {
-      id: Date.now().toString(),
-      ...data,
-      weight: data.weight ? `${data.weight} kg` : '',
-      photo: data.photo ?? '',
-      scheduleEnabled: true,
-      meals: [],
-    };
-    addPet(newPet);
     setAddModalVisible(false);
-    setTimeout(() => {
-      carouselRef.current?.scrollToIndex(pets.length, true);
-      setCurrentIndex(pets.length);
-    }, 100);
-    if (pets.length + 1 >= 2) {
-      setTimeout(() => setRecognitionModalVisible(true), 400);
-    }
+    createCat(
+      { name: data.name, weight: data.weight ? parseFloat(data.weight) : undefined, breed: data.breed || undefined },
+      {
+        onSuccess: (cat) => {
+          const finish = () => {
+            queryClient.invalidateQueries({ queryKey: ['cats'] });
+            setTimeout(() => {
+              const newIndex = pets.length;
+              carouselRef.current?.scrollToIndex(newIndex, true);
+              setCurrentIndex(newIndex);
+              if (pets.length + 1 >= 2) setRecognitionModalVisible(true);
+            }, 100);
+          };
+          if (data.photo) {
+            uploadImage({ id: cat.id, uri: data.photo }, { onSuccess: finish, onError: finish });
+          } else {
+            finish();
+          }
+        },
+        onError: (err: any) =>
+          showToast(err?.response?.data?.message ?? 'Failed to add pet', 'error'),
+      },
+    );
   };
 
   const handleEditPet = (data: PetData) => {
-    updatePet(currentIndex, {
-      ...data,
-      weight: data.weight ? `${data.weight} kg` : currentPet.weight,
-      photo: data.photo ?? currentPet.photo,
-    });
     setEditModalVisible(false);
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.accent} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -80,19 +85,21 @@ export default function SettingsScreen({ navigation }: Props) {
 
       <View style={styles.scrollArea}>
         <View style={styles.cardWrapper}>
-          {/* Shadow backdrop – rendered before (behind) the FlatList so it isn't clipped by the scroll container */}
           {cardHeight > 0 && (
             <View pointerEvents="none" style={[styles.cardShadowLayer, { height: cardHeight }]} />
           )}
 
           <View style={styles.avatarContainer}>
-            <Image source={{ uri: currentPet.photo }} style={styles.avatar} />
+            <Image
+              source={currentPet?.imageUrl ? { uri: currentPet.imageUrl } : require('@/assets/pfp.jpg')}
+              style={styles.avatar}
+            />
           </View>
 
           <PagingCarousel
             ref={carouselRef}
             data={pets}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             itemWidth={CARD_WIDTH}
             onIndexChange={setCurrentIndex}
             renderItem={(item, index) => (
@@ -123,12 +130,12 @@ export default function SettingsScreen({ navigation }: Props) {
 
                 <View style={styles.infoRow}>
                   <Text style={[typography.bodyBold, { color: colors.stroke }]}>Breed</Text>
-                  <Text style={[typography.body, { color: colors.stroke }]}>{getBreedLabel(item.breed)}</Text>
+                  <Text style={[typography.body, { color: colors.stroke }]}>{getBreedLabel(item.breed ?? '')}</Text>
                 </View>
 
                 <View style={styles.infoRow}>
                   <Text style={[typography.bodyBold, { color: colors.stroke }]}>Weight</Text>
-                  <Text style={[typography.body, { color: colors.stroke }]}>{item.weight}</Text>
+                  <Text style={[typography.body, { color: colors.stroke }]}>{item.weight != null ? `${item.weight} kg` : '—'}</Text>
                 </View>
               </View>
             )}
@@ -136,12 +143,18 @@ export default function SettingsScreen({ navigation }: Props) {
         </View>
 
         <TouchableOpacity style={styles.addPetButton} onPress={() => setAddModalVisible(true)}>
-          <Text style={[typography.body, { color: colors.accent, fontWeight: '600' }]}>
-            + Add another cat
+          <Text style={[typography.body, { color: colors.accent, fontWeight: '700' }]}>
+            + Add another pet
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => {
+            setAuthToken(null);
+            navigation.navigate('Login');
+          }}
+        >
           <Text style={[typography.body, { color: colors.text }]}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -163,7 +176,7 @@ export default function SettingsScreen({ navigation }: Props) {
 
       <AddPetModal
         visible={editModalVisible}
-        initialData={{ name: currentPet.name, breed: currentPet.breed, weight: currentPet.weight.replace(/[^0-9.]/g, ''), photo: currentPet.photo }}
+        initialData={{ name: currentPet?.name ?? '', breed: currentPet?.breed ?? '', weight: String(currentPet?.weight ?? ''), photo: currentPet?.imageUrl ?? '' }}
         onSave={handleEditPet}
         onClose={() => setEditModalVisible(false)}
       />
@@ -291,7 +304,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   addPetButton: {
-    marginTop: spacing.xl,
+    marginTop: spacing.md,
   },
   logoutButton: {
     marginTop: spacing.lg,

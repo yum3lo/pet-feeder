@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+
 import { colors, typography, spacing, common, radius } from '@/style';
-import ActionButtons from '@/components/actions/ActionButtons';
+import { ActionButtons } from '@/components';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SetFeeding'>;
 
@@ -122,9 +123,9 @@ export default function SetFeedingScreen({ navigation }: Props) {
       </View>
       <View style={styles.bottomContainer}>
         <ActionButtons
-          variant="row"
+          variant="modal"
           leftLabel="Skip"
-          rightLabel="Done"
+          rightLabel="Set Time"
           onLeft={() => navigation.navigate('Home')}
           onRight={() => navigation.navigate('Home')}
         />
@@ -204,6 +205,8 @@ const styles = StyleSheet.create({
   bottomContainer: {
     backgroundColor: colors.background,
     paddingHorizontal: spacing.xxl,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.xl,
+    width: "90%",
+    alignSelf: 'center',
   },
 });
