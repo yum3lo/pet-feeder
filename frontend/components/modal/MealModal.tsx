@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing, common } from '@/style';
 import ActionButtons from '@/components/actions/ActionButtons';
+import { useToast } from '@/contexts/ToastContext';
 
 export type MealModalData = {
   id?: string;
@@ -34,6 +35,7 @@ function parseTime(t: string) {
 
 export default function MealModal({ visible, meal, onSave, onDelete, onClose }: Props) {
   const isEdit = !!meal?.id;
+  const { showToast } = useToast();
 
   const [hour, setHour] = useState(() => parseTime(meal?.time ?? '09:00').hour);
   const [minute, setMinute] = useState(() => parseTime(meal?.time ?? '09:00').minute);
@@ -51,6 +53,7 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
 
   const handleSave = () => {
     onSave({ id: meal?.id, time: `${hour}:${minute}`, amount: String(amount) });
+    showToast(isEdit ? 'Meal updated!' : 'Meal added!', 'success');
   };
 
   return (
@@ -63,7 +66,10 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
             </Text>
             {isEdit && (
               <TouchableOpacity
-                onPress={() => onDelete?.(meal!.id!)}
+                onPress={() => {
+                  onDelete?.(meal!.id!);
+                  showToast('Meal removed.', 'success');
+                }}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={styles.deleteButton}
               >

@@ -8,6 +8,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing, common, radius } from '@/style';
 import Dropdown from '@/components/dropdown/Dropdown';
 import ActionButtons from '@/components/actions/ActionButtons';
+import { useToast } from '@/contexts/ToastContext';
 import breeds from '@/data/breeds.json';
 
 export type PetData = {
@@ -28,6 +29,7 @@ const DEFAULT: PetData = { name: '', breed: '', weight: '', photo: null };
 
 export default function AddPetModal({ visible, initialData, onSave, onClose }: Props) {
   const [draft, setDraft] = useState<PetData>(DEFAULT);
+  const { showToast } = useToast();
 
   useEffect(() => {
     setDraft(initialData ?? DEFAULT);
@@ -46,8 +48,12 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
   };
 
   const handleSave = () => {
-    if (!draft.name.trim()) return;
+    if (!draft.name.trim()) {
+      showToast('Please enter a name for your cat.', 'error');
+      return;
+    }
     onSave(draft);
+    showToast(initialData ? `${draft.name} updated!` : `${draft.name} added!`, 'success');
   };
 
   return (

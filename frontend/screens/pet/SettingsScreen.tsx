@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList, Dimensions, Modal } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '@/style';
 import BottomNavBar from '@/components/nav/BottomNavBar';
 import AddPetModal, { type PetData } from '@/components/modal/AddPetModal';
+import { PagingCarousel, type PagingCarouselHandle } from '@/components/list/PagingCarousel';
 import { usePets } from '@/contexts/PetsContext';
 import breeds from '@/data/breeds.json';
 import ActionButtons from '@/components/actions/ActionButtons';
@@ -24,7 +25,7 @@ export default function SettingsScreen({ navigation }: Props) {
   const { pets, addPet, updatePet, activePetIndex, setActivePetIndex } = usePets();
   const currentIndex = activePetIndex;
   const setCurrentIndex = setActivePetIndex;
-  const flatListRef = useRef<FlatList>(null);
+  const carouselRef = useRef<PagingCarouselHandle>(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [recognitionModalVisible, setRecognitionModalVisible] = useState(false);
@@ -34,7 +35,7 @@ export default function SettingsScreen({ navigation }: Props) {
   useEffect(() => {
     if (activePetIndex > 0 && pets.length > activePetIndex) {
       const t = setTimeout(() => {
-        flatListRef.current?.scrollToIndex({ index: activePetIndex, animated: false });
+        carouselRef.current?.scrollToIndex(activePetIndex);
       }, 50);
       return () => clearTimeout(t);
     }
@@ -54,7 +55,7 @@ export default function SettingsScreen({ navigation }: Props) {
     addPet(newPet);
     setAddModalVisible(false);
     setTimeout(() => {
-      flatListRef.current?.scrollToIndex({ index: pets.length, animated: true });
+      carouselRef.current?.scrollToIndex(pets.length, true);
       setCurrentIndex(pets.length);
     }, 100);
     if (pets.length + 1 >= 2) {
@@ -88,20 +89,13 @@ export default function SettingsScreen({ navigation }: Props) {
             <Image source={{ uri: currentPet.photo }} style={styles.avatar} />
           </View>
 
-          <FlatList
-            ref={flatListRef}
+          <PagingCarousel
+            ref={carouselRef}
             data={pets}
             keyExtractor={(item) => item.id}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={CARD_WIDTH}
-            decelerationRate="fast"
-            onMomentumScrollEnd={(e) => {
-              const idx = Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH);
-              setCurrentIndex(idx);
-            }}
-            renderItem={({ item, index }) => (
+            itemWidth={CARD_WIDTH}
+            onIndexChange={setCurrentIndex}
+            renderItem={(item, index) => (
               <View
                 style={styles.card}
                 onLayout={index === 0 && cardHeight === 0
@@ -226,7 +220,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
   },
-  // Positioned to align with the FlatList start (avatarContainer 120px − 60px overlap = 60px from content top)
   cardShadowLayer: {
     position: 'absolute',
     top: 60,
@@ -257,8 +250,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xl,
     paddingTop: spacing.md,
-    // shadow lives on cardShadowLayer (outside FlatList) so it isn't clipped
-    elevation: 8, // Android shadow still works here
+    elevation: 8, 
   },
   dots: {
     flexDirection: 'row',

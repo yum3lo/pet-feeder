@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing } from '@/style';
 import BottomNavBar from '@/components/nav/BottomNavBar';
 import MealCard from '@/components/card/MealCard';
+import { PagingCarousel, type PagingCarouselHandle } from '@/components/list/PagingCarousel';
 import { usePets } from '@/contexts/PetsContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,15 +19,15 @@ export default function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('feed');
   const { pets, activePetIndex, setActivePetIndex } = usePets();
-  const flatListRef = useRef<FlatList>(null);
-  const [foodWeight] = useState(245); // grams 
+  const carouselRef = useRef<PagingCarouselHandle>(null);
+  const [foodWeight] = useState(245); //grams
 
   const navBarHeight = 12 + 26 + 4 + 18 + Math.max(insets.bottom, spacing.md);
 
   useEffect(() => {
     if (activePetIndex > 0 && pets.length > activePetIndex) {
       const t = setTimeout(() => {
-        flatListRef.current?.scrollToIndex({ index: activePetIndex, animated: false });
+        carouselRef.current?.scrollToIndex(activePetIndex);
       }, 50);
       return () => clearTimeout(t);
     }
@@ -54,19 +55,13 @@ export default function HomeScreen({ navigation }: Props) {
       </View>
 
       <View style={[styles.mealCardContainer, { bottom: navBarHeight }]}>
-        <FlatList
-          ref={flatListRef}
+        <PagingCarousel
+          ref={carouselRef}
           data={pets}
           keyExtractor={(item) => item.id}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          decelerationRate="fast"
-          onMomentumScrollEnd={(e) => {
-            const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-            setActivePetIndex(idx);
-          }}
-          renderItem={({ item }) => {
+          itemWidth={SCREEN_WIDTH}
+          onIndexChange={setActivePetIndex}
+          renderItem={(item) => {
             const nextMeal = item.meals.length > 0 ? item.meals[0] : null;
             return (
               <View style={{ width: SCREEN_WIDTH }}>

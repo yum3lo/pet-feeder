@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import {
-  StyleSheet, Text, View, TouchableOpacity, Switch, FlatList, ScrollView,
+  StyleSheet, Text, View, TouchableOpacity, Switch, ScrollView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing } from '@/style';
 import BottomNavBar from '@/components/nav/BottomNavBar';
 import MealModal, { type MealModalData } from '@/components/modal/MealModal';
+import MealList, { type MealItem } from '@/components/list/MealList';
 import { usePets } from '@/contexts/PetsContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -14,7 +15,7 @@ import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Schedule'>;
 
-type Meal = { id: string; time: string; amount: string };
+type Meal = MealItem;
 
 export default function ScheduleScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -79,28 +80,11 @@ export default function ScheduleScreen({ navigation }: Props) {
         <View style={styles.mealsSection}>
           <Text style={[typography.bodyBold, styles.sectionLabel]}>Meals scheduled</Text>
 
-          <FlatList
-            data={meals}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            ItemSeparatorComponent={() => <View style={styles.divider} />}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.mealRow} onPress={() => openEdit(item)}>
-                <Text style={[typography.bodySmall, { color: colors.stroke }]}>
-                  {item.time} - {item.amount}
-                </Text>
-                <MaterialIcons name="chevron-right" size={22} color={colors.stroke} />
-              </TouchableOpacity>
-            )}
+          <MealList
+            meals={meals}
+            onPressItem={openEdit}
+            onAdd={openAdd}
           />
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.addMealButton} onPress={openAdd}>
-            <Text style={[typography.bodyBold, { color: colors.accent }]}>
-              + Add meal
-            </Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
 
