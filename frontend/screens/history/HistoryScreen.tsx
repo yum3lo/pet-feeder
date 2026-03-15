@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing } from '@/style';
-import BottomNavBar from '@/components/BottomNavBar';
+import BottomNavBar from '@/components/nav/BottomNavBar';
 import FeedingHistoryList from '@/components/FeedingHistoryList';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
