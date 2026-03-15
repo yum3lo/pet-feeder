@@ -10,8 +10,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, typography, spacing, radius } from '@/style';
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from "@/types";
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CatRecognition'>;
 

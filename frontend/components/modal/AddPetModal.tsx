@@ -1,15 +1,15 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useState, useEffect } from 'react';
 import {
   StyleSheet, Text, View, TouchableOpacity, Modal,
   TextInput, Image, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { MaterialIcons } from '@expo/vector-icons';
-import { colors, typography, spacing, common, radius } from '@/style';
-import Dropdown from '@/components/dropdown/Dropdown';
-import ActionButtons from '@/components/actions/ActionButtons';
-import { useToast } from '@/contexts/ToastContext';
+
+import { Dropdown, ActionButtons } from '@/components';
+import { useToast } from '@/contexts';
 import breeds from '@/data/breeds.json';
+import { colors, typography, spacing, radius } from '@/style';
 
 export type PetData = {
   name: string;

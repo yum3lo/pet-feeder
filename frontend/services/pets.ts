@@ -1,6 +1,8 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
+
+import { type CreatePetPayload, type Pet, type Schedule} from '@/types';
+
 import { api } from './api';
-import {type CreatePetPayload, type Pet} from '@/types';
 
 const getPets = async (): Promise<Pet[]> => {
   const { data } = await api.get<Pet[]>('/cats');
@@ -22,6 +24,18 @@ const uploadPetImage = async ({ id, uri }: { id: number; uri: string }): Promise
 
 export const useGetPets = () =>
   useQuery({ queryKey: ['cats'], queryFn: getPets });
+
+const getCatSchedules = async (catId: number): Promise<Schedule[]> => {
+  const { data } = await api.get<Schedule[]>(`/pet-feeder/cats/${catId}/schedules`);
+  return data;
+};
+
+export const useGetCatSchedules = (catId: number | undefined) =>
+  useQuery({
+    queryKey: ['schedules', catId],
+    queryFn: () => getCatSchedules(catId!),
+    enabled: catId != null,
+  });
 
 export const useCreateCat = () =>
   useMutation({ mutationFn: createPet });

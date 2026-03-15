@@ -1,5 +1,5 @@
-import {type FlatListProps } from 'react-native';
 import {type ReactElement} from 'react';
+import {type FlatListProps } from 'react-native';
 
 export type FeedingEntry = { id: string; time: string; amount: string };
 export type FeedingSection = { title: string; data: FeedingEntry[] };

@@ -1,6 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
-import { api, setAuthToken } from './api';
+
 import type { AuthResponse, AuthPayload } from '@/types';
+
+import { api, setAuthToken } from './api';
 
 
 const register = async (payload: AuthPayload): Promise<AuthResponse> => {

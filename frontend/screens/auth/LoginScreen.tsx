@@ -1,13 +1,13 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
 
+import { useToast } from '@/contexts';
+import { useLogin, api } from '@/services';
 import { colors, typography, spacing, common } from '@/style';
-import { useLogin } from '@/services/auth';
-import { useToast } from '@/contexts/ToastContext';
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/types';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -21,7 +21,14 @@ export default function LoginScreen({ navigation }: Props) {
     login(
       { email, password },
       {
-        onSuccess: (data) => navigation.navigate((data.user.cats?.length ?? 0) === 0 ? 'AddPet' : 'Home'),
+        onSuccess: async () => {
+          try {
+            const { data: cats } = await api.get('/cats');
+            navigation.navigate(cats.length === 0 ? 'AddPet' : 'Home');
+          } catch {
+            navigation.navigate('AddPet');
+          }
+        },
         onError: (err: any) =>
           showToast(err?.response?.data?.message ?? 'Login failed', 'error'),
       },
