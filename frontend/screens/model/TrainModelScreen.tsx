@@ -8,10 +8,11 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+
 import { colors, typography, spacing, radius } from '@/style';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from "@/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TrainModel'>;
 

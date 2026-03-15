@@ -2,10 +2,12 @@ import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Circle } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
+
+import { colors, spacing } from '@/style';
+import { Logo } from '@/components';
+
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, spacing } from '@/style/theme';
-import Logo from '@/components/logo/Logo';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/types';
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 const GLOW_SIZE = 90;

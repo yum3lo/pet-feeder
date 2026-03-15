@@ -7,10 +7,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { colors, typography, spacing, radius } from '@/style';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from "@/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CatRecognition'>;
 

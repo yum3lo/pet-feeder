@@ -2,15 +2,9 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '@/style';
 
-export type MealItem = { id: string; time: string; amount: string };
+import type {  MealProps  } from './types';
 
-type Props = {
-  meals: MealItem[];
-  onPressItem: (meal: MealItem) => void;
-  onAdd: () => void;
-};
-
-export default function MealList({ meals, onPressItem, onAdd }: Props) {
+export default function MealList({ meals, onPressItem, onAdd }: MealProps) {
   return (
     <View>
       <FlatList
