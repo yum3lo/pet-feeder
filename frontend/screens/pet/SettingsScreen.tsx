@@ -1,17 +1,12 @@
-import { MaterialIcons } from '@expo/vector-icons';
-import { useQueryClient } from '@tanstack/react-query';
-import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {AddPetModal, BottomNavBar, type PetData, PagingCarousel, ActionButtons} from '@/components';
-import { useToast, usePets } from '@/contexts';
-import breeds from '@/data/breeds.json';
-import { useGetPets, useCreateCat, useUploadPetImage, setAuthToken  } from '@/services';
+import { AddPetModal, BottomNavBar, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
+import { usePets } from '@/contexts';
+import { useSettingsPets } from '@/hooks';
+import { useGetPets, setAuthToken } from '@/services';
 import { colors, typography, spacing } from '@/style';
-import { toCapitalize } from '@/utils';
 
-import type {PagingCarouselHandle} from '@/components/list/types';
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -20,62 +15,22 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
 const CARD_WIDTH = Dimensions.get('window').width - 48;
 
-const getBreedLabel = (value: string) =>
-  breeds.find((b) => b.value === value)?.label ?? value;
-
 export default function SettingsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { data: pets = [], isLoading } = useGetPets();
   const { activePetIndex: currentIndex, setActivePetIndex: setCurrentIndex } = usePets();
-  const carouselRef = useRef<PagingCarouselHandle>(null);
-  const [addModalVisible, setAddModalVisible] = useState(false);
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [recognitionModalVisible, setRecognitionModalVisible] = useState(false);
-  const [cardHeight, setCardHeight] = useState(0);
-  const { mutate: createCat } = useCreateCat();
-  const { mutate: uploadImage } = useUploadPetImage();
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
 
-  useEffect(() => {
-    if (currentIndex > 0 && pets.length > currentIndex) {
-      const t = setTimeout(() => carouselRef.current?.scrollToIndex(currentIndex), 50);
-      return () => clearTimeout(t);
-    }
-  }, [pets.length]);
+  const {
+    carouselRef,
+    addModalVisible, setAddModalVisible,
+    editModalVisible, setEditModalVisible,
+    recognitionModalVisible, setRecognitionModalVisible,
+    cardHeight, setCardHeight,
+    handleAddPet,
+    handleEditPet,
+  } = useSettingsPets({ pets, currentIndex, setCurrentIndex });
 
   const currentPet = pets[currentIndex];
-
-  const handleAddPet = (data: PetData) => {
-    setAddModalVisible(false);
-    createCat(
-      { name: data.name, weight: data.weight ? parseFloat(data.weight) : undefined, breed: data.breed || undefined },
-      {
-        onSuccess: (cat) => {
-          const finish = () => {
-            queryClient.invalidateQueries({ queryKey: ['cats'] });
-            setTimeout(() => {
-              const newIndex = pets.length;
-              carouselRef.current?.scrollToIndex(newIndex, true);
-              setCurrentIndex(newIndex);
-              if (pets.length + 1 >= 2) setRecognitionModalVisible(true);
-            }, 100);
-          };
-          if (data.photo) {
-            uploadImage({ id: cat.id, uri: data.photo }, { onSuccess: finish, onError: finish });
-          } else {
-            finish();
-          }
-        },
-        onError: (err: any) =>
-          showToast(err?.response?.data?.message ?? 'Failed to add pet', 'error'),
-      },
-    );
-  };
-
-  const handleEditPet = (data: PetData) => {
-    setEditModalVisible(false);
-  };
 
   if (isLoading) {
     return (
@@ -111,41 +66,15 @@ export default function SettingsScreen({ navigation }: Props) {
             itemWidth={CARD_WIDTH}
             onIndexChange={setCurrentIndex}
             renderItem={(item, index) => (
-              <View
-                style={styles.card}
-                onLayout={index === 0 && cardHeight === 0
-                  ? (e) => setCardHeight(e.nativeEvent.layout.height)
-                  : undefined
-                }
-              >
-                <TouchableOpacity style={styles.editButton} onPress={() => setEditModalVisible(true)}>
-                  <MaterialIcons name="edit" size={20} color={colors.accent} />
-                </TouchableOpacity>
-
-                <View style={styles.avatarSpacer} />
-
-                <Text style={[typography.h3, styles.petName]}>{toCapitalize(item.name)}</Text>
-
-                {pets.length > 1 && (
-                  <View style={styles.dots}>
-                    {pets.map((_, i) => (
-                      <View key={i} style={[styles.dot, i === currentIndex && styles.dotActive]} />
-                    ))}
-                  </View>
-                )}
-
-                <View style={styles.divider} />
-
-                <View style={styles.infoRow}>
-                  <Text style={[typography.bodyBold, { color: colors.stroke }]}>Breed</Text>
-                  <Text style={[typography.body, { color: colors.stroke }]}>{getBreedLabel(item.breed ?? '')}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                  <Text style={[typography.bodyBold, { color: colors.stroke }]}>Weight</Text>
-                  <Text style={[typography.body, { color: colors.stroke }]}>{item.weight != null ? `${item.weight} kg` : '—'}</Text>
-                </View>
-              </View>
+              <PetProfileCard
+                item={item}
+                index={index}
+                currentIndex={currentIndex}
+                petsCount={pets.length}
+                cardHeight={cardHeight}
+                setCardHeight={setCardHeight}
+                onEdit={() => setEditModalVisible(true)}
+              />
             )}
           />
         </View>
@@ -184,39 +113,27 @@ export default function SettingsScreen({ navigation }: Props) {
 
       <AddPetModal
         visible={editModalVisible}
-        initialData={{ name: currentPet?.name ?? '', breed: currentPet?.breed ?? '', weight: String(currentPet?.weight ?? ''), photo: currentPet?.imageUrl ?? '' }}
+        initialData={{
+          name: currentPet?.name ?? '',
+          breed: currentPet?.breed ?? '',
+          weight: String(currentPet?.weight ?? ''),
+          photo: currentPet?.imageUrl ?? '',
+        }}
         onSave={handleEditPet}
         onClose={() => setEditModalVisible(false)}
       />
 
-      <Modal
+      <RecognitionPromptModal
         visible={recognitionModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setRecognitionModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={[typography.h4, styles.modalTitle]}>Multiple Cats Detected</Text>
-            <Text style={[typography.body, styles.modalBody]}>
-              Would you like to start cat recognition training to help your feeder distinguish between your cats?
-            </Text>
-            <ActionButtons
-              variant="compact"
-              leftLabel="Later"
-              rightLabel="Start Recognition"
-              onLeft={() => setRecognitionModalVisible(false)}
-              onRight={() => {
-                setRecognitionModalVisible(false);
-                navigation.navigate('CatRecognition', {
-                  petNames: pets.map((p) => p.name),
-                  currentIndex: 0,
-                });
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setRecognitionModalVisible(false)}
+        onStart={() => {
+          setRecognitionModalVisible(false);
+          navigation.navigate('CatRecognition', {
+            petNames: pets.map((p) => p.name),
+            currentIndex: 0,
+          });
+        }}
+      />
     </View>
   );
 }
@@ -251,7 +168,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 20,
-    elevation: 0, 
+    elevation: 0,
   },
   avatarContainer: {
     zIndex: 1,
@@ -263,53 +180,6 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 4,
     borderColor: colors.background,
-  },
-  card: {
-    width: CARD_WIDTH,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: spacing.md,
-    elevation: 8, 
-  },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: colors.outline,
-  },
-  dotActive: {
-    backgroundColor: colors.accent,
-    width: 18,
-  },
-  editButton: {
-    alignSelf: 'flex-end',
-  },
-  avatarSpacer: {
-    height: 44,
-  },
-  petName: {
-    textAlign: 'center',
-    color: colors.text,
-    fontWeight: '700',
-    marginBottom: spacing.lg,
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.outline,
-    marginBottom: spacing.lg,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
   },
   addPetButton: {
     marginTop: spacing.md,
@@ -323,48 +193,5 @@ const styles = StyleSheet.create({
     borderColor: colors.outline,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: colors.overlay,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-  },
-  modalCard: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: spacing.xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 10,
-  },
-  modalTitle: {
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  modalBody: {
-    color: colors.stroke,
-    marginBottom: spacing.xl,
-    lineHeight: 22,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: spacing.md,
-  },
-  laterButton: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  startRecognitionButton: {
-    backgroundColor: colors.accent,
-    borderRadius: 10,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
   },
 });

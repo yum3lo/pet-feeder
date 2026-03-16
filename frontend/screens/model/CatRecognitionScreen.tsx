@@ -26,11 +26,12 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
   const total = petNames.length;
 
   const DURATION_INTERVAL_MS = 1000;
+  const COUNT_DOWN_S = 5;
 
   const startCapture = () => {
     setCapturing(true);
-    setCountdown(5);
-    let count = 5;
+    setCountdown(COUNT_DOWN_S);
+    let count = COUNT_DOWN_S;
     intervalRef.current = setInterval(() => {
       count -= 1;
       setCountdown(count);
@@ -60,7 +61,7 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
         </Text>
 
         <Text style={[typography.bodySmall, styles.note]}>
-          The built-in camera will take pictures of your cat for 5 seconds to
+          The built-in camera will take pictures of your cat for {COUNT_DOWN_S} seconds to
           train the cat recognition model.
         </Text>
 
