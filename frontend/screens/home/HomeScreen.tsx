@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PagingCarousel, BottomNavBar, FeedButton, MealCardWithSchedule, FoodWeightInfo } from '@/components';
-import { usePets } from '@/contexts';
 import {SCREEN_WIDTH, NAVBAR_BASE} from "@/constants";
+import { usePets } from '@/contexts';
 import { useGetPets } from '@/services';
 import { colors, typography, spacing } from '@/style';
 
