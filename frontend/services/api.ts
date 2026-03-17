@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { navigationRef } from '@/navigation/navigationRef';
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3333';
 
 export const api = axios.create({
@@ -20,3 +22,17 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Automatically sign the user out when the server rejects the token
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      authToken = null;
+      if (navigationRef.isReady()) {
+        navigationRef.reset({ index: 0, routes: [{ name: 'Login' }] });
+      }
+    }
+    return Promise.reject(error);
+  },
+);

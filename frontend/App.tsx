@@ -7,6 +7,7 @@ import Toast from './components/toast/Toast';
 import { PetsProvider } from './contexts/PetsContext';
 import { ToastProvider } from './contexts/ToastContext';
 import AppNavigator from './navigation/AppNavigator';
+import { navigationRef } from './navigation/navigationRef';
 
 const queryClient = new QueryClient();
 
@@ -16,7 +17,7 @@ export default function App() {
     <SafeAreaProvider>
       <ToastProvider>
         <PetsProvider>
-          <NavigationContainer>
+          <NavigationContainer ref={navigationRef}>
             <AppNavigator />
             <Toast />
             <StatusBar style="light" />

@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Logo, GlowEffect } from '@/components';
 import { useGlowAnimation } from '@/hooks';
+import { restoreAuthToken } from '@/services';
 import { colors, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -16,10 +17,18 @@ export default function LoadingScreen() {
   const { glowScale, glowOpacity } = useGlowAnimation();
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      navigation.replace('Register');
-    }, SPLASH_DURATION);
-    return () => clearTimeout(timeout);
+    let cancelled = false;
+    const run = async () => {
+      const [token] = await Promise.all([
+        restoreAuthToken(),
+        new Promise((resolve) => setTimeout(resolve, SPLASH_DURATION)),
+      ]);
+      if (!cancelled) {
+        navigation.replace(token ? 'Home' : 'Register');
+      }
+    };
+    run();
+    return () => { cancelled = true; };
   }, [navigation]);
 
   return (
