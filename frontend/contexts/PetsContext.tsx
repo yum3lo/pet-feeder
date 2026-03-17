@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 export type Meal = { id: string; time: string; amount: string };
 
@@ -39,11 +40,26 @@ type PetsContextValue = {
   toggleSchedule: (petIndex: number, enabled: boolean) => void;
 };
 
+const PETS_STORAGE_KEY = 'pets_context';
+
 const PetsContext = createContext<PetsContextValue | null>(null);
 
 export function PetsProvider({ children }: { children: ReactNode }) {
   const [pets, setPets] = useState<Pet[]>(INITIAL_PETS);
   const [activePetIndex, setActivePetIndex] = useState(0);
+
+  useEffect(() => {
+    AsyncStorage.getItem(PETS_STORAGE_KEY).then((raw) => {
+      if (raw) {
+        setPets(JSON.parse(raw) as Pet[]);
+      }
+    });
+  }, []);
+
+  // Persist pets to local storage whenever they change
+  useEffect(() => {
+    AsyncStorage.setItem(PETS_STORAGE_KEY, JSON.stringify(pets));
+  }, [pets]);
 
   const addPet = (pet: Pet) => setPets((prev) => [...prev, pet]);
 
