@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {BottomNavBar, MealModal, type MealModalData, MealList  } from '@/components';
+import {BottomNavBar, MealModal, type MealModalData, MealList, PetSelectorDropdown } from '@/components';
 import { type MealItem } from "@/components/list/types";
 import { usePets } from '@/contexts';
 import { colors, typography, spacing } from '@/style';
@@ -14,6 +14,7 @@ import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { styles } from './styles';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Schedule'>;
 
@@ -61,9 +62,8 @@ export default function ScheduleScreen({ navigation }: Props) {
       <Text style={[typography.h2, styles.title, { marginTop: insets.top + spacing.xl }]}>
         Schedule
       </Text>
-      {activePet && (
-        <Text style={[typography.body, styles.petName]}>{activePet.name}</Text>
-      )}
+
+      <PetSelectorDropdown style={styles.petDropdown} />
 
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
         <View style={styles.toggleRow}>

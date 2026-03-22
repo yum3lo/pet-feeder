@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 
 import { ActionButtons } from '@/components';
+import DeleteModal from '@/components/modal/DeleteModal';
 import { useToast } from '@/contexts';
 import { colors, typography, spacing } from '@/style';
 
@@ -38,6 +39,7 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
   const isEdit = !!meal?.id;
   const { showToast } = useToast();
 
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [hour, setHour] = useState(() => parseTime(meal?.time ?? '09:00').hour);
   const [minute, setMinute] = useState(() => parseTime(meal?.time ?? '09:00').minute);
   const [amount, setAmount] = useState(() => parseInt(meal?.amount ?? '80', 10));
@@ -58,7 +60,8 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <>
+      <Modal visible={visible && !deleteConfirmVisible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.card}>
           <View style={styles.header}>
@@ -67,10 +70,7 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
             </Text>
             {isEdit && (
               <TouchableOpacity
-                onPress={() => {
-                  onDelete?.(meal!.id!);
-                  showToast('Meal removed.', 'success');
-                }}
+                onPress={() => setDeleteConfirmVisible(true)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={styles.deleteButton}
               >
@@ -126,6 +126,19 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
         </View>
       </View>
     </Modal>
+
+      <DeleteModal
+        visible={deleteConfirmVisible}
+        title="Delete meal?"
+        body={`Remove the ${meal?.time ?? ''} meal? This cannot be undone.`}
+        onClose={() => setDeleteConfirmVisible(false)}
+        onConfirm={() => {
+          setDeleteConfirmVisible(false);
+          onDelete?.(meal!.id!);
+          showToast('Meal removed.', 'success');
+        }}
+      />
+    </>  
   );
 }
 

@@ -43,6 +43,13 @@ export const useCreateCat = () =>
 export const useUploadPetImage = () =>
   useMutation({ mutationFn: uploadPetImage });
 
+const deletePet = async (id: number): Promise<void> => {
+  await api.delete(`/cats/${id}`);
+};
+
+export const useDeleteCat = () =>
+  useMutation({ mutationFn: deletePet });
+
 // TODO: replace with real API call when the endpoint is ready ─────────────
 export type PetScheduleEntry = { petName: string; time: string };
 

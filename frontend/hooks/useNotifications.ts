@@ -2,6 +2,7 @@ import * as Notifications from 'expo-notifications';
 import { useEffect, useRef } from 'react';
 
 import { getMockAllSchedules } from '@/services';
+import { toCapitalize } from '@/utils';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -36,7 +37,7 @@ async function scheduleFeeedingReminders() {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Smart Pet Feeder',
-        body: `Feeding ${petName} in 10 minutes`,
+        body: `Feeding ${toCapitalize(petName)} in 10 minutes`,
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -60,7 +61,7 @@ export function useNotifications(foodWeightGrams: number) {
       Notifications.scheduleNotificationAsync({
         content: {
           title: 'Smart Pet Feeder',
-          body: 'Food tank low',
+          body: 'Food tank low. Please refill soon',
         },
         trigger: null,
       });

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import OfflineBanner from './components/banner/OfflineBanner';
 import Toast from './components/toast/Toast';
 import { PetsProvider } from './contexts/PetsContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -20,6 +21,7 @@ export default function App() {
           <NavigationContainer ref={navigationRef}>
             <AppNavigator />
             <Toast />
+            <OfflineBanner />
             <StatusBar style="light" />
           </NavigationContainer>
         </PetsProvider>
