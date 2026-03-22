@@ -65,15 +65,17 @@ export default function SettingsScreen({ navigation }: Props) {
             itemWidth={CARD_WIDTH}
             onIndexChange={setCurrentIndex}
             renderItem={(item, index) => (
-              <PetProfileCard
-                item={item}
-                index={index}
-                currentIndex={currentIndex}
-                petsCount={pets.length}
-                cardHeight={cardHeight}
-                setCardHeight={setCardHeight}
-                onEdit={() => setEditModalVisible(true)}
-              />
+              <View style={{ width: CARD_WIDTH }}>
+                <PetProfileCard
+                  item={item}
+                  index={index}
+                  currentIndex={currentIndex}
+                  petsCount={pets.length}
+                  cardHeight={cardHeight}
+                  setCardHeight={setCardHeight}
+                  onEdit={() => setEditModalVisible(true)}
+                />
+              </View>
             )}
           />
         </View>
