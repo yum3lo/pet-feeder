@@ -18,6 +18,7 @@ export { default as MealModal } from './modal/MealModal';
 export { default as RecognitionPromptModal } from './modal/RecognitionPromptModal';
 export { default as BottomNavBar } from './nav/BottomNavBar';
 export { default as Toast } from './toast/Toast';
+export { default as OfflineBanner } from './banner/OfflineBanner';
 export { default as GlowEffect } from './glow/GlowEffect';
 
 export type { MealModalData } from './modal/MealModal';
