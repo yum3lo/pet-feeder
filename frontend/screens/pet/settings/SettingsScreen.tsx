@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, ActivityIndicator } from 'react-native';
+import { Text, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AddPetModal, BottomNavBar, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
@@ -10,10 +10,9 @@ import { colors, typography, spacing } from '@/style';
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import { styles, CARD_WIDTH } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
-
-const CARD_WIDTH = Dimensions.get('window').width - 48;
 
 export default function SettingsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -138,60 +137,3 @@ export default function SettingsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  title: {
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: spacing.xxl,
-  },
-  scrollArea: {
-    flex: 1,
-    paddingHorizontal: spacing.xl,
-    alignItems: 'center',
-  },
-  cardWrapper: {
-    width: '100%',
-    alignItems: 'center',
-    paddingVertical: 14,
-  },
-  cardShadowLayer: {
-    position: 'absolute',
-    top: 60,
-    width: CARD_WIDTH,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    elevation: 0,
-  },
-  avatarContainer: {
-    zIndex: 1,
-    marginBottom: -60,
-  },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: colors.background,
-  },
-  addPetButton: {
-    marginTop: spacing.md,
-  },
-  logoutButton: {
-    marginTop: spacing.lg,
-    width: CARD_WIDTH,
-    height: 48,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.outline,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

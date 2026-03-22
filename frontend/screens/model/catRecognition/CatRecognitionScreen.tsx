@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   TouchableOpacity,
@@ -8,10 +7,12 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, typography, spacing, radius } from '@/style';
+import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from "@/types";
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CatRecognition'>;
 
@@ -91,63 +92,3 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: spacing.xxl,
-  },
-  catName: {
-    color: colors.text,
-    marginBottom: spacing.xl,
-    textAlign: 'center',
-  },
-  instructions: {
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  note: {
-    color: colors.stroke,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
-    lineHeight: 20,
-  },
-  warning: {
-    color: colors.accent,
-    textAlign: 'center',
-    marginBottom: spacing.xxl,
-  },
-  capturingContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.xxl,
-    gap: spacing.md,
-  },
-  countdown: {
-    color: colors.accent,
-    fontWeight: '700',
-  },
-  button: {
-    width: '100%',
-    height: 52,
-    backgroundColor: colors.accent,
-    borderRadius: radius.input,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xxl,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 24,
-  },
-  progress: {
-    color: colors.stroke,
-    textAlign: 'center',
-  },
-});

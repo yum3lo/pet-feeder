@@ -1,16 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PagingCarousel, BottomNavBar, FeedButton, MealCardWithSchedule, FoodWeightInfo } from '@/components';
 import {SCREEN_WIDTH, NAVBAR_BASE} from "@/constants";
 import { usePets } from '@/contexts';
 import { useGetPets } from '@/services';
-import { colors, typography, spacing } from '@/style';
+import { typography, spacing } from '@/style';
+
+
 
 import type { PagingCarouselHandle } from '@/components/list/types';
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -67,26 +71,4 @@ export default function HomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.accent,
-  },
-  title: {
-    color: colors.background,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
-    gap: spacing.xl,
-  },
-  mealCardContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-  },
-});
+

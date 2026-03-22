@@ -1,12 +1,14 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 
 import { BackButton, Dropdown } from '@/components';
 import breedOptions from '@/data/breeds.json';
 import { usePetForm } from '@/hooks';
-import { colors, typography, spacing, common } from '@/style';
+import { colors, typography, common } from '@/style';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddPet'>;
 
@@ -67,23 +69,3 @@ export default function AddPetScreen({ navigation }: Props) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  inputWithSuffix: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingRight: spacing.md,
-  },
-  innerInput: {
-    flex: 1,
-    height: '100%',
-    color: colors.text,
-    fontSize: 14,
-  },
-  suffix: {
-    fontSize: 14,
-    color: colors.stroke,
-    fontWeight: '500',
-    paddingRight: spacing.lg,
-  },
-});

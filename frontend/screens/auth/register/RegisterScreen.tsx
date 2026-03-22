@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import {Text, View, TextInput, TouchableOpacity } from 'react-native';
 
 import { useRegisterForm } from '@/hooks';
-import { colors, typography, spacing, common } from '@/style';
+import { colors, typography, common } from '@/style';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { styles} from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -63,20 +65,3 @@ export default function RegisterScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  separator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: spacing.md,
-    width: '90%',
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.stroke,
-  },
-  separatorText: {
-    color: colors.stroke,
-    marginHorizontal: spacing.sm,
-  },
-});
