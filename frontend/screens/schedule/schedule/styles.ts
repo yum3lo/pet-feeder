@@ -3,6 +3,11 @@ import { StyleSheet } from 'react-native';
 import { colors, spacing } from '@/style';
 
 export const styles = StyleSheet.create({
+  petDropdown: {
+    width: '90%',
+    alignSelf: 'center',
+    marginBottom: spacing.sm,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

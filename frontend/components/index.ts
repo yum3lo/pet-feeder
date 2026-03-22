@@ -7,6 +7,7 @@ export { default as MealCard } from './card/MealCard';
 export { default as MealCardWithSchedule } from './card/MealCardWithSchedule';
 export { default as PetProfileCard } from './card/PetProfileCard';
 export { default as Dropdown } from './dropdown/Dropdown';
+export { default as PetSelectorDropdown } from './dropdown/PetSelectorDropdown';
 export { default as FeedingHistoryList } from './list/FeedingHistoryList';
 export { default as MealList } from './list/MealList';
 export { PagingCarousel } from './list/PagingCarousel';

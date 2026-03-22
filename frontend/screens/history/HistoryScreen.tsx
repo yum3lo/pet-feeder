@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomNavBar, FeedingHistoryList } from '@/components';
+import { BottomNavBar, FeedingHistoryList, PetSelectorDropdown } from '@/components';
 import { typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -64,6 +64,8 @@ export default function HistoryScreen({ navigation }: Props) {
       <Text style={[typography.h2, styles.title, { marginTop: insets.top + spacing.xl }]}>
         Feeding History
       </Text>
+
+      <PetSelectorDropdown style={styles.petDropdown} />
 
       <FeedingHistoryList
         sections={filtered}

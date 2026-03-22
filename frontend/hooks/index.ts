@@ -5,3 +5,4 @@ export * from './useAddPetPhoto';
 export * from './usePetForm';
 export * from './useSettingsPets';
 export * from './useNotifications';
+export * from './usePetSelector';

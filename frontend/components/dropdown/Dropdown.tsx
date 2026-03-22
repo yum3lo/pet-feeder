@@ -22,19 +22,20 @@ interface DropdownProps {
   value: string;
   onSelect: (value: string) => void;
   style?: object;
+  compact?: boolean;
 }
 
-export default function Dropdown({ placeholder = 'Select', options, value, onSelect, style }: DropdownProps) {
+export default function Dropdown({ placeholder = 'Select', options, value, onSelect, style, compact }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const selectedLabel = options.find((o) => o.value === value)?.label;
 
   return (
-    <View style={[styles.wrapper, style]}>
-      <TouchableOpacity style={styles.trigger} onPress={() => setOpen(true)} activeOpacity={0.7}>
-        <Text style={[styles.triggerText, !selectedLabel && styles.placeholder]}>
+    <View style={[styles.wrapper, compact && styles.wrapperCompact, style]}>
+      <TouchableOpacity style={[styles.trigger, compact && styles.triggerCompact]} onPress={() => setOpen(true)} activeOpacity={0.7}>
+        <Text style={[styles.triggerText, compact && styles.triggerTextCompact, !selectedLabel && styles.placeholder]}>
           {selectedLabel || placeholder}
         </Text>
-        <MaterialIcons name="keyboard-arrow-down" size={22} color={colors.stroke} />
+        <MaterialIcons name="keyboard-arrow-down" size={compact ? 18 : 22} color={compact ? colors.accent : colors.stroke} />
       </TouchableOpacity>
 
       <Modal visible={open} transparent animationType="fade">
@@ -75,6 +76,11 @@ const styles = StyleSheet.create({
     width: '90%',
     marginBottom: spacing.lg,
   },
+  wrapperCompact: {
+    marginBottom: spacing.sm,
+    alignSelf: 'center',
+    marginTop: spacing.xs,
+  },
   trigger: {
     height: 48,
     borderColor: colors.outline,
@@ -86,9 +92,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.background,
   },
+  triggerCompact: {
+    height: 32,
+    borderWidth: 0,
+    borderRadius: 20,
+    paddingHorizontal: spacing.sm,
+    justifyContent: 'center',
+    gap: spacing.xs,
+    backgroundColor: 'transparent',
+  },
   triggerText: {
     fontSize: 14,
     color: colors.text,
+  },
+  triggerTextCompact: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.accent,
   },
   placeholder: {
     color: colors.stroke,
