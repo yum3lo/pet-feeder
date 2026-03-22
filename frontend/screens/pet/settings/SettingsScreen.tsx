@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Text, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -5,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddPetModal, BottomNavBar, DeleteModal, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
 import { usePets } from '@/contexts';
 import { useSettingsPets } from '@/hooks';
-import { useGetPets, useDeleteCat, setAuthToken } from '@/services';
+import { useGetPets, useDeleteCat, logoutUser } from '@/services';
 import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -17,6 +18,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
 export default function SettingsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
+  const queryClient = useQueryClient();
   const { data: pets = [], isLoading } = useGetPets();
   const { activePetIndex: currentIndex, setActivePetIndex: setCurrentIndex } = usePets();
 
@@ -132,10 +134,12 @@ export default function SettingsScreen({ navigation }: Props) {
         title="Log out?"
         body="You will be signed out of your account."
         onClose={() => setLogoutModalVisible(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
           setLogoutModalVisible(false);
-          setAuthToken(null);
-          navigation.navigate('Login');
+          await logoutUser();
+          queryClient.clear();
+          setCurrentIndex(0);
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         }}
       />
 
