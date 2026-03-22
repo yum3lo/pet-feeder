@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { Text, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AddPetModal, BottomNavBar, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
+import { AddPetModal, BottomNavBar, DeleteModal, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
 import { usePets } from '@/contexts';
 import { useSettingsPets } from '@/hooks';
-import { useGetPets, setAuthToken } from '@/services';
+import { useGetPets, useDeleteCat, setAuthToken } from '@/services';
 import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -28,6 +29,10 @@ export default function SettingsScreen({ navigation }: Props) {
     handleAddPet,
     handleEditPet,
   } = useSettingsPets({ pets, currentIndex, setCurrentIndex });
+
+  const { mutate: deleteCat } = useDeleteCat();
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const currentPet = pets[currentIndex];
 
@@ -74,6 +79,7 @@ export default function SettingsScreen({ navigation }: Props) {
                   cardHeight={cardHeight}
                   setCardHeight={setCardHeight}
                   onEdit={() => setEditModalVisible(true)}
+                  onDelete={() => setDeleteModalVisible(true)}
                 />
               </View>
             )}
@@ -88,10 +94,7 @@ export default function SettingsScreen({ navigation }: Props) {
 
         <TouchableOpacity
           style={styles.logoutButton}
-          onPress={() => {
-            setAuthToken(null);
-            navigation.navigate('Login');
-          }}
+          onPress={() => setLogoutModalVisible(true)}
         >
           <Text style={[typography.body, { color: colors.text }]}>Logout</Text>
         </TouchableOpacity>
@@ -122,6 +125,31 @@ export default function SettingsScreen({ navigation }: Props) {
         }}
         onSave={handleEditPet}
         onClose={() => setEditModalVisible(false)}
+      />
+
+      <DeleteModal
+        visible={logoutModalVisible}
+        title="Log out?"
+        body="You will be signed out of your account."
+        onClose={() => setLogoutModalVisible(false)}
+        onConfirm={() => {
+          setLogoutModalVisible(false);
+          setAuthToken(null);
+          navigation.navigate('Login');
+        }}
+      />
+
+      <DeleteModal
+        visible={deleteModalVisible}
+        petName={currentPet?.name ?? ''}
+        onClose={() => setDeleteModalVisible(false)}
+        onConfirm={() => {
+          if (currentPet?.id != null) {
+            deleteCat(currentPet.id, {
+              onSettled: () => setDeleteModalVisible(false),
+            });
+          }
+        }}
       />
 
       <RecognitionPromptModal

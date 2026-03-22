@@ -11,6 +11,7 @@ export { default as FeedingHistoryList } from './list/FeedingHistoryList';
 export { default as MealList } from './list/MealList';
 export { PagingCarousel } from './list/PagingCarousel';
 export { default as Logo } from './logo/Logo';
+export { default as DeleteModal } from './modal/DeleteModal';
 export { default as AddPetModal } from './modal/AddPetModal';
 export { default as MealModal } from './modal/MealModal';
 export { default as RecognitionPromptModal } from './modal/RecognitionPromptModal';

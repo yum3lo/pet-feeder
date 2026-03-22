@@ -18,6 +18,7 @@ type Props = {
   cardHeight: number;
   setCardHeight: (h: number) => void;
   onEdit: () => void;
+  onDelete: () => void;
 };
 
 export default function PetProfileCard({
@@ -28,6 +29,7 @@ export default function PetProfileCard({
   cardHeight,
   setCardHeight,
   onEdit,
+  onDelete,
 }: Props) {
   return (
     <View
@@ -38,6 +40,10 @@ export default function PetProfileCard({
           : undefined
       }
     >
+      <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+        <MaterialIcons name="delete-outline" size={24} color={colors.stroke} />
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.editButton} onPress={onEdit}>
         <MaterialIcons name="edit" size={20} color={colors.accent} />
       </TouchableOpacity>
@@ -84,6 +90,12 @@ const styles = StyleSheet.create({
   },
   editButton: {
     alignSelf: 'flex-end',
+  },
+  deleteButton: {
+    alignSelf: 'flex-start',
+    position: 'absolute',
+    top: spacing.md,
+    left: spacing.xl,
   },
   avatarSpacer: {
     height: 44,
