@@ -4,3 +4,4 @@ export * from './useRegisterForm';
 export * from './useAddPetPhoto';
 export * from './usePetForm';
 export * from './useSettingsPets';
+export * from './useNotifications';

@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PagingCarousel, BottomNavBar, FeedButton, MealCardWithSchedule, FoodWeightInfo } from '@/components';
 import {SCREEN_WIDTH, NAVBAR_BASE} from "@/constants";
 import { usePets } from '@/contexts';
+import { useNotifications } from '@/hooks';
 import { useGetPets } from '@/services';
 import { typography, spacing } from '@/style';
 
@@ -24,7 +25,9 @@ export default function HomeScreen({ navigation }: Props) {
   const { data: pets = [] } = useGetPets();
   const { activePetIndex, setActivePetIndex } = usePets();
   const carouselRef = useRef<PagingCarouselHandle>(null);
-  const [foodWeight] = useState(245);
+  const [foodWeight] = useState(234);
+
+  useNotifications(foodWeight);
 
   useEffect(() => {
     if (activePetIndex > 0 && pets.length > activePetIndex) {
