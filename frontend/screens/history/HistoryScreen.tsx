@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomNavBar, FeedingHistoryList } from '@/components';
-import { colors, typography, spacing } from '@/style';
+import { typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'History'>;
 
@@ -81,15 +83,3 @@ export default function HistoryScreen({ navigation }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  title: {
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
-  },
-});

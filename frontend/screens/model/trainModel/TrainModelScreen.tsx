@@ -1,7 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   TouchableOpacity,
@@ -9,10 +8,12 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, typography, spacing, radius } from '@/style';
+import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from "@/types";
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TrainModel'>;
 
@@ -70,44 +71,3 @@ export default function TrainModelScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xxl,
-    gap: spacing.xl,
-  },
-  title: {
-    color: colors.text,
-    textAlign: 'center',
-  },
-  description: {
-    color: colors.stroke,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  trainingState: {
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  button: {
-    width: '100%',
-    height: 52,
-    backgroundColor: colors.accent,
-    borderRadius: radius.input,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.md,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 24,
-  },
-});

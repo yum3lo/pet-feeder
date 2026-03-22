@@ -1,14 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import {  View } from 'react-native';
 
 import { Logo, GlowEffect } from '@/components';
 import { useGlowAnimation } from '@/hooks';
 import { restoreAuthToken } from '@/services';
-import { colors, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { styles} from './styles';
 
 const SPLASH_DURATION = 3000;
 
@@ -41,16 +42,3 @@ export default function LoadingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
-  logoWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
