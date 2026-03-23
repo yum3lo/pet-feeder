@@ -3,8 +3,8 @@ import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { spacing, typography } from '@/style';
+import { useSharedNetworkStatus } from '@/contexts';
+import { spacing, typography, colors} from '@/style';
 
 const BANNER_CONTENT_HEIGHT = 44;
 const SAFE_AREA_FALLBACK = 50;
@@ -12,7 +12,7 @@ const ANIMATION_DURATION_MS = 280;
 const HIDDEN_OFFSET = -200;
 
 export default function OfflineBanner() {
-  const { isOnline } = useNetworkStatus();
+  const { isOnline } = useSharedNetworkStatus();
   const insets = useSafeAreaInsets();
   const bannerHeight = (insets.top || SAFE_AREA_FALLBACK) + BANNER_CONTENT_HEIGHT;
   const bannerHeightRef = useRef(bannerHeight);
@@ -32,7 +32,7 @@ export default function OfflineBanner() {
       pointerEvents="none"
       style={[styles.banner, { top: 0, height: bannerHeight, paddingTop: insets.top, transform: [{ translateY }] }]}
     >
-      <MaterialIcons name="wifi-off" size={20} color="#7C4A00" />
+      <MaterialIcons name="wifi-off" size={20} color={colors.warningText} />
       <Text style={styles.text}>
         You're offline — feeding commands may not reach the feeder
       </Text>
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10000,
-    backgroundColor: '#FFC107',
+    backgroundColor: colors.warning,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   text: {
     ...(typography.caption as object),
-    color: '#7C4A00',
+    color: colors.warningText,
     fontWeight: '700',
     flexShrink: 1,
   },
