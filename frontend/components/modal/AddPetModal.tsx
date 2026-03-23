@@ -53,7 +53,6 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
       return;
     }
     onSave(draft);
-    showToast(initialData ? `${draft.name} updated!` : `${draft.name} added!`, 'success');
   };
 
   return (

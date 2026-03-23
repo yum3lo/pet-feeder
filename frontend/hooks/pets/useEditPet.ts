@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { type PetData } from '@/components';
 import { useOfflineQueue, useSharedNetworkStatus, useToast } from '@/contexts';
 import { useUpdateCat, useUploadPetImage } from '@/services';
-import { toUpdatePayload } from '@/utils/petPayload';
+import { toUpdatePayload, toCapitalize } from '@/utils';
 
 import type { Pet } from '@/types';
 
@@ -31,7 +31,7 @@ export function useEditPet(currentPet: Pet | undefined) {
       { id: currentPet.id, ...petPayload },
       {
         onSuccess: () => {
-          showToast(`${data.name} updated!`, 'success', 'bottom');
+          showToast(`${toCapitalize(data.name)} updated!`, 'success', 'bottom');
           if (photo) {
             uploadImage(
               { id: currentPet.id, uri: photo },

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 
-import { useGlowAnimation } from '@/hooks/useGlowAnimation';
+import { useGlowAnimation } from '@/hooks/animations/useGlowAnimation';
 
 beforeEach(() => jest.useFakeTimers());
 afterEach(() => { jest.clearAllTimers(); jest.useRealTimers(); });
