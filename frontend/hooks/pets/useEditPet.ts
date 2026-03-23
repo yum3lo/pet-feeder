@@ -23,7 +23,7 @@ export function useEditPet(currentPet: Pet | undefined) {
 
     if (!isOnline) {
       enqueue({ type: 'updatePet', payload: { id: currentPet.id, ...updateFields } });
-      showToast('No connection — changes will sync when back online', 'error', 'bottom');
+      showToast('No connection — changes will sync when back online', 'error');
       return;
     }
 
@@ -31,7 +31,7 @@ export function useEditPet(currentPet: Pet | undefined) {
       { id: currentPet.id, ...petPayload },
       {
         onSuccess: () => {
-          showToast(`${toCapitalize(data.name)} updated!`, 'success', 'bottom');
+          showToast(`${toCapitalize(data.name)} updated!`, 'success');
           if (photo) {
             uploadImage(
               { id: currentPet.id, uri: photo },
@@ -44,7 +44,7 @@ export function useEditPet(currentPet: Pet | undefined) {
         onError: (err: any) => {
           if (!err?.response) {
             enqueue({ type: 'updatePet', payload: { id: currentPet.id, ...updateFields } });
-            showToast('No connection — changes will sync when back online', 'error', 'bottom');
+            showToast('No connection — changes will sync when back online', 'error');
           } else {
             showToast(err?.response?.data?.message ?? 'Failed to update pet', 'error');
           }

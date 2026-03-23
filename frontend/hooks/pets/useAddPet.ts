@@ -27,14 +27,14 @@ export function useAddPet({ petsCount, carouselRef, setCurrentIndex, setRecognit
 
     if (!isOnline) {
       enqueue({ type: 'createPet', payload });
-      showToast('No connection — pet will sync when back online', 'error', 'bottom');
+      showToast('No connection — pet will sync when back online', 'error');
       return;
     }
 
     const { photo, ...petPayload } = payload;
     createCat(petPayload, {
       onSuccess: (cat) => {
-        showToast(`${data.name} added!`, 'success', 'bottom');
+        showToast(`${data.name} added!`, 'success');
         const finish = () => {
           queryClient.invalidateQueries({ queryKey: ['cats'] });
           setTimeout(() => {
@@ -52,7 +52,7 @@ export function useAddPet({ petsCount, carouselRef, setCurrentIndex, setRecognit
       onError: (err: any) => {
         if (!err?.response) {
           enqueue({ type: 'createPet', payload });
-          showToast('No connection — pet will sync when back online', 'error', 'bottom');
+          showToast('No connection — pet will sync when back online', 'error');
         } else {
           showToast(err?.response?.data?.message ?? 'Failed to add pet', 'error');
         }

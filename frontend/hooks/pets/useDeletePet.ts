@@ -20,13 +20,14 @@ export function useDeletePet() {
 
     if (!isOnline) {
       enqueue({ type: 'deletePet', payload: { id: pet.id } });
-      showToast('No connection — deletion will sync when back online', 'error', 'bottom');
+      showToast('No connection — deletion will sync when back online', 'error');
       return;
     }
 
     deleteCat(pet.id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['cats'] });
+        showToast('Pet deleted', 'success');
       },
       onError: (err: any) => {
         queryClient.setQueryData<Pet[]>(['cats'], previous);

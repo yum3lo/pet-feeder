@@ -16,7 +16,7 @@ export function usePetForm(navigation: NavigationProp<RootStackParamList>) {
   const handleSubmit = () => {
     if (!isOnline) {
       enqueue({ type: 'createPet', payload: { name: pet.petName, weight: parseFloat(pet.petWeight), breed: pet.petBreed } });
-      showToast('No connection — pet will sync when back online', 'error', 'bottom');
+      showToast('No connection — pet will sync when back online', 'error');
       return;
     }
 
@@ -27,7 +27,7 @@ export function usePetForm(navigation: NavigationProp<RootStackParamList>) {
         onError: (err: any) => {
           if (!err?.response) {
             enqueue({ type: 'createPet', payload: { name: pet.petName, weight: parseFloat(pet.petWeight), breed: pet.petBreed } });
-            showToast('No connection — pet will sync when back online', 'error', 'bottom');
+            showToast('No connection — pet will sync when back online', 'error');
           } else {
             showToast(err?.response?.data?.message ?? 'Failed to add pet', 'error');
           }
