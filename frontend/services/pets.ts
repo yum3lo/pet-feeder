@@ -9,12 +9,12 @@ const getPets = async (): Promise<Pet[]> => {
   return data;
 };
 
-const createPet = async (payload: CreatePetPayload): Promise<Pet> => {
+export const createPet = async (payload: CreatePetPayload): Promise<Pet> => {
   const { data } = await api.post<Pet>('/cats', payload);
   return data;
 };
 
-const uploadPetImage = async ({ id, uri }: { id: number; uri: string }): Promise<void> => {
+export const uploadPetImage = async ({ id, uri }: { id: number; uri: string }): Promise<void> => {
   const form = new FormData();
   form.append('image', { uri, name: 'photo.jpg', type: 'image/jpeg' } as any);
   await api.post(`/cats/${id}/image`, form, {
@@ -39,6 +39,14 @@ export const useGetCatSchedules = (catId: number | undefined) =>
 
 export const useCreateCat = () =>
   useMutation({ mutationFn: createPet });
+
+export const updatePet = async ({ id, ...payload }: { id: number } & Partial<CreatePetPayload>): Promise<Pet> => {
+  const { data } = await api.put<Pet>(`/cats/${id}`, payload);
+  return data;
+};
+
+export const useUpdateCat = () =>
+  useMutation({ mutationFn: updatePet });
 
 export const useUploadPetImage = () =>
   useMutation({ mutationFn: uploadPetImage });
