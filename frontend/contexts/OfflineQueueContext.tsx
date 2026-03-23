@@ -4,14 +4,15 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 
 import { BackOnlineModal } from '@/components';
 import { useSharedNetworkStatus, useToast  } from '@/contexts';
-import { createPet, updatePet, uploadPetImage } from '@/services';
+import { createPet, deletePet, updatePet, uploadPetImage } from '@/services';
 
 import type { CreatePetPayload } from '@/types';
 
 
 export type OfflineOp =
   | { type: 'createPet'; payload: CreatePetPayload & { photo?: string } }
-  | { type: 'updatePet'; payload: { id: number } & Partial<CreatePetPayload> & { photo?: string } };
+  | { type: 'updatePet'; payload: { id: number } & Partial<CreatePetPayload> & { photo?: string } }
+  | { type: 'deletePet'; payload: { id: number } };
 
 type OfflineQueueContextValue = {
   enqueue: (op: OfflineOp) => Promise<void>;
@@ -71,6 +72,9 @@ export function OfflineQueueProvider({ children }: { children: ReactNode }) {
             const { photo, ...petPayload } = op.payload;
             await updatePet(petPayload);
             if (photo) await uploadPetImage({ id: petPayload.id, uri: photo });
+            successCount += 1;
+          } else if (op.type === 'deletePet') {
+            await deletePet(op.payload.id);
             successCount += 1;
           }
         } catch (e: any) {

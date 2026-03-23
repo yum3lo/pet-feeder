@@ -51,7 +51,7 @@ export const useUpdateCat = () =>
 export const useUploadPetImage = () =>
   useMutation({ mutationFn: uploadPetImage });
 
-const deletePet = async (id: number): Promise<void> => {
+export const deletePet = async (id: number): Promise<void> => {
   await api.delete(`/cats/${id}`);
 };
 

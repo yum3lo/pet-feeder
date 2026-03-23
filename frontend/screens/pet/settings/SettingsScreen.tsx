@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddPetModal, BottomNavBar, DeleteModal, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
 import { usePets } from '@/contexts';
 import { useSettingsPets } from '@/hooks';
-import { useGetPets, useDeleteCat, logoutUser } from '@/services';
+import { useGetPets, logoutUser } from '@/services';
 import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -26,14 +26,14 @@ export default function SettingsScreen({ navigation }: Props) {
     carouselRef,
     addModalVisible, setAddModalVisible,
     editModalVisible, setEditModalVisible,
+    deleteModalVisible, setDeleteModalVisible,
     recognitionModalVisible, setRecognitionModalVisible,
     cardHeight, setCardHeight,
     handleAddPet,
     handleEditPet,
+    handleDeletePet,
   } = useSettingsPets({ pets, currentIndex, setCurrentIndex });
 
-  const { mutate: deleteCat } = useDeleteCat();
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const currentPet = pets[currentIndex];
@@ -148,11 +148,7 @@ export default function SettingsScreen({ navigation }: Props) {
         petName={currentPet?.name ?? ''}
         onClose={() => setDeleteModalVisible(false)}
         onConfirm={() => {
-          if (currentPet?.id != null) {
-            deleteCat(currentPet.id, {
-              onSettled: () => setDeleteModalVisible(false),
-            });
-          }
+          if (currentPet != null) handleDeletePet(currentPet);
         }}
       />
 
