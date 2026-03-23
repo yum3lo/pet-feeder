@@ -6,6 +6,7 @@ export const colors = {
   background: '#F8F9FA',
 
   text: '#3C3A3A',
+  warningText: '#7C4A00',
   stroke: '#7C7B73',
   outline: '#D4D3D0',
 

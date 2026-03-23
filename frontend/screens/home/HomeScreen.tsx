@@ -9,8 +9,6 @@ import { useNotifications } from '@/hooks';
 import { useGetPets } from '@/services';
 import { typography, spacing } from '@/style';
 
-
-
 import type { PagingCarouselHandle } from '@/components/list/types';
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';

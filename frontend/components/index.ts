@@ -16,6 +16,7 @@ export { default as DeleteModal } from './modal/DeleteModal';
 export { default as AddPetModal } from './modal/AddPetModal';
 export { default as MealModal } from './modal/MealModal';
 export { default as RecognitionPromptModal } from './modal/RecognitionPromptModal';
+export { default as BackOnlineModal } from './modal/BackOnlineModal';
 export { default as BottomNavBar } from './nav/BottomNavBar';
 export { default as Toast } from './toast/Toast';
 export { default as OfflineBanner } from './banner/OfflineBanner';

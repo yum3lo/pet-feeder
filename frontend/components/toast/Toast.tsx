@@ -10,10 +10,13 @@ export default function Toast() {
   const { toast } = useToast();
   const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(-16)).current;
+  const isBottom = toast.position === 'bottom';
+  const translateY = useRef(new Animated.Value(isBottom ? 16 : -16)).current;
 
   useEffect(() => {
+    const hiddenOffset = isBottom ? 16 : -16;
     if (toast.visible) {
+      translateY.setValue(hiddenOffset);
       Animated.parallel([
         Animated.timing(opacity, { toValue: 1, duration: 220, useNativeDriver: true }),
         Animated.timing(translateY, { toValue: 0, duration: 220, useNativeDriver: true }),
@@ -21,10 +24,10 @@ export default function Toast() {
     } else {
       Animated.parallel([
         Animated.timing(opacity, { toValue: 0, duration: 180, useNativeDriver: true }),
-        Animated.timing(translateY, { toValue: -16, duration: 180, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: hiddenOffset, duration: 180, useNativeDriver: true }),
       ]).start();
     }
-  }, [toast.visible]);
+  }, [toast.visible, isBottom]);
 
   const isSuccess = toast.type === 'success';
   const iconName = isSuccess ? 'check-circle' : 'error';
@@ -33,12 +36,17 @@ export default function Toast() {
 
   if (!toast.message) return null;
 
+  const positionStyle = isBottom
+    ? { bottom: insets.bottom + spacing.xl }
+    : { top: insets.top + spacing.md };
+
   return (
     <Animated.View
       pointerEvents="none"
       style={[
         styles.container,
-        { top: insets.top + spacing.md, opacity, transform: [{ translateY }] },
+        positionStyle,
+        { opacity, transform: [{ translateY }] },
       ]}
     >
       <View style={[styles.toast, { borderLeftColor: borderColor }]}>
@@ -56,7 +64,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: spacing.xl,
     right: spacing.xl,
-    zIndex: 9999,
+    zIndex: 10001,
   },
   toast: {
     flexDirection: 'row',
