@@ -1,11 +1,12 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, SectionList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SectionList } from 'react-native';
 
+import { DateFilterPicker } from '@/components';
 import { colors, typography, spacing } from '@/style';
 
 import type { FeedingProps } from './types';
 
-export default function FeedingHistoryList({ sections, query, onQueryChange, onRefresh }: FeedingProps) {
+export default function FeedingHistoryList({ sections, selectedDate, onSelectDate, markedDates, onRefresh }: FeedingProps) {
   return (
     <SectionList
       style={styles.list}
@@ -14,16 +15,18 @@ export default function FeedingHistoryList({ sections, query, onQueryChange, onR
       keyExtractor={(item) => item.id}
       stickySectionHeadersEnabled={false}
       ListHeaderComponent={
-        <View style={styles.searchWrapper}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search"
-            placeholderTextColor={colors.stroke}
-            value={query}
-            onChangeText={onQueryChange}
-          />
-          <MaterialIcons name="search" size={22} color={colors.stroke} style={styles.searchIcon} />
-        </View>
+        <DateFilterPicker
+          selectedDate={selectedDate}
+          onSelectDate={onSelectDate}
+          markedDates={markedDates}
+        />
+      }
+      ListEmptyComponent={
+        selectedDate ? (
+          <Text style={[typography.bodySmall, styles.empty]}>
+            No feeding records for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-GB', { month: 'long', day: 'numeric' })}.
+          </Text>
+        ) : null
       }
       renderSectionHeader={({ section }) => (
         <View style={styles.sectionHeader}>
@@ -58,24 +61,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.lg,
   },
-  searchWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.outline,
-    borderRadius: 28,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.xl,
-    height: 52,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.text,
-  },
-  searchIcon: {
-    marginLeft: spacing.sm,
-  },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -91,5 +76,10 @@ const styles = StyleSheet.create({
   },
   sectionFooter: {
     height: spacing.lg,
+  },
+  empty: {
+    color: colors.stroke,
+    textAlign: 'center',
+    marginTop: spacing.lg,
   },
 });

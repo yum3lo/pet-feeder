@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomNavBar, FeedingHistoryList, PetSelectorDropdown } from '@/components';
-import { typography, spacing } from '@/style';
+import { usePets } from '@/contexts';
+import { useGetFeedingHistory } from '@/services';
+import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -12,52 +14,42 @@ import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'History'>;
 
-type FeedingEntry = { id: string; time: string; amount: string };
-type FeedingSection = { title: string; data: FeedingEntry[] };
-
-const MOCK_DATA: FeedingSection[] = [
-  {
-    title: '10th of March 2025',
-    data: [
-      { id: '1', time: '10:00', amount: '150 g' },
-      { id: '2', time: '17:00', amount: '150 g' },
-    ],
-  },
-  {
-    title: '9th of March 2025',
-    data: [
-      { id: '3', time: '10:00', amount: '150 g' },
-      { id: '4', time: '17:00', amount: '150 g' },
-    ],
-  },
-  {
-    title: '8th of March 2025',
-    data: [
-      { id: '5', time: '10:00', amount: '150 g' },
-      { id: '6', time: '17:00', amount: '150 g' },
-    ],
-  },
-  {
-    title: '7th of March 2025',
-    data: [
-      { id: '7', time: '10:00', amount: '150 g' },
-      { id: '8', time: '17:00', amount: '150 g' },
-    ],
-  },
-];
+function formatSectionTitle(isoDate: string): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
 
 export default function HistoryScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const [query, setQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const { pets, activePetIndex } = usePets();
+  const activePet = pets[activePetIndex];
 
-  const filtered = query.trim()
-    ? MOCK_DATA.map((section) => ({
-        ...section,
-        data: section.data.filter(
-          (e) => e.time.includes(query) || e.amount.includes(query) || section.title.toLowerCase().includes(query.toLowerCase())
-        ),
-      })).filter((s) => s.data.length > 0)
-    : MOCK_DATA;
+  const { data: entries = [], isLoading, refetch } = useGetFeedingHistory(
+    activePet ? Number(activePet.id) : undefined,
+  );
+
+  // TODO: remove mock
+  const MOCK_ENTRIES = [{ id: '1', date: '2026-03-27', feedings: [{ time: '10:00', amount: 80 }, { time: '17:00', amount: 80 }] }];
+
+  const sections = (entries.length ? entries : MOCK_ENTRIES).map((e) => ({
+    title: formatSectionTitle(e.date),
+    date: e.date,
+    data: e.feedings.map((f, idx) => ({
+      id: `${e.id}-${idx}`,
+      time: f.time,
+      amount: `${f.amount} g`,
+    })),
+  }));
+
+  const markedDates: Record<string, object> = {};
+  sections.forEach((s) => {
+    markedDates[s.date] = { marked: true, dotColor: colors.accent };
+  });
+
+  const filtered = selectedDate
+    ? sections.filter((s) => s.date === selectedDate)
+    : sections;
 
   return (
     <View style={styles.container}>
@@ -67,12 +59,29 @@ export default function HistoryScreen({ navigation }: Props) {
 
       <PetSelectorDropdown style={styles.petDropdown} />
 
-      <FeedingHistoryList
-        sections={filtered}
-        query={query}
-        onQueryChange={setQuery}
-        onRefresh={() => {}}
-      />
+      {isLoading ? (
+        <View style={styles.loadingState}>
+          <ActivityIndicator color={colors.accent} size="large" />
+          <Text style={[typography.bodyBold, { color: colors.accent, marginTop: spacing.md }]}>
+            Loading history logs...
+          </Text>
+        </View>
+      ) : sections.length === 0 ? (
+        <View style={styles.loadingState}>
+          <Text style={[typography.bodyBold, { color: colors.stroke }]}>No feeding history yet.</Text>
+          <Text style={[typography.bodySmall, { color: colors.stroke, marginTop: spacing.xs, textAlign: 'center' }]}>
+            Feeding events will appear here once your cat has been fed.
+          </Text>
+        </View>
+      ) : (
+        <FeedingHistoryList
+          sections={filtered}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+          markedDates={markedDates}
+          onRefresh={refetch}
+        />
+      )}
 
       <BottomNavBar
         activeTab="history"

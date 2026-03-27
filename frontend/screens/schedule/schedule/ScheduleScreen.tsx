@@ -1,13 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-  Text, View, TouchableOpacity, Switch, ScrollView,
+  Text, View, TouchableOpacity, Switch, ScrollView, Image, ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {BottomNavBar, MealModal, type MealModalData, MealList, PetSelectorDropdown } from '@/components';
 import { type MealItem } from "@/components/list/types";
 import { usePets } from '@/contexts';
+import { useGetCatSchedules } from '@/services';
 import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -18,14 +19,20 @@ import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Schedule'>;
 
-type Meal = MealItem;
-
 export default function ScheduleScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { pets, activePetIndex, updateSchedule, toggleSchedule } = usePets();
+  const { pets, activePetIndex, toggleSchedule } = usePets();
   const activePet = pets[activePetIndex];
   const scheduleEnabled = activePet?.scheduleEnabled ?? true;
-  const meals: Meal[] = activePet?.meals ?? [];
+
+  const { data: schedules = [], isLoading } = useGetCatSchedules(
+    activePet ? Number(activePet.id) : undefined,
+  );
+  const meals: MealItem[] = schedules.map((s) => ({
+    id: String(s.id),
+    time: s.time,
+    amount: `${s.amount} g`,
+  }));
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingMeal, setEditingMeal] = useState<MealModalData | null>(null);
@@ -35,25 +42,16 @@ export default function ScheduleScreen({ navigation }: Props) {
     setModalVisible(true);
   };
 
-  const openEdit = (meal: Meal) => {
+  const openEdit = (meal: MealItem) => {
     setEditingMeal({ id: meal.id, time: meal.time, amount: meal.amount.replace(/[^0-9]/g, '') });
     setModalVisible(true);
   };
 
-  const handleSave = (data: MealModalData) => {
-    const formatted = `${data.amount} g`;
-    let updated: Meal[];
-    if (data.id) {
-      updated = meals.map((m) => m.id === data.id ? { ...m, time: data.time, amount: formatted } : m);
-    } else {
-      updated = [...meals, { id: Date.now().toString(), time: data.time, amount: formatted }];
-    }
-    updateSchedule(activePetIndex, updated);
+  const handleSave = (_data: MealModalData) => {
     setModalVisible(false);
   };
 
-  const handleDelete = (id: string) => {
-    updateSchedule(activePetIndex, meals.filter((m) => m.id !== id));
+  const handleDelete = (_id: string) => {
     setModalVisible(false);
   };
 
@@ -82,11 +80,27 @@ export default function ScheduleScreen({ navigation }: Props) {
         <View style={styles.mealsSection}>
           <Text style={[typography.bodyBold, styles.sectionLabel]}>Meals scheduled</Text>
 
-          <MealList
-            meals={meals}
-            onPressItem={openEdit}
-            onAdd={openAdd}
-          />
+          {isLoading ? (
+            <ActivityIndicator color={colors.accent} style={{ marginTop: spacing.xl }} />
+          ) : (
+            <MealList
+              meals={meals}
+              onPressItem={openEdit}
+              onAdd={openAdd}
+              emptyComponent={
+                <View style={styles.emptyState}>
+                  <Image
+                    source={require('../../../assets/no-schedule.png')}
+                    style={styles.emptyImage}
+                    resizeMode="contain"
+                  />
+                  <Text style={[typography.bodySmall, styles.emptyText]}>
+                    No scheduled meals yet.
+                  </Text>
+                </View>
+              }
+            />
+          )}
         </View>
       </ScrollView>
 

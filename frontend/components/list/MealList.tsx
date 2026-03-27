@@ -5,7 +5,7 @@ import { colors, typography, spacing } from '@/style';
 
 import type {  MealProps  } from './types';
 
-export default function MealList({ meals, onPressItem, onAdd }: MealProps) {
+export default function MealList({ meals, onPressItem, onAdd, emptyComponent }: MealProps) {
   return (
     <View>
       <FlatList
@@ -14,7 +14,7 @@ export default function MealList({ meals, onPressItem, onAdd }: MealProps) {
         scrollEnabled={false}
         ItemSeparatorComponent={() => <View style={styles.divider} />}
         ListEmptyComponent={
-          <Text style={[typography.bodySmall, styles.empty]}>No meals added yet.</Text>
+          emptyComponent ?? <Text style={[typography.bodySmall, styles.empty]}>No meals added yet.</Text>
         }
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.row} onPress={() => onPressItem(item)}>
