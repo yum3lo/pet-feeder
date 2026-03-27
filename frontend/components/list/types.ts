@@ -6,8 +6,9 @@ export type FeedingSection = { title: string; data: FeedingEntry[] };
 
 export type FeedingProps = {
   sections: FeedingSection[];
-  query: string;
-  onQueryChange: (q: string) => void;
+  selectedDate: string | null;
+  onSelectDate: (date: string | null) => void;
+  markedDates: Record<string, object>;
   onRefresh?: () => void;
 };
 
@@ -17,6 +18,7 @@ export type MealProps = {
   meals: MealItem[];
   onPressItem: (meal: MealItem) => void;
   onAdd: () => void;
+  emptyComponent?: ReactElement;
 };
 
 

@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 
-import { type CreatePetPayload, type Pet, type Schedule} from '@/types';
+import { type CreatePetPayload, type Pet, type Schedule, type FeedingHistoryEntry } from '@/types';
 
 import { api } from './api';
 
@@ -35,6 +35,7 @@ export const useGetCatSchedules = (catId: number | undefined) =>
     queryKey: ['schedules', catId],
     queryFn: () => getCatSchedules(catId!),
     enabled: catId != null,
+    staleTime: 30_000,
   });
 
 export const useCreateCat = () =>
@@ -57,6 +58,23 @@ export const deletePet = async (id: number): Promise<void> => {
 
 export const useDeleteCat = () =>
   useMutation({ mutationFn: deletePet });
+
+export const toggleCatSchedule = async (catId: number, isActive: boolean): Promise<void> => {
+  await api.patch(`/pet-feeder/cats/${catId}/toggle`, { isActive });
+};
+
+const getFeedingHistory = async (catId: number): Promise<FeedingHistoryEntry[]> => {
+  const { data } = await api.get<FeedingHistoryEntry[]>(`/pet-feeder/cats/${catId}/feeding-history`);
+  return data;
+};
+
+export const useGetFeedingHistory = (catId: number | undefined) =>
+  useQuery({
+    queryKey: ['feeding-history', catId],
+    queryFn: () => getFeedingHistory(catId!),
+    enabled: catId != null,
+    staleTime: 30_000,
+  });
 
 // TODO: replace with real API call when the endpoint is ready ─────────────
 export type PetScheduleEntry = { petName: string; time: string };

@@ -80,4 +80,20 @@ export const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
+  emptyState: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    gap: spacing.md,
+    justifyContent: 'center',
+  },
+  emptyImage: {
+    width: 76,
+    height: 76,
+  },
+  emptyText: {
+    color: colors.stroke,
+    textAlign: 'center',
+  },
 });
