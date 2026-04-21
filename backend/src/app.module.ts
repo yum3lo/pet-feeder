@@ -4,6 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { PetsModule } from './pets/pets.module';
+import { DevicesModule } from './devices/devices.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { PetsModule } from './pets/pets.module';
     ScheduleModule.forRoot(),
     PrismaModule,
     AuthModule,
-     PetsModule,
+    PetsModule,
+    DevicesModule
   ],
 })
 export class AppModule {}
