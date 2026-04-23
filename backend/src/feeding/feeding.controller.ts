@@ -22,13 +22,16 @@ import { FeedingService } from './feeding.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { ManualFeedDto } from './dto/manual-feed.dto';
 import { ToggleScheduleDto } from './dto/toggle-schedule.dto';
+import { MqttService } from '../mqtt/mqtt.service';
 
 @ApiTags('Feeding')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('feeding')
 export class FeedingController {
-  constructor(private feedingService: FeedingService) {}
+  constructor(
+    private feedingService: FeedingService,
+    private mqttService: MqttService) {}
 
   // ── Schedules ─────────────────────────────────────────────
 
@@ -87,5 +90,20 @@ export class FeedingController {
       petId ? Number(petId) : undefined,
       days ? Number(days) : 30,
     );
+  }
+
+  // ── Capture Photos ───────────────────────────────
+  @Post('capture-photos')
+  @ApiOperation({ summary: 'Trigger training photo capture on the device' })
+  capturePhotos(
+    @Req() req,
+    @Body() body: { deviceId: string; petId: number; durationSeconds?: number },
+  ) {
+    this.mqttService.sendCapturePhotosCommand(
+      body.deviceId,
+      body.petId,
+      body.durationSeconds ?? 8,
+    );
+    return { message: 'Photo capture command sent.' };
   }
 }
