@@ -15,6 +15,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   // tracking pending feeding timeouts per device
   // if no feeding result arrives within 60s, marking as failed
   private feedingTimeouts = new Map<string, NodeJS.Timeout>();
+  private lowFoodAlertCooldowns = new Map<string, number>();
 
   constructor(
     private config: ConfigService,
@@ -216,13 +217,24 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     if (!userId) return;
 
     const LOW_FOOD_THRESHOLD = 100;
+    const ALERT_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
+
     if (weightGrams < LOW_FOOD_THRESHOLD) {
-      this.logger.warn(`Low food alert for device ${deviceId}: ${weightGrams}g`);
-      await this.notificationsService.create(
-        userId,
-        `Food is running low (${weightGrams}g remaining). Please refill the container.`,
-        'low_food',
-      );
+      const lastAlert = this.lowFoodAlertCooldowns.get(deviceId) ?? 0;
+      const now = Date.now();
+
+      if (now - lastAlert > ALERT_COOLDOWN_MS) {
+        this.logger.warn(`Low food alert for device ${deviceId}: ${weightGrams}g`);
+        await this.notificationsService.create(
+          userId,
+          `Food is running low (${weightGrams}g remaining). Please refill the container.`,
+          'low_food',
+        );
+        this.lowFoodAlertCooldowns.set(deviceId, now);
+      }
+    } else {
+      // resetting cooldown when food is refilled
+      this.lowFoodAlertCooldowns.delete(deviceId);
     }
   }
 
