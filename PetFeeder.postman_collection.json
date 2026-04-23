@@ -1,0 +1,487 @@
+{
+  "info": {
+    "name": "Smart Pet Feeder API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Maria\",\n  \"lastName\": \"Doe\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1,\n  \"email\": \"maria@example.com\",\n  \"firstName\": \"Maria\",\n  \"lastName\": \"Doe\",\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.accessToken) pm.collectionVariables.set('token', res.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n  \"user\": {\n    \"id\": 1,\n    \"email\": \"maria@example.com\",\n    \"firstName\": \"Maria\",\n    \"lastName\": \"Doe\",\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n    \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"email\": \"maria@example.com\",\n  \"firstName\": \"Maria\",\n  \"lastName\": \"Doe\",\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\",\n  \"pets\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pets",
+      "item": [
+        {
+          "name": "Create Pet",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/pets",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"dietaryRestrictions\": \"grain-free\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"dietaryRestrictions\": \"grain-free\",\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Pets",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pets",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"userId\": 1,\n    \"name\": \"Whiskers\",\n    \"species\": \"cat\",\n    \"breed\": \"Siamese\",\n    \"weight\": 4.5,\n    \"dietaryRestrictions\": \"grain-free\",\n    \"imageUrl\": \"https://res.cloudinary.com/...\",\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n    \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Pet by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pets/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"dietaryRestrictions\": \"grain-free\",\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Pet",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/pets/1",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Whiskers Jr.\",\n  \"weight\": 5.0\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers Jr.\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 5.0,\n  \"dietaryRestrictions\": \"grain-free\",\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:05:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Pet",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/pets/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"message\": \"Pet deleted successfully.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Pet Image",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/pets/1/image",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1,\n  \"imageUrl\": \"https://res.cloudinary.com/your-cloud/image/upload/v1234/pet-profiles/abc123.jpg\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Devices",
+      "item": [
+        {
+          "name": "Register Device",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/devices/register",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceId\": \"feeder_01\",\n  \"name\": \"Living Room Feeder\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"name\": \"Living Room Feeder\",\n  \"isOnline\": false,\n  \"lastSeen\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Devices",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/devices",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"userId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"name\": \"Living Room Feeder\",\n    \"isOnline\": true,\n    \"lastSeen\": \"2026-04-23T10:00:00.000Z\",\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Device by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/devices/feeder_01",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"name\": \"Living Room Feeder\",\n  \"isOnline\": true,\n  \"lastSeen\": \"2026-04-23T10:00:00.000Z\",\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove Device",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/devices/feeder_01",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"message\": \"Device removed successfully.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Feeding",
+      "item": [
+        {
+          "name": "Create Schedule",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/feeding/schedules",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"time\": \"08:00\",\n  \"portionSize\": 50,\n  \"feedingMode\": \"scheduled\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1,\n  \"petId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"time\": \"08:00\",\n  \"portionSize\": 50,\n  \"isActive\": true,\n  \"feedingMode\": \"scheduled\",\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Schedules for Pet",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/feeding/schedules/pet/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"petId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"time\": \"08:00\",\n    \"portionSize\": 50,\n    \"isActive\": true,\n    \"feedingMode\": \"scheduled\",\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n    \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Toggle Schedule",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/feeding/schedules/1/toggle",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"petId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"time\": \"08:00\",\n  \"portionSize\": 50,\n  \"isActive\": false,\n  \"feedingMode\": \"scheduled\",\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:10:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Schedule",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/feeding/schedules/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"message\": \"Schedule deleted successfully.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Manual Feed",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/feeding/manual",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"portionSize\": 50\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"message\": \"Feed command sent successfully.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Feeding History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/feeding/history?petId=1&days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["feeding", "history"],
+              "query": [
+                { "key": "petId", "value": "1", "description": "Optional — filter by pet" },
+                { "key": "days", "value": "7", "description": "Optional — defaults to 30" }
+              ]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"petId\": 1,\n    \"actualPetId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"scheduledGrams\": 50,\n    \"dispensedGrams\": 50,\n    \"consumedGrams\": 45,\n    \"leftoverGrams\": 5,\n    \"feedingType\": \"scheduled\",\n    \"status\": \"completed\",\n    \"timestamp\": \"2026-04-23T08:00:00.000Z\",\n    \"pet\": { \"id\": 1, \"name\": \"Whiskers\", \"imageUrl\": null }\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Trigger Training Photo Capture",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/feeding/capture-photos",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceId\": \"feeder_01\",\n  \"petId\": 1,\n  \"durationSeconds\": 8\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"message\": \"Photo capture command sent.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/notifications",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"userId\": 1,\n    \"message\": \"Whiskers has eaten 45g.\",\n    \"type\": \"feeding_complete\",\n    \"isRead\": false,\n    \"createdAt\": \"2026-04-23T08:01:00.000Z\"\n  },\n  {\n    \"id\": 2,\n    \"userId\": 1,\n    \"message\": \"Food is running low (80g remaining). Please refill the container.\",\n    \"type\": \"low_food\",\n    \"isRead\": false,\n    \"createdAt\": \"2026-04-23T09:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/notifications/1/read",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"count\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/notifications/read-all",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"count\": 2\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
