@@ -1,0 +1,16 @@
+[
+  { "label": "Labrador Retriever", "value": "labrador_retriever" },
+  { "label": "German Shepherd", "value": "german_shepherd" },
+  { "label": "Golden Retriever", "value": "golden_retriever" },
+  { "label": "Bulldog", "value": "bulldog" },
+  { "label": "Beagle", "value": "beagle" },
+  { "label": "Poodle", "value": "poodle" },
+  { "label": "Rottweiler", "value": "rottweiler" },
+  { "label": "Yorkshire Terrier", "value": "yorkshire_terrier" },
+  { "label": "Boxer", "value": "boxer" },
+  { "label": "Dachshund", "value": "dachshund" },
+  { "label": "Shih Tzu", "value": "shih_tzu" },
+  { "label": "Siberian Husky", "value": "siberian_husky" },
+  { "label": "Chihuahua", "value": "chihuahua" },
+  { "label": "Other", "value": "other" }
+]

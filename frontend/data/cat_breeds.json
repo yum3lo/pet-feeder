@@ -1,0 +1,13 @@
+[
+  { "label": "Just a cute cat", "value": "cute_cat" },
+  { "label": "Siamese", "value": "siamese" },
+  { "label": "British Shorthair", "value": "british_shorthair" },
+  { "label": "Scottish Fold", "value": "scottish_fold" },
+  { "label": "Sphynx", "value": "sphynx" },
+  { "label": "Persian", "value": "persian" },
+  { "label": "Maine Coon", "value": "maine_coon" },
+  { "label": "Ragdoll", "value": "ragdoll" },
+  { "label": "Bengal", "value": "bengal" },
+  { "label": "Abyssinian", "value": "abyssinian" },
+  { "label": "Other", "value": "other" }
+]
