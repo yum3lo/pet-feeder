@@ -1,14 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-  Text, View, TouchableOpacity, Switch, ScrollView, Image, ActivityIndicator,
+  Text, View, TouchableOpacity, ScrollView, Image, ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {BottomNavBar, MealModal, type MealModalData, MealList, PetSelectorDropdown } from '@/components';
 import { type MealItem } from "@/components/list/types";
-import { usePets } from '@/contexts';
-import { useGetPetSchedules, useGetPets, togglePetSchedule } from '@/services';
+import { usePets, useToast } from '@/contexts';
+import { useGetPetSchedules, useGetPets, togglePetSchedule, createSchedule, updateSchedule, deleteSchedule } from '@/services';
 import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -22,25 +22,24 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Schedule'>;
 export default function ScheduleScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { activePetIndex } = usePets();
+  const { showToast } = useToast();
   const { data: pets = [] } = useGetPets();
   const activePet = pets[activePetIndex];
-  const [scheduleEnabled, setScheduleEnabled] = useState(true);
 
-  const handleToggle = async (val: boolean) => {
-    setScheduleEnabled(val);
-    if (activePet?.id != null) {
-      await togglePetSchedule(activePet.id, val);
-    }
-  };
-
-  const { data: schedules = [], isLoading } = useGetPetSchedules(
+  const { data: schedules = [], isLoading, refetch } = useGetPetSchedules(
     activePet?.id,
   );
   const meals: MealItem[] = schedules.map((s) => ({
     id: String(s.id),
     time: s.time,
     amount: `${s.amount} g`,
+    isActive: s.isActive,
   }));
+
+  const handleToggle = async (scheduleId: string, val: boolean) => {
+    await togglePetSchedule(Number(scheduleId), val);
+    refetch();
+  };
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingMeal, setEditingMeal] = useState<MealModalData | null>(null);
@@ -55,12 +54,33 @@ export default function ScheduleScreen({ navigation }: Props) {
     setModalVisible(true);
   };
 
-  const handleSave = (_data: MealModalData) => {
+  const handleSave = async (data: MealModalData) => {
     setModalVisible(false);
+    if (!activePet?.id) return;
+    const portionSize = parseInt(data.amount, 10);
+    try {
+      if (data.id) {
+        await updateSchedule(Number(data.id), { time: data.time, portionSize });
+        showToast('Meal updated!', 'success');
+      } else {
+        await createSchedule({ petId: activePet.id, time: data.time, portionSize });
+        showToast('Meal added!', 'success');
+      }
+      refetch();
+    } catch (err: any) {
+      showToast(err?.response?.data?.message ?? 'Failed to save meal', 'error');
+    }
   };
 
-  const handleDelete = (_id: string) => {
+  const handleDelete = async (id: string) => {
     setModalVisible(false);
+    try {
+      await deleteSchedule(Number(id));
+      showToast('Meal deleted!', 'success');
+      refetch();
+    } catch (err: any) {
+      showToast(err?.response?.data?.message ?? 'Failed to delete meal', 'error');
+    }
   };
 
   return (
@@ -72,19 +92,6 @@ export default function ScheduleScreen({ navigation }: Props) {
       <PetSelectorDropdown style={styles.petDropdown} />
 
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.toggleRow}>
-          <MaterialIcons name="event-available" size={28} color={colors.stroke} />
-          <Text style={[typography.bodyBold, styles.toggleLabel]}>Schedule</Text>
-          <Switch
-            value={scheduleEnabled}
-            onValueChange={handleToggle}
-            trackColor={{ false: colors.outline, true: colors.accent }}
-            thumbColor={colors.background}
-          />
-        </View>
-
-        <View style={styles.divider} />
-
         <View style={styles.mealsSection}>
           <Text style={[typography.bodyBold, styles.sectionLabel]}>Meals scheduled</Text>
 
@@ -94,6 +101,7 @@ export default function ScheduleScreen({ navigation }: Props) {
             <MealList
               meals={meals}
               onPressItem={openEdit}
+              onToggle={handleToggle}
               onAdd={openAdd}
               emptyComponent={
                 <View style={styles.emptyState}>

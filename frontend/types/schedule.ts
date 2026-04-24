@@ -2,6 +2,7 @@ export interface Schedule {
   id: number;
   time: string;   // "HH:mm"
   amount: number; // grams
+  isActive: boolean;
 }
 
 export interface FeedingRecord {

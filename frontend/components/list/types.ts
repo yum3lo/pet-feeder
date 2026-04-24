@@ -12,11 +12,12 @@ export type FeedingProps = {
   onRefresh?: () => void;
 };
 
-export type MealItem = { id: string; time: string; amount: string };
+export type MealItem = { id: string; time: string; amount: string; isActive: boolean };
 
 export type MealProps = {
   meals: MealItem[];
   onPressItem: (meal: MealItem) => void;
+  onToggle: (id: string, isActive: boolean) => void;
   onAdd: () => void;
   emptyComponent?: ReactElement;
 };
