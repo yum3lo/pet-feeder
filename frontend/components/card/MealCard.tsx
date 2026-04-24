@@ -6,18 +6,18 @@ import { colors, spacing, typography } from "@/style";
 import { toCapitalize } from '@/utils';
 
 type Props = {
-  catName: string;
+  petName: string;
   time?: string;
   amount?: number;
 };
 
-export default function MealCard({ catName, time, amount }: Props) {
+export default function MealCard({ petName, time, amount }: Props) {
   const hasSchedule = time != null && time !== '—';
   return (
     <View style={styles.card}>
       <MaterialIcons name="access-time" size={36} color={colors.accent} />
       <View style={styles.cardText}>
-        <Text style={[typography.h4, { color: colors.text }]}>{toCapitalize(catName)}</Text>
+        <Text style={[typography.h4, { color: colors.text }]}>{toCapitalize(petName)}</Text>
         {hasSchedule ? (
           <Text style={[typography.bodySmall, { color: colors.stroke }]}>Next meal · {time} · {amount}g</Text>
         ) : (

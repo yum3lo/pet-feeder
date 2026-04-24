@@ -1,17 +1,17 @@
 import { MealCard } from '@/components';
-import { useGetCatSchedules } from '@/services';
+import { useGetPetSchedules } from '@/services';
 
 type Props = {
-  catId: number;
-  catName: string;
+  petId: number;
+  petName: string;
 };
 
-export default function MealCardWithSchedule({ catId, catName }: Props) {
-  const { data: schedules = [] } = useGetCatSchedules(catId);
+export default function MealCardWithSchedule({ petId, petName }: Props) {
+  const { data: schedules = [] } = useGetPetSchedules(petId);
   const nextMeal = schedules[0] ?? null;
   return (
     <MealCard
-      catName={catName}
+      petName={petName}
       time={nextMeal?.time ?? '—'}
       amount={nextMeal?.amount}
     />

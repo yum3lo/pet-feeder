@@ -4,7 +4,7 @@ import { type MutableRefObject } from 'react';
 import { type PetData } from '@/components';
 import { type PagingCarouselHandle } from '@/components/list/types';
 import { useOfflineQueue, useSharedNetworkStatus, useToast } from '@/contexts';
-import { useCreateCat, useUploadPetImage } from '@/services';
+import { useCreatePet, useUploadPetImage } from '@/services';
 import { toCreatePayload } from '@/utils';
 
 type Params = {
@@ -15,7 +15,7 @@ type Params = {
 };
 
 export function useAddPet({ petsCount, carouselRef, setCurrentIndex, setRecognitionModalVisible }: Params) {
-  const { mutate: createCat } = useCreateCat();
+  const { mutate: createPet } = useCreatePet();
   const { mutate: uploadImage } = useUploadPetImage();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -32,11 +32,11 @@ export function useAddPet({ petsCount, carouselRef, setCurrentIndex, setRecognit
     }
 
     const { photo, ...petPayload } = payload;
-    createCat(petPayload, {
-      onSuccess: (cat) => {
+    createPet(petPayload, {
+      onSuccess: (pet) => {
         showToast(`${data.name} added!`, 'success');
         const finish = () => {
-          queryClient.invalidateQueries({ queryKey: ['cats'] });
+          queryClient.invalidateQueries({ queryKey: ['pets'] });
           setTimeout(() => {
             carouselRef.current?.scrollToIndex(petsCount, true);
             setCurrentIndex(petsCount);
@@ -44,7 +44,7 @@ export function useAddPet({ petsCount, carouselRef, setCurrentIndex, setRecognit
           }, 100);
         };
         if (photo) {
-          uploadImage({ id: cat.id, uri: photo }, { onSuccess: finish, onError: finish });
+          uploadImage({ id: pet.id, uri: photo }, { onSuccess: finish, onError: finish });
         } else {
           finish();
         }

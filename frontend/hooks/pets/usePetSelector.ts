@@ -6,29 +6,29 @@ import { toCapitalize } from '@/utils';
 
 export function usePetSelector() {
   const { pets, activePetIndex, setActivePetIndex } = usePets();
-  const { data: apiCats = [] } = useGetPets();
+  const { data: apiPets = [] } = useGetPets();
 
   const [selectedId, setSelectedId] = useState('');
 
-  if (selectedId === '' && apiCats.length > 0) {
+  if (selectedId === '' && apiPets.length > 0) {
     const activeName = pets[activePetIndex]?.name ?? '';
-    const match = apiCats.find(
+    const match = apiPets.find(
       (c) => c.name.toLowerCase() === activeName.toLowerCase()
     );
-    setSelectedId(String((match ?? apiCats[0]).id));
+    setSelectedId(String((match ?? apiPets[0]).id));
   }
 
-  const petOptions = apiCats.map((c) => ({
+  const petOptions = apiPets.map((c) => ({
     label: toCapitalize(c.name),
     value: String(c.id),
   }));
 
   const onSelect = (apiId: string) => {
     setSelectedId(apiId);
-    const cat = apiCats.find((c) => String(c.id) === apiId);
-    if (!cat) return;
+    const pet = apiPets.find((c) => String(c.id) === apiId);
+    if (!pet) return;
     const idx = pets.findIndex(
-      (p) => p.name.toLowerCase() === cat.name.toLowerCase()
+      (p) => p.name.toLowerCase() === pet.name.toLowerCase()
     );
     if (idx !== -1) setActivePetIndex(idx);
   };

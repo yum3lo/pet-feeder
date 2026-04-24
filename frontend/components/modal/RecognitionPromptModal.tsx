@@ -19,10 +19,10 @@ export default function RecognitionPromptModal({ visible, onClose, onStart }: Pr
     >
       <View style={styles.overlay}>
         <View style={styles.card}>
-          <Text style={[typography.h4, styles.title]}>Multiple Cats Detected</Text>
+          <Text style={[typography.h4, styles.title]}>Multiple Pets Detected</Text>
           <Text style={[typography.body, styles.body]}>
-            Would you like to start cat recognition training to help your feeder distinguish between
-            your cats?
+            Would you like to start pet recognition training to help your feeder distinguish between
+            your pets?
           </Text>
           <ActionButtons
             variant="compact"

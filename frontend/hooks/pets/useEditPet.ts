@@ -2,13 +2,13 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { type PetData } from '@/components';
 import { useOfflineQueue, useSharedNetworkStatus, useToast } from '@/contexts';
-import { useUpdateCat, useUploadPetImage } from '@/services';
+import { useUpdatePet, useUploadPetImage } from '@/services';
 import { toUpdatePayload, toCapitalize } from '@/utils';
 
 import type { Pet } from '@/types';
 
 export function useEditPet(currentPet: Pet | undefined) {
-  const { mutate: updateCat } = useUpdateCat();
+  const { mutate: updatePet } = useUpdatePet();
   const { mutate: uploadImage } = useUploadPetImage();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -27,7 +27,7 @@ export function useEditPet(currentPet: Pet | undefined) {
       return;
     }
 
-    updateCat(
+    updatePet(
       { id: currentPet.id, ...petPayload },
       {
         onSuccess: () => {
@@ -35,10 +35,10 @@ export function useEditPet(currentPet: Pet | undefined) {
           if (photo) {
             uploadImage(
               { id: currentPet.id, uri: photo },
-              { onSettled: () => queryClient.invalidateQueries({ queryKey: ['cats'] }) },
+              { onSettled: () => queryClient.invalidateQueries({ queryKey: ['pets'] }) },
             );
           } else {
-            queryClient.invalidateQueries({ queryKey: ['cats'] });
+            queryClient.invalidateQueries({ queryKey: ['pets'] });
           }
         },
         onError: (err: any) => {

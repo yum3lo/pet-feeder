@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-import { toggleCatSchedule } from '@/services/pets';
+import { togglePetSchedule } from '@/services/pets';
 
 export type Meal = { id: string; time: string; amount: string };
 
@@ -75,7 +75,7 @@ export function PetsProvider({ children }: { children: ReactNode }) {
     setPets((prev) => prev.map((p, i) => (i === petIndex ? { ...p, scheduleEnabled: enabled } : p)));
     const pet = pets[petIndex];
     if (pet) {
-      await toggleCatSchedule(Number(pet.id), enabled);
+      await togglePetSchedule(Number(pet.id), enabled);
     }
   };
 

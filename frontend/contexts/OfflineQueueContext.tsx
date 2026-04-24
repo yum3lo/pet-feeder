@@ -65,8 +65,8 @@ export function OfflineQueueProvider({ children }: { children: ReactNode }) {
         try {
           if (op.type === 'createPet') {
             const { photo, ...petPayload } = op.payload;
-            const cat = await createPet(petPayload);
-            if (photo) await uploadPetImage({ id: cat.id, uri: photo });
+            const pet = await createPet(petPayload);
+            if (photo) await uploadPetImage({ id: pet.id, uri: photo });
             successCount += 1;
           } else if (op.type === 'updatePet') {
             const { photo, ...petPayload } = op.payload;
@@ -93,7 +93,7 @@ export function OfflineQueueProvider({ children }: { children: ReactNode }) {
       await writeQueue(remaining);
 
       if (successCount > 0) {
-        queryClient.invalidateQueries({ queryKey: ['cats'] });
+        queryClient.invalidateQueries({ queryKey: ['pets'] });
         setSyncedCount(successCount);
         setModalVisible(true);
       }
