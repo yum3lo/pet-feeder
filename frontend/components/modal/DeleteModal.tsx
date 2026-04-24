@@ -9,11 +9,12 @@ type Props = {
   petName?: string;
   title?: string;
   body?: string;
+  confirmLabel?: string;
   onConfirm: () => void;
   onClose: () => void;
 };
 
-export default function DeleteModal({ visible, petName, title, body, onConfirm, onClose }: Props) {
+export default function DeleteModal({ visible, petName, title, body, confirmLabel = 'Delete', onConfirm, onClose }: Props) {
   const resolvedTitle = title ?? 'Are you sure?';
   const resolvedBody = body ?? `This will permanently delete ${
     petName ? toCapitalize(petName) : 'this item'
@@ -35,7 +36,7 @@ export default function DeleteModal({ visible, petName, title, body, onConfirm, 
               <Text style={[typography.bodyBold, { color: colors.text }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.btn, styles.deleteBtn]} onPress={onConfirm}>
-              <Text style={[typography.bodyBold, { color: colors.background }]}>Delete</Text>
+              <Text style={[typography.bodyBold, { color: colors.background }]}>{confirmLabel}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -1,7 +1,8 @@
 import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 
 import { BackButton, Dropdown } from '@/components';
-import breedOptions from '@/data/breeds.json';
+import catBreeds from '@/data/cat_breeds.json';
+import dogBreeds from '@/data/dog_breeds.json';
 import { usePetForm } from '@/hooks';
 import { colors, typography, common } from '@/style';
 
@@ -48,9 +49,33 @@ export default function AddPetScreen({ navigation }: Props) {
           />
           <Text style={styles.suffix}>kg</Text>
         </View>
+        <View style={[common.input, styles.speciesRow]}>
+          <Text style={[styles.speciesLabel, { color: colors.stroke }]}>Your Pet is a</Text>
+          <View style={styles.speciesButtons}>
+            {(['Cat', 'Dog'] as const).map((s) => (
+              <TouchableOpacity
+                key={s}
+                style={[
+                  styles.speciesButton,
+                  pet.petSpecies === s.toLowerCase() && styles.speciesButtonActive,
+                ]}
+                onPress={() => setPet({ ...pet, petSpecies: s.toLowerCase(), petBreed: '' })}
+              >
+                <Text
+                  style={[
+                    styles.speciesButtonText,
+                    pet.petSpecies === s.toLowerCase() && styles.speciesButtonTextActive,
+                  ]}
+                >
+                  {s}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
         <Dropdown
           placeholder='Breed'
-          options={breedOptions}
+          options={pet.petSpecies === 'cat' ? catBreeds : pet.petSpecies === 'dog' ? dogBreeds : []}
           value={pet.petBreed}
           onSelect={(value) => setPet({ ...pet, petBreed: value })}
         />

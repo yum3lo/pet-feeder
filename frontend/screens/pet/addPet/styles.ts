@@ -20,4 +20,35 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     paddingRight: spacing.lg,
   },
+  speciesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  speciesLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  speciesButtons: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  speciesButton: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  speciesButtonActive: {
+    borderBottomColor: colors.accent,
+  },
+  speciesButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.stroke,
+  },
+  speciesButtonTextActive: {
+    color: colors.accent,
+    fontWeight: '600',
+  },
 });

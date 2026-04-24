@@ -8,7 +8,8 @@ import {
 
 import { Dropdown, ActionButtons } from '@/components';
 import { useToast } from '@/contexts';
-import breeds from '@/data/breeds.json';
+import catBreeds from '@/data/cat_breeds.json';
+import dogBreeds from '@/data/dog_breeds.json';
 import { colors, typography, spacing, radius } from '@/style';
 
 export type PetData = {
@@ -16,6 +17,7 @@ export type PetData = {
   breed: string;
   weight: string;
   photo: string | null;
+  species: string;
 };
 
 type Props = {
@@ -25,7 +27,7 @@ type Props = {
   onClose: () => void;
 };
 
-const DEFAULT: PetData = { name: '', breed: '', weight: '', photo: null };
+const DEFAULT: PetData = { name: '', breed: '', weight: '', photo: null, species: '' };
 
 export default function AddPetModal({ visible, initialData, onSave, onClose }: Props) {
   const [draft, setDraft] = useState<PetData>(DEFAULT);
@@ -49,7 +51,7 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
 
   const handleSave = () => {
     if (!draft.name.trim()) {
-      showToast('Please enter a name for your cat.', 'error');
+      showToast('Please enter a name for your pet.', 'error');
       return;
     }
     onSave(draft);
@@ -63,7 +65,7 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
       >
         <View style={styles.card}>
           <View style={styles.header}>
-            <Text style={[typography.h3, { color: colors.text }]}>{initialData ? 'Edit cat' : 'Add a cat'}</Text>
+            <Text style={[typography.h3, { color: colors.text }]}>{initialData ? 'Edit pet' : 'Add a pet'}</Text>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <MaterialIcons name="close" size={24} color={colors.stroke} />
             </TouchableOpacity>
@@ -90,9 +92,34 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
             onChangeText={(v) => setDraft((p) => ({ ...p, name: v }))}
           />
 
+          <View style={[styles.input, styles.speciesRow]}>
+            <Text style={styles.speciesLabel}>Your pet is a</Text>
+            <View style={styles.speciesButtons}>
+              {(['Cat', 'Dog'] as const).map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={[
+                    styles.speciesButton,
+                    draft.species === s.toLowerCase() && styles.speciesButtonActive,
+                  ]}
+                  onPress={() => setDraft((p) => ({ ...p, species: s.toLowerCase(), breed: '' }))}
+                >
+                  <Text
+                    style={[
+                      styles.speciesButtonText,
+                      draft.species === s.toLowerCase() && styles.speciesButtonTextActive,
+                    ]}
+                  >
+                    {s}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
           <Dropdown
             placeholder="Breed"
-            options={breeds as { label: string; value: string }[]}
+            options={(draft.species === 'cat' ? catBreeds : draft.species === 'dog' ? dogBreeds : []) as { label: string; value: string }[]}
             value={draft.breed}
             onSelect={(v) => setDraft((p) => ({ ...p, breed: v }))}
             style={{ width: '100%' }}
@@ -195,6 +222,38 @@ const styles = StyleSheet.create({
     color: colors.stroke,
     fontWeight: '500',
     paddingRight: spacing.lg,
+  },
+  speciesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  speciesLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.stroke,
+  },
+  speciesButtons: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  speciesButton: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  speciesButtonActive: {
+    borderBottomColor: colors.accent,
+  },
+  speciesButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.stroke,
+  },
+  speciesButtonTextActive: {
+    color: colors.accent,
+    fontWeight: '600',
   },
   weightRow: {
     flexDirection: 'row',
