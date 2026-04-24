@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native';
 
-import { useLoginForm } from '@/hooks';
+import { useLoginForm } from '@/hooks/auth/useLoginForm';
 
 import type { RootStackParamList } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
@@ -24,7 +24,7 @@ const mockNavigation = {
 
 describe('useLoginForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   it('initializes with empty email and password', () => {
@@ -130,5 +130,55 @@ describe('useLoginForm', () => {
     });
 
     expect(mockShowToast).toHaveBeenCalledWith('Login failed', 'error');
+  });
+
+  it('locks the form and shows a lockout toast after 5 failed login attempts', () => {
+    jest.useFakeTimers();
+    const error = { response: { data: { message: 'Wrong password' } } };
+    mockMutate.mockImplementation(
+      (_payload: unknown, { onError }: { onError: (e: unknown) => void }) => { onError(error); },
+    );
+
+    const { result } = renderHook(() => useLoginForm(mockNavigation));
+    for (let i = 0; i < 5; i++) {
+      act(() => { result.current.handleLogin(); });
+    }
+
+    expect(mockShowToast).toHaveBeenLastCalledWith(
+      'Too many failed attempts. Please wait 30 seconds.',
+      'error',
+    );
+    expect(result.current.isPending).toBe(true);
+
+    act(() => { jest.runAllTimers(); });
+    expect(result.current.isPending).toBe(false);
+    jest.useRealTimers();
+  });
+
+  it('blocks login and shows a try-again message when the form is already locked', () => {
+    jest.useFakeTimers();
+    const error = { response: { data: { message: 'Wrong password' } } };
+    mockMutate.mockImplementation(
+      (_payload: unknown, { onError }: { onError: (e: unknown) => void }) => { onError(error); },
+    );
+
+    const { result } = renderHook(() => useLoginForm(mockNavigation));
+    for (let i = 0; i < 5; i++) {
+      act(() => { result.current.handleLogin(); });
+    }
+
+    mockShowToast.mockClear();
+    mockMutate.mockClear();
+
+    act(() => { result.current.handleLogin(); });
+
+    expect(mockMutate).not.toHaveBeenCalled();
+    expect(mockShowToast).toHaveBeenCalledWith(
+      expect.stringContaining('Too many attempts'),
+      'error',
+    );
+
+    act(() => { jest.runAllTimers(); });
+    jest.useRealTimers();
   });
 });

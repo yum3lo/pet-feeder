@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native';
 
-import { usePetForm } from '@/hooks';
+import { usePetForm } from '@/hooks/pets/usePetForm';
 
 import type { RootStackParamList } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
@@ -8,8 +8,14 @@ import type { NavigationProp } from '@react-navigation/native';
 const mockShowToast = jest.fn();
 const mockMutate = jest.fn();
 
+jest.mock('@/hooks', () => ({
+  useNetworkStatus: () => ({ isOnline: true }),
+}));
+
 jest.mock('@/contexts', () => ({
   useToast: () => ({ showToast: mockShowToast }),
+  useOfflineQueue: () => ({ enqueue: jest.fn() }),
+  useSharedNetworkStatus: () => ({ isOnline: true }),
 }));
 
 jest.mock('@/services', () => ({
@@ -88,7 +94,7 @@ describe('usePetForm', () => {
   it('falls back to the default error message when the server sends no message', () => {
     mockMutate.mockImplementation(
       (_payload: unknown, { onError }: { onError: (e: unknown) => void }) => {
-        onError({});
+        onError({ response: { data: {} } });
       },
     );
 

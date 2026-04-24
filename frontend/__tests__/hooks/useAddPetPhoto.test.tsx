@@ -1,13 +1,22 @@
 import { renderHook, act } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 
-import { useAddPetPhoto } from '@/hooks';
+import { useAddPetPhoto } from '@/hooks/pets/useAddPetPhoto';
 
 import type { RootStackParamList } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
 
 const mockShowToast = jest.fn();
 const mockMutate = jest.fn();
+
+jest.mock('@/hooks', () => ({
+  useNetworkStatus: () => ({ isOnline: true }),
+}));
+
+jest.mock('expo-image-manipulator', () => ({
+  manipulateAsync: jest.fn().mockResolvedValue({ uri: 'file://compressed.jpg' }),
+  SaveFormat: { JPEG: 'jpeg' },
+}));
 
 jest.mock('expo-image-picker', () => ({
   launchImageLibraryAsync: jest.fn(),
@@ -47,7 +56,7 @@ describe('useAddPetPhoto', () => {
       await result.current.pickImage();
     });
 
-    expect(result.current.image).toBe('file://photo.jpg');
+    expect(result.current.image).toBe('file://compressed.jpg');
   });
 
   it('handleAdd navigates to SetFeeding without uploading when there is no image', () => {
@@ -81,7 +90,7 @@ describe('useAddPetPhoto', () => {
     });
 
     expect(mockMutate).toHaveBeenCalledWith(
-      { id: 5, uri: 'file://photo.jpg' },
+      { id: 5, uri: 'file://compressed.jpg' },
       expect.any(Object),
     );
     expect((mockNavigation as any).navigate).toHaveBeenCalledWith('SetFeeding');

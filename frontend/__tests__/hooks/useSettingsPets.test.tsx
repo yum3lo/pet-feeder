@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native';
 
-import { useSettingsPets } from '@/hooks';
+import { useSettingsPets } from '@/hooks/pets/useSettingsPets';
 
 import type { Pet } from '@/types';
 
@@ -9,17 +9,29 @@ const mockCreateCatMutate = jest.fn();
 const mockUploadImageMutate = jest.fn();
 const mockInvalidateQueries = jest.fn();
 
+jest.mock('@/hooks', () => ({
+  useNetworkStatus: () => ({ isOnline: true }),
+}));
+
 jest.mock('@tanstack/react-query', () => ({
-  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
+  useQueryClient: () => ({
+    invalidateQueries: mockInvalidateQueries,
+    getQueryData: jest.fn().mockReturnValue([]),
+    setQueryData: jest.fn(),
+  }),
 }));
 
 jest.mock('@/contexts', () => ({
   useToast: () => ({ showToast: mockShowToast }),
+  useOfflineQueue: () => ({ enqueue: jest.fn() }),
+  useSharedNetworkStatus: () => ({ isOnline: true }),
 }));
 
 jest.mock('@/services', () => ({
   useCreateCat: () => ({ mutate: mockCreateCatMutate }),
   useUploadPetImage: () => ({ mutate: mockUploadImageMutate }),
+  useUpdateCat: () => ({ mutate: jest.fn() }),
+  useDeleteCat: () => ({ mutate: jest.fn() }),
 }));
 
 const defaultPet: Pet = { id: 1, name: 'Pookie' };
@@ -188,5 +200,40 @@ describe('useSettingsPets', () => {
 
     act(() => { result.current.setCardHeight(200); });
     expect(result.current.cardHeight).toBe(200);
+  });
+
+  it('setDeleteModalVisible opens and closes the delete modal', () => {
+    const { result } = renderHook(() =>
+      useSettingsPets({ pets: [defaultPet], currentIndex: 0, setCurrentIndex: jest.fn() }),
+    );
+
+    act(() => { result.current.setDeleteModalVisible(true); });
+    expect(result.current.deleteModalVisible).toBe(true);
+
+    act(() => { result.current.setDeleteModalVisible(false); });
+    expect(result.current.deleteModalVisible).toBe(false);
+  });
+
+  it('handleDeletePet hides the delete modal', () => {
+    const { result } = renderHook(() =>
+      useSettingsPets({ pets: [defaultPet], currentIndex: 0, setCurrentIndex: jest.fn() }),
+    );
+
+    act(() => { result.current.setDeleteModalVisible(true); });
+    act(() => { result.current.handleDeletePet(defaultPet); });
+
+    expect(result.current.deleteModalVisible).toBe(false);
+  });
+
+  it('handleDeletePet updates the current index when the deleted pet is not the last', () => {
+    const secondPet: Pet = { id: 2, name: 'Max' };
+    const setCurrentIndex = jest.fn();
+    const { result } = renderHook(() =>
+      useSettingsPets({ pets: [defaultPet, secondPet], currentIndex: 1, setCurrentIndex }),
+    );
+
+    act(() => { result.current.handleDeletePet(secondPet); });
+
+    expect(setCurrentIndex).toHaveBeenCalledWith(0);
   });
 });

@@ -1,7 +1,11 @@
 import { renderHook, act } from '@testing-library/react-native';
 import React from 'react';
 
-import { ToastProvider, useToast } from '@/contexts';
+import { ToastProvider, useToast } from '@/contexts/ToastContext';
+
+jest.mock('@/hooks', () => ({
+  useNetworkStatus: () => ({ isOnline: true }),
+}));
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ToastProvider>{children}</ToastProvider>

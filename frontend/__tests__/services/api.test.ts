@@ -41,3 +41,40 @@ describe('setAuthToken', () => {
     expect(config.headers.Authorization).toBe('Bearer second-token');
   });
 });
+
+describe('response interceptor — 401 handling', () => {
+  const getResponseInterceptor = () =>
+    (api.interceptors.response as any).handlers.find(Boolean);
+
+  afterEach(() => {
+    setAuthToken(null);
+  });
+
+  it('clears the auth token when a 401 response is received', async () => {
+    setAuthToken('valid-token');
+    const getRequestInterceptor = () =>
+      (api.interceptors.request as any).handlers.find(Boolean).fulfilled;
+
+    const configBefore = getRequestInterceptor()({ headers: {} });
+    expect(configBefore.headers.Authorization).toBe('Bearer valid-token');
+
+    const { rejected } = getResponseInterceptor();
+    const error = { response: { status: 401 } };
+    await expect(rejected(error)).rejects.toEqual(error);
+
+    const configAfter = getRequestInterceptor()({ headers: {} });
+    expect(configAfter.headers.Authorization).toBeUndefined();
+  });
+
+  it('passes non-401 errors through without clearing the token', async () => {
+    setAuthToken('valid-token');
+    const { rejected } = getResponseInterceptor();
+    const error = { response: { status: 500 } };
+    await expect(rejected(error)).rejects.toEqual(error);
+
+    const getRequestInterceptor = () =>
+      (api.interceptors.request as any).handlers.find(Boolean).fulfilled;
+    const config = getRequestInterceptor()({ headers: {} });
+    expect(config.headers.Authorization).toBe('Bearer valid-token');
+  });
+});

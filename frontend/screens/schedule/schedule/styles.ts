@@ -83,9 +83,9 @@ export const styles = StyleSheet.create({
   emptyState: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.lg,
+    paddingVertical: spacing.sm,
     paddingHorizontal: spacing.xl,
-    gap: spacing.md,
+    gap: spacing.lg,
     justifyContent: 'center',
   },
   emptyImage: {

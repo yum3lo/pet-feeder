@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native';
 
-import { useRegisterForm } from '@/hooks';
+import { useRegisterForm } from '@/hooks/auth/useRegisterForm';
 
 import type { RootStackParamList } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
