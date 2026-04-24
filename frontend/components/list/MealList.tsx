@@ -1,11 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Switch } from 'react-native';
 
 import { colors, typography, spacing } from '@/style';
 
 import type {  MealProps  } from './types';
 
-export default function MealList({ meals, onPressItem, onAdd, emptyComponent }: MealProps) {
+export default function MealList({ meals, onPressItem, onToggle, onAdd, emptyComponent }: MealProps) {
   return (
     <View>
       <FlatList
@@ -21,7 +21,12 @@ export default function MealList({ meals, onPressItem, onAdd, emptyComponent }: 
             <Text style={[typography.bodySmall, { color: colors.stroke }]}>
               {item.time} · {item.amount}
             </Text>
-            <MaterialIcons name="chevron-right" size={22} color={colors.stroke} />
+            <Switch
+              value={item.isActive}
+              onValueChange={(val) => onToggle(item.id, val)}
+              trackColor={{ false: colors.outline, true: colors.accent }}
+              thumbColor={colors.background}
+            />
           </TouchableOpacity>
         )}
       />

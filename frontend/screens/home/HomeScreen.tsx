@@ -23,7 +23,7 @@ export default function HomeScreen({ navigation }: Props) {
   const { data: pets = [] } = useGetPets();
   const { activePetIndex, setActivePetIndex } = usePets();
   const carouselRef = useRef<PagingCarouselHandle>(null);
-  const [foodWeight] = useState(234);
+  const [foodWeight] = useState(244);
 
   useNotifications(foodWeight);
 

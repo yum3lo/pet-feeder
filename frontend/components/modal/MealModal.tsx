@@ -7,7 +7,6 @@ import {
 
 import { ActionButtons } from '@/components';
 import DeleteModal from '@/components/modal/DeleteModal';
-import { useToast } from '@/contexts';
 import { colors, typography, spacing } from '@/style';
 
 export type MealModalData = {
@@ -37,7 +36,6 @@ function parseTime(t: string) {
 
 export default function MealModal({ visible, meal, onSave, onDelete, onClose }: Props) {
   const isEdit = !!meal?.id;
-  const { showToast } = useToast();
 
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [hour, setHour] = useState(() => parseTime(meal?.time ?? '09:00').hour);
@@ -56,7 +54,6 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
 
   const handleSave = () => {
     onSave({ id: meal?.id, time: `${hour}:${minute}`, amount: String(amount) });
-    showToast(isEdit ? 'Meal updated!' : 'Meal added!', 'success');
   };
 
   return (
@@ -135,7 +132,6 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
         onConfirm={() => {
           setDeleteConfirmVisible(false);
           onDelete?.(meal!.id!);
-          showToast('Meal removed.', 'success');
         }}
       />
     </>  

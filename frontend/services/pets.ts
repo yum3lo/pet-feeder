@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 
-import { type CreatePetPayload, type Pet, type Schedule, type FeedingHistoryEntry } from '@/types';
+import { type CreatePetPayload, type Pet } from '@/types';
 
 import { api } from './api';
 
@@ -25,19 +25,6 @@ export const uploadPetImage = async ({ id, uri }: { id: number; uri: string }): 
 export const useGetPets = () =>
   useQuery({ queryKey: ['pets'], queryFn: getPets });
 
-const getPetSchedules = async (petId: number): Promise<Schedule[]> => {
-  const { data } = await api.get<Schedule[]>(`/feeding/schedules/pet/${petId}`);
-  return data;
-};
-
-export const useGetPetSchedules = (petId: number | undefined) =>
-  useQuery({
-    queryKey: ['schedules', petId],
-    queryFn: () => getPetSchedules(petId!),
-    enabled: petId != null,
-    staleTime: 30_000,
-  });
-
 export const useCreatePet = () =>
   useMutation({ mutationFn: createPet });
 
@@ -58,28 +45,3 @@ export const deletePet = async (id: number): Promise<void> => {
 
 export const useDeletePet = () =>
   useMutation({ mutationFn: deletePet });
-
-export const togglePetSchedule = async (petId: number, isActive: boolean): Promise<void> => {
-  await api.patch(`/feeding/schedules/${petId}/toggle`, { isActive });
-};
-
-const getFeedingHistory = async (petId: number): Promise<FeedingHistoryEntry[]> => {
-  const { data } = await api.get<FeedingHistoryEntry[]>(`/feeding/history?petId=${petId}`);
-  return data;
-};
-
-export const useGetFeedingHistory = (petId: number | undefined) =>
-  useQuery({
-    queryKey: ['feeding-history', petId],
-    queryFn: () => getFeedingHistory(petId!),
-    enabled: petId != null,
-    staleTime: 30_000,
-  });
-
-// TODO: replace with real API call when the endpoint is ready ─────────────
-export type PetScheduleEntry = { petName: string; time: string };
-
-export const getMockAllSchedules = async (): Promise<PetScheduleEntry[]> => [
-  { petName: 'Pookie', time: '21:57' },
-  { petName: 'Pookie', time: '17:00' },
-];
