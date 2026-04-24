@@ -24,7 +24,7 @@ export default function FeedingHistoryList({ sections, selectedDate, onSelectDat
       ListEmptyComponent={
         selectedDate ? (
           <Text style={[typography.bodySmall, styles.empty]}>
-            No feeding records for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-GB', { month: 'long', day: 'numeric' })}.
+            No feeding records for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}.
           </Text>
         ) : null
       }

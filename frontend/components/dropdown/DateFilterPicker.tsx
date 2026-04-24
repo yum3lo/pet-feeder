@@ -13,7 +13,7 @@ type Props = {
 
 function formatDate(dateString: string): string {
   const [year, month, day] = dateString.split('-').map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString('en-GB', { month: 'long', day: 'numeric' });
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 }
 
 export default function DateFilterPicker({ selectedDate, onSelectDate, markedDates = {} }: Props) {
