@@ -53,7 +53,7 @@ export default function HomeScreen({ navigation }: Props) {
           onIndexChange={setActivePetIndex}
           renderItem={(item) => (
             <View style={{ width: SCREEN_WIDTH }}>
-              <MealCardWithSchedule catId={item.id} catName={item.name} />
+              <MealCardWithSchedule petId={item.id} petName={item.name} />
             </View>
           )}
         />

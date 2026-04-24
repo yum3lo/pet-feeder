@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'History'>;
 
 function formatSectionTitle(isoDate: string): string {
   const date = new Date(isoDate);
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export default function HistoryScreen({ navigation }: Props) {
@@ -70,7 +70,7 @@ export default function HistoryScreen({ navigation }: Props) {
         <View style={styles.loadingState}>
           <Text style={[typography.bodyBold, { color: colors.stroke }]}>No feeding history yet.</Text>
           <Text style={[typography.bodySmall, { color: colors.stroke, marginTop: spacing.xs, textAlign: 'center' }]}>
-            Feeding events will appear here once your cat has been fed.
+            Feeding events will appear here once your pet has been fed.
           </Text>
         </View>
       ) : (

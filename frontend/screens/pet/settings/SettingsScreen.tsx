@@ -124,6 +124,7 @@ export default function SettingsScreen({ navigation }: Props) {
           breed: currentPet?.breed ?? '',
           weight: String(currentPet?.weight ?? ''),
           photo: currentPet?.imageUrl ?? '',
+          species: currentPet?.species ?? '',
         }}
         onSave={handleEditPet}
         onClose={() => setEditModalVisible(false)}
@@ -133,6 +134,7 @@ export default function SettingsScreen({ navigation }: Props) {
         visible={logoutModalVisible}
         title="Log out?"
         body="You will be signed out of your account."
+        confirmLabel="Log Out"
         onClose={() => setLogoutModalVisible(false)}
         onConfirm={async () => {
           setLogoutModalVisible(false);

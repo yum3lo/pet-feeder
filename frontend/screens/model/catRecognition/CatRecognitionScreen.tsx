@@ -23,7 +23,7 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
   const [countdown, setCountdown] = useState(5);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const catName = petNames[currentIndex];
+  const petName = petNames[currentIndex];
   const total = petNames.length;
 
   const DURATION_INTERVAL_MS = 1000;
@@ -54,20 +54,20 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
   return (
     <View style={[styles.container, { paddingTop: insets.top + spacing.xxl }]}>
       <View style={styles.content}>
-        <Text style={[typography.h2, styles.catName]}>{catName}</Text>
+        <Text style={[typography.h2, styles.catName]}>{petName}</Text>
 
         <Text style={[typography.body, styles.instructions]}>
-          Place {catName} in front of the pet feeder and click the{' '}
+          Place {petName} in front of the pet feeder and click the{' '}
           <Text style={typography.bodyBold}>'Start taking pictures'</Text> button.
         </Text>
 
         <Text style={[typography.bodySmall, styles.note]}>
-          The built-in camera will take pictures of your cat for {COUNT_DOWN_S} seconds to
-          train the cat recognition model.
+          The built-in camera will take pictures of your pet for {COUNT_DOWN_S} seconds to
+          train the pet recognition model.
         </Text>
 
         <Text style={[typography.bodyBold, styles.warning]}>
-          Don't make the cat stand still, encourage movement!
+          Don't make the pet stand still, encourage movement!
         </Text>
 
         {capturing ? (
@@ -85,7 +85,7 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
         )}
 
         <Text style={[typography.body, styles.progress]}>
-          Cat {currentIndex + 1} of {total}
+          Pet {currentIndex + 1} of {total}
         </Text>
       </View>
     </View>

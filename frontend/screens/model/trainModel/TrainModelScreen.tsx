@@ -17,7 +17,7 @@ import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TrainModel'>;
 
-const TRAINING_TIME_MS = 3000;
+const TRAINING_TIME_MS = 8000;
 
 export default function TrainModelScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -43,8 +43,8 @@ export default function TrainModelScreen({ navigation }: Props) {
 
         <Text style={[typography.body, styles.description]}>
           {done
-            ? 'Your feeder can now recognize your cats individually. Feeding will be tracked per cat.'
-            : 'Now that we have captured images of your cats, we can train the model to recognize them. This process may take a few minutes.'}
+            ? 'Your feeder can now recognize your pets individually. Feeding will be tracked per pet.'
+            : 'Now that we have captured images of your pets, we can train the model to recognize them. This process may take a few minutes.'}
         </Text>
 
         {training ? (

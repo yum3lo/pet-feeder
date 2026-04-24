@@ -1,14 +1,18 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-import breeds from '@/data/breeds.json';
+import catBreeds from '@/data/cat_breeds.json';
+import dogBreeds from '@/data/dog_breeds.json';
 import { colors, typography, spacing } from '@/style';
 import { toCapitalize } from '@/utils';
 
 import type { Pet } from '@/types';
 
-const getBreedLabel = (value: string) =>
-  breeds.find((b) => b.value === value)?.label ?? value;
+const allBreeds = [...catBreeds, ...dogBreeds];
+
+const getBreedLabel = (value?: string) =>
+  allBreeds.find((b) => b.value === value)?.label ?? value ?? '—';
+
 
 type Props = {
   item: Pet;
@@ -65,7 +69,7 @@ export default function PetProfileCard({
       <View style={styles.infoRow}>
         <Text style={[typography.bodyBold, { color: colors.stroke }]}>Breed</Text>
         <Text style={[typography.body, { color: colors.stroke }]}>
-          {getBreedLabel(item.breed ?? '')}
+          {getBreedLabel(item.breed)}
         </Text>
       </View>
 

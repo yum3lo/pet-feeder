@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {BottomNavBar, MealModal, type MealModalData, MealList, PetSelectorDropdown } from '@/components';
 import { type MealItem } from "@/components/list/types";
 import { usePets } from '@/contexts';
-import { useGetCatSchedules } from '@/services';
+import { useGetPetSchedules, useGetPets, togglePetSchedule } from '@/services';
 import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -21,12 +21,20 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Schedule'>;
 
 export default function ScheduleScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { pets, activePetIndex, toggleSchedule } = usePets();
+  const { activePetIndex } = usePets();
+  const { data: pets = [] } = useGetPets();
   const activePet = pets[activePetIndex];
-  const scheduleEnabled = activePet?.scheduleEnabled ?? true;
+  const [scheduleEnabled, setScheduleEnabled] = useState(true);
 
-  const { data: schedules = [], isLoading } = useGetCatSchedules(
-    activePet ? Number(activePet.id) : undefined,
+  const handleToggle = async (val: boolean) => {
+    setScheduleEnabled(val);
+    if (activePet?.id != null) {
+      await togglePetSchedule(activePet.id, val);
+    }
+  };
+
+  const { data: schedules = [], isLoading } = useGetPetSchedules(
+    activePet?.id,
   );
   const meals: MealItem[] = schedules.map((s) => ({
     id: String(s.id),
@@ -69,7 +77,7 @@ export default function ScheduleScreen({ navigation }: Props) {
           <Text style={[typography.bodyBold, styles.toggleLabel]}>Schedule</Text>
           <Switch
             value={scheduleEnabled}
-            onValueChange={(val) => toggleSchedule(activePetIndex, val)}
+            onValueChange={handleToggle}
             trackColor={{ false: colors.outline, true: colors.accent }}
             thumbColor={colors.background}
           />
