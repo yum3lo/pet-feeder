@@ -33,8 +33,8 @@ export function useLoginForm(navigation: NavigationProp<RootStackParamList>) {
         onSuccess: async () => {
           attemptCount.current = 0;
           try {
-            const { data: cats } = await api.get('/cats');
-            navigation.navigate(cats.length === 0 ? 'AddPet' : 'Home');
+            const { data: pets } = await api.get('/pets');
+            navigation.navigate(pets.length === 0 ? 'AddPet' : 'Home');
           } catch {
             navigation.navigate('AddPet');
           }

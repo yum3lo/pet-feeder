@@ -3,11 +3,11 @@ export interface User {
     email: string;
     createdAt: string;
     updatedAt: string;
-    cats: any[];
+    pets: any[];
 }
 
 export interface AuthResponse {
-    access_token: string;
+    accessToken: string;
     user: User;
 }
 

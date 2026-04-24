@@ -24,15 +24,13 @@ const persistToken = async (token: string) => {
   setAuthToken(token);
 };
 
-const register = async (payload: AuthPayload): Promise<AuthResponse> => {
-  const { data } = await api.post<AuthResponse>('/auth/register', payload);
-  await persistToken(data.access_token);
-  return data;
+const register = async (payload: AuthPayload): Promise<void> => {
+  await api.post('/auth/register', payload);
 };
 
 const login = async (payload: AuthPayload): Promise<AuthResponse> => {
   const { data } = await api.post<AuthResponse>('/auth/login', payload);
-  await persistToken(data.access_token);
+  await persistToken(data.accessToken);
   return data;
 };
 

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { navigationRef } from '@/navigation/navigationRef';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3333';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -27,10 +27,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url ?? '';
+    if (error.response?.status === 401 && !url.startsWith('/auth/')) {
       authToken = null;
       if (navigationRef.isReady()) {
-        navigationRef.reset({ index: 0, routes: [{ name: 'Login' }] });
+        navigationRef.reset({ index: 0, routes: [{ name: 'Register' }] });
       }
     }
     return Promise.reject(error);

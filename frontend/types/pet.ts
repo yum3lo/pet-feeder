@@ -2,6 +2,7 @@ export interface CreatePetPayload {
   name: string;
   weight?: number;
   breed?: string;
+  species?: string;
 }
 
 export interface Pet {
@@ -9,5 +10,6 @@ export interface Pet {
   name: string;
   weight?: number;
   breed?: string;
+  species?: string;
   imageUrl?: string;
 }

@@ -21,7 +21,7 @@ export function useRegisterForm(navigation: NavigationProp<RootStackParamList>) 
     register(
       { email, password },
       {
-        onSuccess: () => navigation.navigate('AddPet'),
+        onSuccess: () => navigation.navigate('Login'),
         onError: (err: any) =>
           showToast(err?.response?.data?.message ?? 'Registration failed', 'error'),
       },
