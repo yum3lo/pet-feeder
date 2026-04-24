@@ -28,10 +28,16 @@ function PagingCarouselInner<T>(
       data={data}
       keyExtractor={keyExtractor}
       horizontal
-      pagingEnabled
       showsHorizontalScrollIndicator={false}
       decelerationRate="fast"
       snapToInterval={itemWidth}
+      snapToAlignment="start"
+      disableIntervalMomentum
+      getItemLayout={(_: any, index: number) => ({
+        length: itemWidth,
+        offset: itemWidth * index,
+        index,
+      })}
       onMomentumScrollEnd={(e) => {
         const idx = Math.round(e.nativeEvent.contentOffset.x / itemWidth);
         onIndexChange?.(idx);
