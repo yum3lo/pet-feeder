@@ -1,6 +1,7 @@
 export { default as LoadingScreen } from './loading/LoadingScreen';
 export { default as LoginScreen } from './auth/login/LoginScreen';
 export { default as RegisterScreen } from './auth/register/RegisterScreen';
+export { default as AddDeviceScreen } from './device/AddDeviceScreen';
 export { default as AddPetScreen } from './pet/addPet/AddPetScreen';
 export { default as AddPetPhotoScreen } from './pet/addPetPhoto/AddPetPhotoScreen';
 export { default as SetFeedingScreen } from './schedule/setFeeding/SetFeedingScreen';

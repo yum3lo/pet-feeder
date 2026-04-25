@@ -2,6 +2,7 @@ export type RootStackParamList = {
   Loading: undefined;
   Register: undefined;
   Login: undefined;
+  AddDevice: undefined;
   AddPet: undefined;
   AddPetPhoto: { petId: number };
   SetFeeding: undefined;
