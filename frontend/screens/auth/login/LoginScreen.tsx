@@ -13,8 +13,8 @@ export default function LoginScreen({ navigation }: Props) {
   const { email, setEmail, password, setPassword, isPending, handleLogin } = useLoginForm(navigation);
 
   const fields = [
-    { placeholder: 'name@example.com', value: email, onChangeText: (v: string) => setEmail(v.trim()), keyboardType: 'email-address' as const, autoCapitalize: 'none' as const, secureTextEntry: false },
-    { placeholder: 'Password', value: password, onChangeText: (v: string) => setPassword(v.trim()), secureTextEntry: true },
+    { placeholder: 'name@example.com', value: email, onChangeText: (v: string) => setEmail(v), keyboardType: 'email-address' as const, autoCapitalize: 'none' as const, secureTextEntry: false },
+    { placeholder: 'Password', value: password, onChangeText: (v: string) => setPassword(v), secureTextEntry: true },
   ];
 
   return (

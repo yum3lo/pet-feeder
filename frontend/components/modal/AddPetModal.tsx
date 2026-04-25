@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 
 import { Dropdown, ActionButtons } from '@/components';
+import DietaryRestrictionsField from '@/components/pet/DietaryRestrictionsField';
 import { useToast } from '@/contexts';
 import catBreeds from '@/data/cat_breeds.json';
 import dogBreeds from '@/data/dog_breeds.json';
@@ -18,6 +19,7 @@ export type PetData = {
   weight: string;
   photo: string | null;
   species: string;
+  dietaryRestrictions: string[];
 };
 
 type Props = {
@@ -27,7 +29,7 @@ type Props = {
   onClose: () => void;
 };
 
-const DEFAULT: PetData = { name: '', breed: '', weight: '', photo: null, species: '' };
+const DEFAULT: PetData = { name: '', breed: '', weight: '', photo: null, species: '', dietaryRestrictions: [] };
 
 export default function AddPetModal({ visible, initialData, onSave, onClose }: Props) {
   const [draft, setDraft] = useState<PetData>(DEFAULT);
@@ -50,11 +52,12 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
   };
 
   const handleSave = () => {
-    if (!draft.name.trim()) {
+    const saved = { ...draft, name: draft.name.trim(), weight: draft.weight.trim() };
+    if (!saved.name) {
       showToast('Please enter a name for your pet.', 'error');
       return;
     }
-    onSave(draft);
+    onSave(saved);
   };
 
   return (
@@ -89,7 +92,7 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
             placeholder="Name"
             placeholderTextColor={colors.stroke}
             value={draft.name}
-            onChangeText={(v) => setDraft((p) => ({ ...p, name: v.trim() }))}
+            onChangeText={(v) => setDraft((p) => ({ ...p, name: v }))}
           />
 
           <View style={[styles.input, styles.speciesRow]}>
@@ -131,11 +134,16 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
               placeholder="Weight"
               placeholderTextColor={colors.stroke}
               value={draft.weight}
-              onChangeText={(v) => setDraft((p) => ({ ...p, weight: v.trim() }))}
+              onChangeText={(v) => setDraft((p) => ({ ...p, weight: v }))}
               keyboardType="numeric"
             />
             <Text style={styles.unit}>kg</Text>
           </View>
+
+          <DietaryRestrictionsField
+            value={draft.dietaryRestrictions}
+            onChange={(v) => setDraft((p) => ({ ...p, dietaryRestrictions: v }))}
+          />
 
           <ActionButtons
             leftLabel="Cancel"

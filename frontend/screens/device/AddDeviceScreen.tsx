@@ -64,7 +64,7 @@ export default function AddDeviceScreen({ navigation }: Props) {
                 placeholder={index === 0 ? "Device Name (e.g. Living Room Feeder)" : "Add Another Device"}
                 placeholderTextColor={colors.stroke}
                 value={device.name}
-                onChangeText={(v) => updateName(index, v.trim())}
+                onChangeText={(v) => updateName(index, v)}
               />
               {devices.length > 1 && index === devices.length - 1 && (
                 <TouchableOpacity onPress={() => removeRow(index)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>

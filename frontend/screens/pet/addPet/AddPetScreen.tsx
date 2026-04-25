@@ -1,6 +1,7 @@
 import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 
 import { BackButton, Dropdown } from '@/components';
+import DietaryRestrictionsField from '@/components/pet/DietaryRestrictionsField';
 import catBreeds from '@/data/cat_breeds.json';
 import dogBreeds from '@/data/dog_breeds.json';
 import { usePetForm } from '@/hooks';
@@ -34,7 +35,7 @@ export default function AddPetScreen({ navigation }: Props) {
             placeholder={field.placeholder}
             placeholderTextColor={colors.stroke}
             value={pet[field.key]}
-            onChangeText={(text) => setPet({ ...pet, [field.key]: text.trim() })}
+            onChangeText={(text) => setPet({ ...pet, [field.key]: text })}
             autoCapitalize='none'
           />
         ))}
@@ -44,7 +45,7 @@ export default function AddPetScreen({ navigation }: Props) {
             placeholder='Pet Weight'
             placeholderTextColor={colors.stroke}
             value={pet.petWeight}
-            onChangeText={(text) => setPet({ ...pet, petWeight: text.trim() })}
+            onChangeText={(text) => setPet({ ...pet, petWeight: text })}
             keyboardType='numeric'
           />
           <Text style={styles.suffix}>kg</Text>
@@ -78,6 +79,12 @@ export default function AddPetScreen({ navigation }: Props) {
           options={pet.petSpecies === 'cat' ? catBreeds : pet.petSpecies === 'dog' ? dogBreeds : []}
           value={pet.petBreed}
           onSelect={(value) => setPet({ ...pet, petBreed: value })}
+        />
+
+        <DietaryRestrictionsField
+          value={pet.petDietaryRestrictions}
+          onChange={(v) => setPet({ ...pet, petDietaryRestrictions: v })}
+          style={{ width: '90%' }}
         />
 
         <TouchableOpacity

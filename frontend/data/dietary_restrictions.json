@@ -1,0 +1,22 @@
+[
+   { "label": "None", "value": "none" },
+   { "label": "Grain-free", "value": "grain-free" },
+  { "label": "Gluten-free", "value": "gluten-free" },
+  { "label": "Lactose-free", "value": "lactose-free" },
+  { "label": "Low sodium", "value": "low-sodium" },
+  { "label": "Low fat", "value": "low-fat" },
+  { "label": "Low protein", "value": "low-protein" },
+  { "label": "High protein", "value": "high-protein" },
+  { "label": "Hypoallergenic", "value": "hypoallergenic" },
+  { "label": "Raw diet", "value": "raw-diet" },
+  { "label": "Diabetic diet", "value": "diabetic-diet" },
+  { "label": "Renal diet", "value": "renal-diet" },
+  { "label": "Vegetarian", "value": "vegetarian" },
+  { "label": "No chicken", "value": "no-chicken" },
+  { "label": "No beef", "value": "no-beef" },
+  { "label": "No fish", "value": "no-fish" },
+  { "label": "No pork", "value": "no-pork" },
+  { "label": "No dairy", "value": "no-dairy" },
+  { "label": "No eggs", "value": "no-eggs" },
+  { "label": "No soy", "value": "no-soy" }
+]

@@ -3,6 +3,7 @@ export interface CreatePetPayload {
   weight?: number;
   breed?: string;
   species?: string;
+  dietaryRestrictions?: string[];
 }
 
 export interface Pet {
@@ -12,4 +13,5 @@ export interface Pet {
   breed?: string;
   species?: string;
   imageUrl?: string;
+  dietaryRestrictions?: string[];
 }
