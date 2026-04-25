@@ -130,8 +130,8 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     this.clearFeedingTimeout(deviceId);
 
     const {
-      scheduledCatId,
-      actualCatId,
+      scheduledPetId,
+      actualPetId,
       dispensedGrams,
       consumedGrams,
       leftoverGrams,
@@ -139,8 +139,8 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
     const log = await this.feedingService.handleFeedingResult(
       deviceId,
-      scheduledCatId ?? null,
-      actualCatId ?? null,
+      scheduledPetId ?? null,
+      actualPetId ?? null,
       dispensedGrams ?? 0,
       consumedGrams ?? 0,
       leftoverGrams ?? 0,
@@ -153,7 +153,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
         ? await this.getPetName(log.petId)
         : 'Your pet';
 
-      const samepet = !actualCatId || actualCatId === scheduledCatId;
+      const samepet = !actualPetId || actualPetId === scheduledPetId;
       const message = samepet
         ? `${petName} has eaten ${consumedGrams}g.`
         : `A different pet ate ${consumedGrams}g from ${petName}'s bowl.`;
@@ -169,13 +169,12 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       `for pet ${petId} from ${deviceId}`,
     );
 
-    await this.recognitionService.storeTrainingPhotos(petId, photos);
-
-    // if this is the last batch, triggering model training
-    if (batchIndex + 1 === totalBatches) {
-      this.logger.log(`All batches received for pet ${petId}. Starting training...`);
-      await this.recognitionService.trainModel(petId);
-    }
+    await this.recognitionService.storeTrainingPhotos(
+      petId,
+      photos,
+      batchIndex,
+      totalBatches,
+    );
   }
 
   private async handleMovementImage(deviceId: string, data: any) {
@@ -190,18 +189,18 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     this.publish(
       `feeder/${deviceId}/results/recognition`,
       {
-        catId: result.catId,
+        petId: result.petId,
         confidence: result.confidence,
       },
     );
 
     // if pet is on free-feeding mode, sending dispense command
-    if (result.catId && result.shouldFeed) {
-      const pet = await this.getPetWithSchedule(result.catId);
+    if (result.petId && result.shouldFeed) {
+      const pet = await this.getPetWithSchedule(result.petId);
       if (pet) {
         this.sendDispenseCommand(
           deviceId,
-          result.catId,
+          result.petId,
           pet.defaultPortionSize,
           null,
         );
@@ -275,7 +274,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     );
 
     this.publish(`feeder/${deviceId}/commands/dispense`, {
-      catId: petId,
+      petId: petId,
       portionGrams,
       logId,
     });
