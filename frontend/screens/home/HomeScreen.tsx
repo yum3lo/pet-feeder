@@ -49,6 +49,9 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }, [pets.length]);
 
+  const MEAL_CARDS_GAP = 28;
+  const MEAL_CARD_WIDTH = pets.length > 1 ? SCREEN_WIDTH - MEAL_CARDS_GAP : SCREEN_WIDTH;
+
   return (
     <View style={styles.container}>
       <DeviceSelectorDropdown
@@ -67,11 +70,15 @@ export default function HomeScreen({ navigation }: Props) {
           ref={carouselRef}
           data={pets}
           keyExtractor={(item) => String(item.id)}
-          itemWidth={SCREEN_WIDTH}
+          itemWidth={ MEAL_CARD_WIDTH }
           onIndexChange={setActivePetIndex}
-          renderItem={(item) => (
-            <View style={{ width: SCREEN_WIDTH }}>
-              <MealCardWithSchedule petId={item.id} petName={item.name} />
+          renderItem={(item, index) => (
+            <View style={{ width: MEAL_CARD_WIDTH }}>
+              <MealCardWithSchedule
+                petId={item.id}
+                petName={item.name}
+                cardStyle={pets.length > 1 ? { marginLeft: index === 0 ? 16 : 8, marginRight: index === pets.length - 1 ? 16 : 8 } : undefined}
+              />
             </View>
           )}
         />
