@@ -46,11 +46,11 @@ export default function HistoryScreen({ navigation }: Props) {
     return toCapitalize(device?.name || deviceId);
   };
 
-  const grouped: Record<string, { title: string; date: string; data: { id: string; time: string; amount: string; deviceName: string }[] }> = {};
+  const grouped: Record<string, { title: string; date: string; data: { id: string; time: string; amount: string; deviceName: string; petName?: string; feedingType?: string }[] }> = {};
 
   const MOCK_ENTRIES = devices.length > 0 ? [
-    { id: 1, deviceId: devices[0].deviceId, dispensedGrams: 80, timestamp: '2026-03-27T10:00:00.000Z' },
-    { id: 2, deviceId: devices[0].deviceId, dispensedGrams: 80, timestamp: '2026-03-27T17:00:00.000Z' },
+    { id: 1, deviceId: devices[0].deviceId, dispensedGrams: 20, timestamp: '2026-03-27T10:00:00.000Z' },
+    { id: 2, deviceId: devices[0].deviceId, dispensedGrams: 30, timestamp: '2026-03-27T17:00:00.000Z' },
   ] : [];
 
   const source = entries.length ? entries : MOCK_ENTRIES;
@@ -65,6 +65,8 @@ export default function HistoryScreen({ navigation }: Props) {
       time: isoToTime(e.timestamp),
       amount: `${e.dispensedGrams} g`,
       deviceName: getDeviceName(e.deviceId),
+      petName: (e as any).pet?.name,
+      feedingType: (e as any).feedingType,
     });
   });
 
