@@ -238,8 +238,13 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async handleHeartbeat(deviceId: string, data: any) {
-    this.logger.debug(`Heartbeat from ${deviceId}`);
-    await this.devicesService.markOnline(deviceId);
+    if (data.status === 'offline') {
+      this.logger.log(`Device ${deviceId} disconnected.`);
+      await this.devicesService.markOffline(deviceId);
+    } else {
+      this.logger.log(`Device ${deviceId} connected.`);
+      await this.devicesService.markOnline(deviceId);
+    }
   }
 
   private async handleError(deviceId: string, data: any) {
