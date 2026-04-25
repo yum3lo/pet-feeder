@@ -22,7 +22,9 @@ import { FeedingService } from './feeding.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { ManualFeedDto } from './dto/manual-feed.dto';
 import { ToggleScheduleDto } from './dto/toggle-schedule.dto';
+import { CapturePhotosDto } from './dto/capture-photos.dto';
 import { MqttService } from '../mqtt/mqtt.service';
+import { RecognitionService } from 'src/recognition/recognition.service';
 
 @ApiTags('Feeding')
 @ApiBearerAuth()
@@ -31,7 +33,9 @@ import { MqttService } from '../mqtt/mqtt.service';
 export class FeedingController {
   constructor(
     private feedingService: FeedingService,
-    private mqttService: MqttService) {}
+    private mqttService: MqttService,
+    private recognitionService: RecognitionService
+  ) {}
 
   // ── Schedules ─────────────────────────────────────────────
 
@@ -97,13 +101,17 @@ export class FeedingController {
   @ApiOperation({ summary: 'Trigger training photo capture on the device' })
   capturePhotos(
     @Req() req,
-    @Body() body: { deviceId: string; petId: number; durationSeconds?: number },
+    @Body() dto: CapturePhotosDto,
   ) {
-    this.mqttService.sendCapturePhotosCommand(
-      body.deviceId,
-      body.petId,
-      body.durationSeconds ?? 8,
-    );
+    this.mqttService.sendCapturePhotosCommand(dto.deviceId, dto.petId);
     return { message: 'Photo capture command sent.' };
+  }
+
+  // ── Train Model ────────────────────────────────────────
+  @Post('train/:deviceId')
+  @ApiOperation({ summary: 'Trigger model training for all pets of this user' })
+  async trainModel(@Req() req, @Param('deviceId') deviceId: string) {
+    const result = await this.recognitionService.trainModel(req.user.id);
+    return result;
   }
 }
