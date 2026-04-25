@@ -94,7 +94,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"]\n}"
+              "raw": "{\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"],\n  \"freePortionSize\": 20\n}"
             }
           },
           "response": [
@@ -102,7 +102,7 @@
               "name": "201 Created",
               "status": "Created",
               "code": 201,
-              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"],\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"freePortionSize\": 20,\n  \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"],\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
             }
           ]
         },
@@ -118,7 +118,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "[\n  {\n    \"id\": 1,\n    \"userId\": 1,\n    \"name\": \"Whiskers\",\n    \"species\": \"cat\",\n    \"breed\": \"Siamese\",\n    \"weight\": 4.5,\n    \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"],\n    \"imageUrl\": \"https://res.cloudinary.com/...\",\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n    \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n]"
+              "body": "[\n  {\n    \"id\": 1,\n    \"userId\": 1,\n    \"name\": \"Whiskers\",\n    \"species\": \"cat\",\n    \"breed\": \"Siamese\",\n    \"weight\": 4.5,\n    \"freePortionSize\": 20,\n    \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"],\n    \"imageUrl\": \"https://res.cloudinary.com/...\",\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n    \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n]"
             }
           ]
         },
@@ -134,7 +134,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"],\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 4.5,\n  \"freePortionSize\": 20,\n  \"dietaryRestrictions\": [\"grain-free\", \"no dairy\"],\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:00:00.000Z\"\n}"
             }
           ]
         },
@@ -149,7 +149,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Whiskers Jr.\",\n  \"weight\": 5.0\n}"
+              "raw": "{\n  \"name\": \"Whiskers Jr.\",\n  \"weight\": 5.0,\n  \"freePortionSize\": 30\n}"
             }
           },
           "response": [
@@ -157,7 +157,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers Jr.\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 5.0,\n  \"dietaryRestrictions\": [\"grain-free\"],\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:05:00.000Z\"\n}"
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"name\": \"Whiskers Jr.\",\n  \"species\": \"cat\",\n  \"breed\": \"Siamese\",\n  \"weight\": 5.0,\n  \"freePortionSize\": 30,\n  \"dietaryRestrictions\": [\"grain-free\"],\n  \"imageUrl\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\",\n  \"updatedAt\": \"2026-04-23T10:05:00.000Z\"\n}"
             }
           ]
         },
@@ -223,7 +223,7 @@
               "name": "201 Created",
               "status": "Created",
               "code": 201,
-              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"name\": \"Living Room Feeder\",\n  \"isOnline\": false,\n  \"lastSeen\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"name\": \"Living Room Feeder\",\n  \"isOnline\": false,\n  \"lastSeen\": null,\n  \"containerWeight\": null,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n}"
             }
           ]
         },
@@ -239,7 +239,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "[\n  {\n    \"id\": 1,\n    \"userId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"name\": \"Living Room Feeder\",\n    \"isOnline\": true,\n    \"lastSeen\": \"2026-04-23T10:00:00.000Z\",\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n]"
+              "body": "[\n  {\n    \"id\": 1,\n    \"userId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"name\": \"Living Room Feeder\",\n    \"isOnline\": true,\n    \"lastSeen\": \"2026-04-23T10:00:00.000Z\",\n    \"containerWeight\": 450.5,\n    \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n  }\n]"
             }
           ]
         },
@@ -255,7 +255,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"name\": \"Living Room Feeder\",\n  \"isOnline\": true,\n  \"lastSeen\": \"2026-04-23T10:00:00.000Z\",\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n}"
+              "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"deviceId\": \"feeder_01\",\n  \"name\": \"Living Room Feeder\",\n  \"isOnline\": true,\n  \"lastSeen\": \"2026-04-23T10:00:00.000Z\",\n  \"containerWeight\": 450.5,\n  \"createdAt\": \"2026-04-23T10:00:00.000Z\"\n}"
             }
           ]
         },
@@ -401,7 +401,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "[\n  {\n    \"id\": 1,\n    \"petId\": 1,\n    \"actualPetId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"scheduledGrams\": 50,\n    \"dispensedGrams\": 50,\n    \"consumedGrams\": 45,\n    \"leftoverGrams\": 5,\n    \"feedingType\": \"scheduled\",\n    \"status\": \"completed\",\n    \"timestamp\": \"2026-04-23T08:00:00.000Z\",\n    \"pet\": { \"id\": 1, \"name\": \"Whiskers\", \"imageUrl\": null }\n  }\n]"
+              "body": "[\n  {\n    \"id\": 1,\n    \"petId\": 1,\n    \"actualPetId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"scheduledGrams\": 50,\n    \"dispensedGrams\": 50,\n    \"consumedGrams\": 45,\n    \"leftoverGrams\": 5,\n    \"feedingType\": \"scheduled\",\n    \"status\": \"completed\",\n    \"timestamp\": \"2026-04-23T08:00:00.000Z\",\n    \"pet\": { \"id\": 1, \"name\": \"Whiskers\", \"imageUrl\": null }\n  },\n  {\n    \"id\": 2,\n    \"petId\": 1,\n    \"actualPetId\": 1,\n    \"deviceId\": \"feeder_01\",\n    \"scheduledGrams\": 30,\n    \"dispensedGrams\": 30,\n    \"consumedGrams\": 28,\n    \"leftoverGrams\": 2,\n    \"feedingType\": \"free\",\n    \"status\": \"completed\",\n    \"timestamp\": \"2026-04-23T11:30:00.000Z\",\n    \"pet\": { \"id\": 1, \"name\": \"Whiskers\", \"imageUrl\": null }\n  }\n]"
             }
           ]
         },
@@ -416,7 +416,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"deviceId\": \"feeder_01\",\n  \"petId\": 1,\n  \"durationSeconds\": 8\n}"
+              "raw": "{\n  \"deviceId\": \"feeder_01\",\n  \"petId\": 1\n}"
             }
           },
           "response": [
@@ -425,6 +425,22 @@
               "status": "Created",
               "code": 201,
               "body": "{\n  \"message\": \"Photo capture command sent.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Train Model",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/feeding/train/feeder_01",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"accuracy\": 0.9583,\n  \"numClasses\": 2,\n  \"classNames\": [\"background\", \"1\"],\n  \"modelPath\": \"...\\\\models\\\\user_1\\\\model.h5\"\n}"
             }
           ]
         }
