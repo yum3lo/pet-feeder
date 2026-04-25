@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Text, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AddPetModal, BottomNavBar, DeleteModal, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
@@ -12,7 +12,7 @@ import { colors, typography, spacing } from '@/style';
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { styles, CARD_WIDTH } from './styles';
+import { styles, CARD_WIDTH, CAROUSEL_SLOT_WIDTH } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -52,42 +52,37 @@ export default function SettingsScreen({ navigation }: Props) {
         Pet Profile
       </Text>
 
-      <View style={styles.scrollArea}>
-        <View style={styles.cardWrapper}>
-          {cardHeight > 0 && (
-            <View pointerEvents="none" style={[styles.cardShadowLayer, { height: cardHeight }]} />
+      <View style={styles.cardWrapper}>
+        <PagingCarousel
+          ref={carouselRef}
+          data={pets}
+          keyExtractor={(item) => String(item.id)}
+          itemWidth={pets.length > 1 ? CAROUSEL_SLOT_WIDTH : CARD_WIDTH}
+          onIndexChange={setCurrentIndex}
+          renderItem={(item, index) => (
+            <View style={{
+              width: pets.length > 1 ? CAROUSEL_SLOT_WIDTH : CARD_WIDTH,
+              paddingLeft: pets.length > 1 ? (index === 0 ? spacing.xl : 8) : 0,
+              paddingRight: pets.length > 1 ? (index === pets.length - 1 ? spacing.xl : 8) : 0,
+              paddingTop: 64,
+              paddingBottom: 32,
+            }}>
+              <PetProfileCard
+                item={item}
+                index={index}
+                currentIndex={currentIndex}
+                petsCount={pets.length}
+                cardHeight={cardHeight}
+                setCardHeight={setCardHeight}
+                onEdit={() => setEditModalVisible(true)}
+                onDelete={() => setDeleteModalVisible(true)}
+              />
+            </View>
           )}
+        />
+      </View>
 
-          <View style={styles.avatarContainer}>
-            <Image
-              source={currentPet?.imageUrl ? { uri: currentPet.imageUrl } : require('@/assets/pfp.jpg')}
-              style={styles.avatar}
-            />
-          </View>
-
-          <PagingCarousel
-            ref={carouselRef}
-            data={pets}
-            keyExtractor={(item) => String(item.id)}
-            itemWidth={CARD_WIDTH}
-            onIndexChange={setCurrentIndex}
-            renderItem={(item, index) => (
-              <View style={{ width: CARD_WIDTH }}>
-                <PetProfileCard
-                  item={item}
-                  index={index}
-                  currentIndex={currentIndex}
-                  petsCount={pets.length}
-                  cardHeight={cardHeight}
-                  setCardHeight={setCardHeight}
-                  onEdit={() => setEditModalVisible(true)}
-                  onDelete={() => setDeleteModalVisible(true)}
-                />
-              </View>
-            )}
-          />
-        </View>
-
+      <View style={styles.scrollArea}>
         <TouchableOpacity style={styles.addPetButton} onPress={() => setAddModalVisible(true)}>
           <Text style={[typography.body, { color: colors.accent, fontWeight: '700' }]}>
             + Add another pet
