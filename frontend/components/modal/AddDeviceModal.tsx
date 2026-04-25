@@ -1,13 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
   Modal, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator,
 } from 'react-native';
 
 import { useToast } from '@/contexts';
-import { registerDevice, useGetDevices } from '@/services/devices';
+import { registerDevice } from '@/services/devices';
 import { colors, spacing, typography, radius } from '@/style';
-import { useQueryClient } from '@tanstack/react-query';
 
 const generateDeviceId = () =>
   `feeder_${Math.random().toString(36).slice(2, 10)}${Math.random().toString(36).slice(2, 10)}`;
