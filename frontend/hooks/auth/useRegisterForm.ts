@@ -19,7 +19,7 @@ export function useRegisterForm(navigation: NavigationProp<RootStackParamList>) 
       return;
     }
     register(
-      { email, password },
+      { email: email.trim(), password },
       {
         onSuccess: () => navigation.navigate('Login'),
         onError: (err: any) =>

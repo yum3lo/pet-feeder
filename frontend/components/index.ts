@@ -24,6 +24,7 @@ export { default as BottomNavBar } from './nav/BottomNavBar';
 export { default as Toast } from './toast/Toast';
 export { default as OfflineBanner } from './banner/OfflineBanner';
 export { default as GlowEffect } from './glow/GlowEffect';
+export { default as DietaryRestrictionsField } from './pet/DietaryRestrictionsField';
 
 export type { MealModalData } from './modal/MealModal';
 export type { PetData } from './modal/AddPetModal';

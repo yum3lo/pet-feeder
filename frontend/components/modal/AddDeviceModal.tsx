@@ -65,7 +65,7 @@ export default function AddDeviceModal({ visible, onClose }: Props) {
               placeholder="e.g. Living Room Feeder"
               placeholderTextColor={colors.stroke}
               value={name}
-              onChangeText={(v) => setName(v.trim())}
+              onChangeText={(v) => setName(v)}
               autoFocus
               returnKeyType="done"
               onSubmitEditing={handleAdd}

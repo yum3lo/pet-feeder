@@ -120,6 +120,7 @@ export default function SettingsScreen({ navigation }: Props) {
           weight: String(currentPet?.weight ?? ''),
           photo: currentPet?.imageUrl ?? '',
           species: currentPet?.species ?? '',
+          dietaryRestrictions: currentPet?.dietaryRestrictions ?? [],
         }}
         onSave={handleEditPet}
         onClose={() => setEditModalVisible(false)}

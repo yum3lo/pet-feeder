@@ -7,6 +7,7 @@ export function toCreatePayload(data: PetData): CreatePetPayload & { photo?: str
     weight: data.weight ? parseFloat(data.weight) : undefined,
     breed: data.breed || undefined,
     species: data.species || undefined,
+    dietaryRestrictions: data.dietaryRestrictions?.length ? data.dietaryRestrictions : undefined,
     photo: data.photo || undefined,
   };
 }
@@ -20,6 +21,7 @@ export function toUpdatePayload(
     weight: data.weight ? parseFloat(data.weight) : undefined,
     breed: data.breed || undefined,
     species: data.species || undefined,
+    dietaryRestrictions: data.dietaryRestrictions ?? [],
     photo: data.photo && data.photo !== currentImageUrl ? data.photo : undefined,
   };
 }

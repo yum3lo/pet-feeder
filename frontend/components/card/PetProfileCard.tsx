@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 
 import catBreeds from '@/data/cat_breeds.json';
+import dietaryOptions from '@/data/dietary_restrictions.json';
 import dogBreeds from '@/data/dog_breeds.json';
 import { colors, typography, spacing } from '@/style';
 import { toCapitalize } from '@/utils';
@@ -14,6 +15,9 @@ const allBreeds = [...catBreeds, ...dogBreeds];
 
 const getBreedLabel = (value?: string) =>
   allBreeds.find((b) => b.value === value)?.label ?? value ?? '—';
+
+const getDietLabel = (val: string) =>
+  dietaryOptions.find((o) => o.value === val)?.label ?? val;
 
 
 type Props = {
@@ -86,6 +90,28 @@ export default function PetProfileCard({
           {item.weight != null ? `${item.weight} kg` : '—'}
         </Text>
       </View>
+
+      {item.dietaryRestrictions && item.dietaryRestrictions.length > 0 && (
+        item.dietaryRestrictions.length === 1 ? (
+          <View style={styles.infoRow}>
+            <Text style={[typography.bodyBold, { color: colors.stroke }]}>Dietary Restrictions</Text>
+            <View style={styles.dietTag}>
+              <Text style={styles.dietTagText}>{getDietLabel(item.dietaryRestrictions[0])}</Text>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.dietSection}>
+            <Text style={[typography.bodyBold, { color: colors.stroke, marginBottom: spacing.sm }]}>Dietary Restrictions</Text>
+            <View style={styles.dietTags}>
+              {item.dietaryRestrictions.map((r) => (
+                <View key={r} style={styles.dietTag}>
+                  <Text style={styles.dietTagText}>{getDietLabel(r)}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )
+      )}
     </View>
   );
 }
@@ -158,5 +184,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: spacing.md,
+  },
+  dietSection: {
+    marginTop: spacing.xs,
+  },
+  dietTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  dietTag: {
+    backgroundColor: colors.accent + '18',
+    borderRadius: 20,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  dietTagText: {
+    color: colors.accent,
+    fontSize: 12,
+    fontWeight: '500',
   },
 });

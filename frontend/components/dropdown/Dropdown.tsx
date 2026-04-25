@@ -26,16 +26,17 @@ interface DropdownProps {
   compact?: boolean;
   light?: boolean;
   triggerTextStyle?: object | object[];
+  triggerIconColor?: string;
   onAdd?: () => void;
   onDelete?: (value: string) => void;
 }
 
-export default function Dropdown({ placeholder = 'Select', options, value, onSelect, style, compact, light, triggerTextStyle, onDelete }: DropdownProps) {
+export default function Dropdown({ placeholder = 'Select', options, value, onSelect, style, compact, light, triggerTextStyle, triggerIconColor, onDelete }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const selectedOption = options.find((o) => o.value === value);
   const selectedLabel = selectedOption?.label;
   const selectedDot = selectedOption?.dotColor;
-  const compactIconColor = light ? colors.background : colors.accent;
+  const compactIconColor = triggerIconColor ?? (light ? colors.background : colors.accent);
 
   return (
     <View style={[styles.wrapper, !compact && styles.wrapperFull, compact && styles.wrapperCompact, style]}>
