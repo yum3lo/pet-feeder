@@ -194,15 +194,15 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       },
     );
 
-    // if pet is on free-feeding mode, sending dispense command
+    // if pet is on free-feeding mode, log and dispense
     if (result.petId && result.shouldFeed) {
       const pet = await this.getPetWithSchedule(result.petId);
       if (pet) {
-        this.sendDispenseCommand(
+        await this.feedingService.executeFeeding(
           deviceId,
           result.petId,
           pet.defaultPortionSize,
-          null,
+          'free',
         );
       }
     }
@@ -211,6 +211,8 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   private async handleContainerWeight(deviceId: string, data: any) {
     const { weightGrams } = data;
     this.logger.debug(`Container weight from ${deviceId}: ${weightGrams}g`);
+
+    await this.devicesService.updateContainerWeight(deviceId, weightGrams);
 
     const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
     if (!userId) return;
@@ -343,10 +345,15 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async getPetWithSchedule(petId: number) {
-    const schedule = await this.prisma.feedingSchedule.findFirst({
-      where: { petId, isActive: true, feedingMode: 'free' },
+    const anySchedule = await this.prisma.feedingSchedule.findFirst({
+      where: { petId, isActive: true },
     });
-    if (!schedule) return null;
-    return { defaultPortionSize: schedule.portionSize };
+    if (anySchedule) return null;
+
+    const pet = await this.prisma.pet.findUnique({
+      where: { id: petId },
+      select: { freePortionSize: true },
+    });
+    return pet ? { defaultPortionSize: pet.freePortionSize } : null;
   }
 }

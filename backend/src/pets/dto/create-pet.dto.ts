@@ -33,4 +33,10 @@ export class CreatePetDto {
   @IsArray()
   @IsString({ each: true })
   dietaryRestrictions?: string[];
+
+  @ApiPropertyOptional({ example: 20, description: 'Grams dispensed per free-feeding visit (default 20g)' })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  freePortionSize?: number;
 }
