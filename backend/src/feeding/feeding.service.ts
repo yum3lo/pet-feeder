@@ -168,8 +168,8 @@ export class FeedingService {
 
   async handleFeedingResult(
     deviceId: string,
-    scheduledCatId: number | null,
-    actualCatId: number | null,
+    scheduledPetId: number | null,
+    actualPetId: number | null,
     dispensedGrams: number,
     consumedGrams: number,
     leftoverGrams: number,
@@ -184,8 +184,8 @@ export class FeedingService {
       await this.prisma.feedingLog.update({
         where: { id: pendingLog.id },
         data: {
-          petId: scheduledCatId,
-          actualPetId: actualCatId,
+          petId: scheduledPetId,
+          actualPetId: actualPetId,
           dispensedGrams,
           consumedGrams,
           leftoverGrams,
@@ -195,13 +195,13 @@ export class FeedingService {
     }
 
     // if a different pet ate the food, adjust its next portion
-    if (actualCatId && actualCatId !== scheduledCatId && leftoverGrams > 0) {
-      await this.adjustNextPortion(actualCatId, leftoverGrams);
+    if (actualPetId && actualPetId !== scheduledPetId && leftoverGrams > 0) {
+      await this.adjustNextPortion(actualPetId, leftoverGrams);
     }
 
     // adjusting scheduled pet's next portion by leftover
-    if (scheduledCatId && leftoverGrams > 0) {
-      await this.adjustNextPortion(scheduledCatId, -leftoverGrams);
+    if (scheduledPetId && leftoverGrams > 0) {
+      await this.adjustNextPortion(scheduledPetId, -leftoverGrams);
     }
 
     return pendingLog;
