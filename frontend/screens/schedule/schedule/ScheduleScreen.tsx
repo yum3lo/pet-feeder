@@ -9,7 +9,9 @@ import {BottomNavBar, MealModal, type MealModalData, MealList, PetSelectorDropdo
 import { type MealItem } from "@/components/list/types";
 import { usePets, useToast } from '@/contexts';
 import { useGetPetSchedules, useGetPets, togglePetSchedule, createSchedule, updateSchedule, deleteSchedule } from '@/services';
+import { useGetDevices } from '@/services/devices';
 import { colors, typography, spacing } from '@/style';
+import { toCapitalize } from '@/utils';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -29,12 +31,15 @@ export default function ScheduleScreen({ navigation }: Props) {
   const { data: schedules = [], isLoading, refetch } = useGetPetSchedules(
     activePet?.id,
   );
-  const meals: MealItem[] = schedules.map((s) => ({
-    id: String(s.id),
-    time: s.time,
-    amount: `${s.amount} g`,
-    isActive: s.isActive,
-  }));
+  const { data: devices = [] } = useGetDevices();
+
+  const toMealItems = (group: typeof schedules): MealItem[] =>
+    group.map((s) => ({
+      id: String(s.id),
+      time: s.time,
+      amount: `${s.portionSize} g`,
+      isActive: s.isActive,
+    }));
 
   const handleToggle = async (scheduleId: string, val: boolean) => {
     await togglePetSchedule(Number(scheduleId), val);
@@ -43,13 +48,16 @@ export default function ScheduleScreen({ navigation }: Props) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingMeal, setEditingMeal] = useState<MealModalData | null>(null);
+  const [activeDevice, setActiveDevice] = useState<{ deviceId: string; name: string } | null>(null);
 
-  const openAdd = () => {
+  const openAdd = (device: { deviceId: string; name: string }) => {
+    setActiveDevice(device);
     setEditingMeal(null);
     setModalVisible(true);
   };
 
   const openEdit = (meal: MealItem) => {
+    setActiveDevice(null);
     setEditingMeal({ id: meal.id, time: meal.time, amount: meal.amount.replace(/[^0-9]/g, '') });
     setModalVisible(true);
   };
@@ -63,7 +71,7 @@ export default function ScheduleScreen({ navigation }: Props) {
         await updateSchedule(Number(data.id), { time: data.time, portionSize });
         showToast('Meal updated!', 'success');
       } else {
-        await createSchedule({ petId: activePet.id, time: data.time, portionSize });
+        await createSchedule({ petId: activePet.id, time: data.time, portionSize, deviceId: activeDevice?.deviceId });
         showToast('Meal added!', 'success');
       }
       refetch();
@@ -94,33 +102,44 @@ export default function ScheduleScreen({ navigation }: Props) {
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
         <View style={styles.mealsSection}>
           <Text style={[typography.bodyBold, styles.sectionLabel]}>Meals scheduled</Text>
+          <View style={styles.sectionLabelUnderline} />
 
           {isLoading ? (
             <ActivityIndicator color={colors.accent} style={{ marginTop: spacing.xl }} />
           ) : (
-            <MealList
-              meals={meals}
-              onPressItem={openEdit}
-              onToggle={handleToggle}
-              onAdd={openAdd}
-              emptyComponent={
-                <View style={styles.emptyState}>
-                  <Image
-                    source={require('../../../assets/no-schedule.png')}
-                    style={styles.emptyImage}
-                    resizeMode="contain"
-                  />
-                  <Text style={[typography.bodySmall, styles.emptyText]}>
-                    No scheduled meals yet.
+            devices.map((device) => {
+              const group = schedules.filter((s) => s.deviceId === device.deviceId);
+              return (
+                <View key={device.deviceId} style={styles.deviceGroup}>
+                  <Text style={styles.deviceGroupLabel}>
+                    {`Device ${toCapitalize(device.name || device.deviceId)}`}
                   </Text>
+                  <MealList
+                    meals={toMealItems(group)}
+                    onPressItem={openEdit}
+                    onToggle={handleToggle}
+                    onAdd={() => openAdd({ deviceId: device.deviceId, name: toCapitalize(device.name || device.deviceId) })}
+                    emptyComponent={
+                      <View style={styles.emptyState}>
+                        <Image
+                          source={require('../../../assets/no-schedule.png')}
+                          style={styles.emptyImage}
+                          resizeMode="contain"
+                        />
+                        <Text style={[typography.bodySmall, styles.emptyText]}>
+                          No scheduled meals yet.
+                        </Text>
+                      </View>
+                    }
+                  />
                 </View>
-              }
-            />
+              );
+            })
           )}
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} onPress={openAdd}>
+      <TouchableOpacity style={styles.fab} onPress={() => openAdd(devices[0] ? { deviceId: devices[0].deviceId, name: toCapitalize(devices[0].name || devices[0].deviceId) } : { deviceId: '', name: '' })}>
         <MaterialIcons name="add" size={30} color={colors.background} />
       </TouchableOpacity>
 
@@ -136,6 +155,7 @@ export default function ScheduleScreen({ navigation }: Props) {
       <MealModal
         visible={modalVisible}
         meal={editingMeal}
+        title={activeDevice ? `Add meal on ${activeDevice.name}` : undefined}
         onSave={handleSave}
         onDelete={handleDelete}
         onClose={() => setModalVisible(false)}
