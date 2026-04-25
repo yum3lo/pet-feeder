@@ -34,7 +34,7 @@ export default function AddPetScreen({ navigation }: Props) {
             placeholder={field.placeholder}
             placeholderTextColor={colors.stroke}
             value={pet[field.key]}
-            onChangeText={(text) => setPet({ ...pet, [field.key]: text })}
+            onChangeText={(text) => setPet({ ...pet, [field.key]: text.trim() })}
             autoCapitalize='none'
           />
         ))}
@@ -44,7 +44,7 @@ export default function AddPetScreen({ navigation }: Props) {
             placeholder='Pet Weight'
             placeholderTextColor={colors.stroke}
             value={pet.petWeight}
-            onChangeText={(text) => setPet({ ...pet, petWeight: text })}
+            onChangeText={(text) => setPet({ ...pet, petWeight: text.trim() })}
             keyboardType='numeric'
           />
           <Text style={styles.suffix}>kg</Text>
@@ -90,7 +90,7 @@ export default function AddPetScreen({ navigation }: Props) {
           </Text>
         </TouchableOpacity>
       </View>
-      <BackButton onPress={() => navigation.navigate('Login')} />
+      <BackButton onPress={() => navigation.navigate('AddDevice')} />
     </>
   );
 }
