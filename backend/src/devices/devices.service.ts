@@ -72,6 +72,13 @@ export class DevicesService {
     });
   }
 
+  async updateContainerWeight(deviceId: string, weightGrams: number) {
+    await this.prisma.device.updateMany({
+      where: { deviceId },
+      data: { containerWeight: weightGrams },
+    });
+  }
+
   async getUserIdByDeviceId(deviceId: string): Promise<number | null> {
     const device = await this.prisma.device.findUnique({
       where: { deviceId },

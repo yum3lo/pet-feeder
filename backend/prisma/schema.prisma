@@ -24,7 +24,8 @@ model Pet {
   name               String
   species            String?
   breed              String?
-  weight             Float?
+  weight              Float?
+  freePortionSize     Float    @default(20)
   dietaryRestrictions Json?
   imageUrl           String?
   createdAt          DateTime @default(now())
@@ -40,9 +41,10 @@ model Device {
   userId    Int
   deviceId  String   @unique
   name      String?
-  isOnline  Boolean  @default(false)
-  lastSeen  DateTime?
-  createdAt DateTime @default(now())
+  isOnline        Boolean   @default(false)
+  lastSeen        DateTime?
+  containerWeight Float?
+  createdAt       DateTime  @default(now())
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   feedingSchedules FeedingSchedule[]
