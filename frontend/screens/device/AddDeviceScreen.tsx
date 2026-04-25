@@ -55,31 +55,33 @@ export default function AddDeviceScreen({ navigation }: Props) {
 
         {devices.map((device, index) => (
           <View key={index} style={styles.inputRow}>
-            <View style={[common.input, styles.inputInner]}>
+            <View style={styles.inputInner}>
               <TextInput
-                style={styles.inputText}
+                style={[common.input, styles.inputText, { marginBottom: spacing.sm }]}
                 placeholder={index === 0 ? 'Device Name (e.g. Living Room Feeder)' : 'Add Another Device'}
                 placeholderTextColor={colors.stroke}
                 value={device.name}
                 onChangeText={(v) => updateField(index, 'name', v)}
               />
               {devices.length > 1 && index === devices.length - 1 && (
-                <TouchableOpacity onPress={() => removeRow(index)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <TouchableOpacity
+                  style={styles.removeBtn}
+                  onPress={() => removeRow(index)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
                   <MaterialIcons name="close" size={18} color={colors.stroke} />
                 </TouchableOpacity>
               )}
             </View>
-            <View style={[common.input, styles.inputInner, { marginTop: -spacing.md }]}>
-              <TextInput
-                style={styles.inputText}
-                placeholder="Device ID"
-                placeholderTextColor={colors.stroke}
-                value={device.deviceId}
-                onChangeText={(v) => updateField(index, 'deviceId', v)}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
+            <TextInput
+              style={[common.input, { width: '90%' }]}
+              placeholder="Device ID"
+              placeholderTextColor={colors.stroke}
+              value={device.deviceId}
+              onChangeText={(v) => updateField(index, 'deviceId', v)}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
             <Text style={styles.hint}>You can find it on the sticker on the back of your feeder.</Text>
           </View>
         ))}

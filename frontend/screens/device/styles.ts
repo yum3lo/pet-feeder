@@ -18,25 +18,26 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.stroke,
     paddingHorizontal: spacing.xs,
+    width: '90%',
   },
   inputRow: {
-    width: '90%',
+    width: '100%',
+    alignItems: 'center',
     marginBottom: spacing.lg,
   },
   inputInner: {
+    width: '90%',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 0,
-    width: '100%',
   },
   inputText: {
     flex: 1,
-    color: colors.text,
-    fontSize: 14,
+    marginBottom: 0,
+    width: '100%',
   },
-  removeButton: {
-    paddingLeft: spacing.md,
-    paddingVertical: spacing.sm,
+  removeBtn: {
+    position: 'absolute',
+    right: spacing.xl,
   },
   bottomBar: {
     flexDirection: 'row',

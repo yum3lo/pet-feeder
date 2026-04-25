@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, SectionList } from 'react-native';
 
 import { DateFilterPicker } from '@/components';
@@ -6,7 +7,14 @@ import { colors, typography, spacing } from '@/style';
 
 import type { FeedingProps } from './types';
 
+const TYPE_LABELS: Record<string, { icon: string; label: string }> = {
+  scheduled: { icon: 'schedule', label: 'Scheduled feeding' },
+  manual:    { icon: 'touch-app', label: 'Manual feeding' },
+  free: { icon: 'videocam', label: 'Recognition-triggered feeding' },
+};
+
 export default function FeedingHistoryList({ sections, selectedDate, onSelectDate, markedDates, onRefresh }: FeedingProps) {
+  const [tooltipId, setTooltipId] = useState<string | null>(null);
   return (
     <SectionList
       style={styles.list}
@@ -39,20 +47,42 @@ export default function FeedingHistoryList({ sections, selectedDate, onSelectDat
         </View>
       )}
       renderSectionFooter={() => <View style={styles.sectionFooter} />}
-      renderItem={({ item, index, section }) => (
-        <>
-          <View style={styles.entryRow}>
-            <Text style={[typography.bodySmall, { color: colors.stroke }]}>
-              {item.time} · {item.amount}
-            </Text>
-            <Text style={[typography.bodySmall, { color: colors.inactive }]}>
-              {item.deviceName}
-            </Text>
-          </View>
-          {index < section.data.length - 1 && <View style={styles.divider} />}
-        </>
-      )}
-    />
+      renderItem={({ item, index, section }) => {
+        const type = item.feedingType ?? 'manual';
+        const { icon, label } = TYPE_LABELS[type] ?? TYPE_LABELS.manual;
+        const isTooltipVisible = tooltipId === item.id;
+        return (
+          <>
+            <View style={styles.entryRow}>
+              <View style={styles.entryLeft}>
+                <View>
+                  <TouchableOpacity
+                    onPress={() => setTooltipId(isTooltipVisible ? null : item.id)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <MaterialIcons name={icon as any} size={18} color={isTooltipVisible ? colors.accent : colors.stroke} style={{ marginRight: spacing.sm }} />
+                  </TouchableOpacity>
+                  {isTooltipVisible && (
+                    <View style={styles.tooltip}>
+                      <Text style={styles.tooltipText}>{label}</Text>
+                    </View>
+                  )}
+                </View>
+                <View>
+                  <Text style={[typography.bodySmall, { color: colors.stroke }]}>
+                    {item.time} · {item.amount}
+                  </Text>
+                </View>
+              </View>
+              <Text style={[typography.bodySmall, { color: colors.inactive }]}>
+                {item.deviceName}
+              </Text>
+            </View>
+            {index < section.data.length - 1 && <View style={styles.divider} />}
+          </>
+        );
+      }}
+      />
   );
 }
 
@@ -75,6 +105,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  entryLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  tooltip: {
+    position: 'absolute',
+    top: 24,
+    left: 0,
+    backgroundColor: colors.text,
+    borderRadius: 6,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    zIndex: 10,
+    minWidth: 120,
+  },
+  tooltipText: {
+    color: colors.background,
+    fontSize: 12,
+    fontWeight: '500',
   },
   divider: {
     height: StyleSheet.hairlineWidth,

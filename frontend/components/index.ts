@@ -2,6 +2,7 @@ export { default as ActionButtons } from './actions/ActionButtons';
 export { default as BackButton } from './actions/BackButton';
 export { default as FeedButton } from './actions/FeedButton';
 export { default as ImageUploadArea } from './actions/ImageUploadArea';
+export { default as Stepper } from './actions/Stepper';
 export { default as FoodWeightInfo } from './card/FoodWeightInfo';
 export { default as MealCard } from './card/MealCard';
 export { default as MealCardWithSchedule } from './card/MealCardWithSchedule';
