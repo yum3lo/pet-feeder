@@ -15,7 +15,7 @@ export function useRegisterForm(navigation: NavigationProp<RootStackParamList>) 
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
-      showToast('Passwords do not match!', 'error');
+      showToast('Passwords do not match. Try again.', 'error');
       return;
     }
     register(
@@ -23,7 +23,7 @@ export function useRegisterForm(navigation: NavigationProp<RootStackParamList>) 
       {
         onSuccess: () => navigation.navigate('Login'),
         onError: (err: any) =>
-          showToast(err?.response?.data?.message ?? 'Registration failed', 'error'),
+          showToast(err?.response?.data?.message ?? 'Registration failed. Try again.', 'error'),
       },
     );
   };

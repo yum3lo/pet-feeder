@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 
 import catBreeds from '@/data/cat_breeds.json';
 import dogBreeds from '@/data/dog_breeds.json';
@@ -7,6 +7,8 @@ import { colors, typography, spacing } from '@/style';
 import { toCapitalize } from '@/utils';
 
 import type { Pet } from '@/types';
+
+const AVATAR_SIZE = 120;
 
 const allBreeds = [...catBreeds, ...dogBreeds];
 
@@ -44,6 +46,13 @@ export default function PetProfileCard({
           : undefined
       }
     >
+      <View style={styles.avatarContainer}>
+        <Image
+          source={item.imageUrl ? { uri: item.imageUrl } : require('@/assets/pfp.jpg')}
+          style={styles.avatar}
+        />
+      </View>
+
       <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
         <MaterialIcons name="delete-outline" size={24} color={colors.stroke} />
       </TouchableOpacity>
@@ -51,8 +60,6 @@ export default function PetProfileCard({
       <TouchableOpacity style={styles.editButton} onPress={onEdit}>
         <MaterialIcons name="edit" size={20} color={colors.accent} />
       </TouchableOpacity>
-
-      <View style={styles.avatarSpacer} />
 
       <Text style={[typography.h3, styles.petName]}>{toCapitalize(item.name)}</Text>
 
@@ -91,19 +98,35 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
     paddingTop: spacing.md,
     elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    overflow: 'visible',
   },
-  editButton: {
-    alignSelf: 'flex-end',
+  avatarContainer: {
+    alignItems: 'center',
+    marginTop: -(AVATAR_SIZE / 2),
+    marginBottom: spacing.md,
+  },
+  avatar: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
+    borderWidth: 4,
+    borderColor: colors.background,
   },
   deleteButton: {
-    alignSelf: 'flex-start',
     position: 'absolute',
     top: spacing.md,
     left: spacing.xl,
   },
-  avatarSpacer: {
-    height: 44,
+  editButton: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.xl,
   },
+  topRow: {},
   petName: {
     textAlign: 'center',
     color: colors.text,
