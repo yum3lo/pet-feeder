@@ -53,6 +53,27 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     marginBottom: spacing.sm,
   },
+  sectionLabelUnderline: {
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.stroke,
+  },
+  deviceGroup: {
+    marginTop: spacing.md,
+  },
+  deviceGroupLabel: {
+    color: colors.stroke,
+    fontWeight: '700',
+    fontSize: 14,
+    paddingHorizontal: spacing.xl,
+    marginBottom: spacing.xs,
+  },
+  deviceEmptyText: {
+    color: colors.inactive,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+  },
   mealRow: {
     flexDirection: 'row',
     alignItems: 'center',

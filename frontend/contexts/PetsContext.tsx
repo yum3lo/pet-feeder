@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-import { togglePetSchedule } from '@/services/pets';
+import { togglePetSchedule } from '@/services/schedule';
 
 export type Meal = { id: string; time: string; amount: string };
 
@@ -16,8 +16,8 @@ export type Pet = {
 };
 
 const DEFAULT_MEALS: Meal[] = [
-  { id: '1', time: '10:00', amount: '80 g' },
-  { id: '2', time: '17:00', amount: '80 g' },
+  { id: '1', time: '10:00', amount: '40 g' },
+  { id: '2', time: '17:00', amount: '40 g' },
 ];
 
 const INITIAL_PETS: Pet[] = [
@@ -25,7 +25,7 @@ const INITIAL_PETS: Pet[] = [
     id: '1',
     name: 'Pookie',
     breed: 'Scottish',
-    weight: '12 kg',
+    weight: '5 kg',
     photo: 'https://placecats.com/200/200',
     scheduleEnabled: true,
     meals: DEFAULT_MEALS,

@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PagingCarousel, BottomNavBar, FeedButton, MealCardWithSchedule, FoodWeightInfo } from '@/components';
+import { PagingCarousel, BottomNavBar, FeedButton, MealCardWithSchedule, FoodWeightInfo, DeviceSelectorDropdown, AddDeviceModal } from '@/components';
 import {SCREEN_WIDTH, NAVBAR_BASE} from "@/constants";
-import { usePets } from '@/contexts';
+import { usePets, useToast } from '@/contexts';
 import { useNotifications } from '@/hooks';
-import { useGetPets } from '@/services';
-import { typography, spacing } from '@/style';
+import { useGetPets, manualFeed } from '@/services';
+import { typography, spacing, colors } from '@/style';
 
 import type { PagingCarouselHandle } from '@/components/list/types';
 import type { RootStackParamList } from '@/types';
@@ -22,8 +22,23 @@ export default function HomeScreen({ navigation }: Props) {
   const [activeTab, setActiveTab] = useState('feed');
   const { data: pets = [] } = useGetPets();
   const { activePetIndex, setActivePetIndex } = usePets();
+  const { showToast } = useToast();
+  const [selectedDeviceId, setSelectedDeviceId] = useState('');
+  const [addDeviceVisible, setAddDeviceVisible] = useState(false);
   const carouselRef = useRef<PagingCarouselHandle>(null);
   const [foodWeight] = useState(244);
+
+  const activePet = pets[activePetIndex];
+
+  const handleFeed = async () => {
+    if (!activePet?.id || !selectedDeviceId) return;
+    try {
+      await manualFeed({ petId: activePet.id, deviceId: selectedDeviceId, portionSize: 50 });
+      showToast('Feeding triggered!', 'success');
+    } catch (err: any) {
+      showToast(err?.response?.data?.message ?? 'Failed to trigger feeding', 'error');
+    }
+  };
 
   useNotifications(foodWeight);
 
@@ -36,11 +51,14 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={[typography.h3, styles.title, { marginTop: insets.top + spacing.xl }]}>
-        Smart Pet Feeder
-      </Text>
+      <DeviceSelectorDropdown
+        textStyle={[typography.h3, { color: colors.background }]}
+        containerStyle={{ marginTop: insets.top + spacing.xl, marginBottom: spacing.lg, justifyContent: 'center' }}
+        onDeviceChange={setSelectedDeviceId}
+        onAdd={() => setAddDeviceVisible(true)}
+      />
       <View style={styles.content}>
-        <FeedButton onPress={() => console.log('Feed pressed')} />
+        <FeedButton onPress={handleFeed} />
         <FoodWeightInfo grams={foodWeight} />
       </View>
 
@@ -68,6 +86,8 @@ export default function HomeScreen({ navigation }: Props) {
           if (key === 'settings') navigation.navigate('Settings');
         }}
       />
+
+      <AddDeviceModal visible={addDeviceVisible} onClose={() => setAddDeviceVisible(false)} />
     </View>
   );
 }

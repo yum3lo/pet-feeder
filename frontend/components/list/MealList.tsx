@@ -1,4 +1,3 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Switch } from 'react-native';
 
 import { colors, typography, spacing } from '@/style';

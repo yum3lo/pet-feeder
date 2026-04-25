@@ -43,7 +43,10 @@ export default function FeedingHistoryList({ sections, selectedDate, onSelectDat
         <>
           <View style={styles.entryRow}>
             <Text style={[typography.bodySmall, { color: colors.stroke }]}>
-              {item.time} - {item.amount}
+              {item.time} · {item.amount}
+            </Text>
+            <Text style={[typography.bodySmall, { color: colors.inactive }]}>
+              {item.deviceName}
             </Text>
           </View>
           {index < section.data.length - 1 && <View style={styles.divider} />}
@@ -69,6 +72,9 @@ const styles = StyleSheet.create({
   },
   entryRow: {
     paddingVertical: spacing.sm,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   divider: {
     height: StyleSheet.hairlineWidth,

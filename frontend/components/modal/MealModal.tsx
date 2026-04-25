@@ -18,6 +18,7 @@ export type MealModalData = {
 type Props = {
   visible: boolean;
   meal?: MealModalData | null;
+  title?: string;
   onSave: (data: MealModalData) => void;
   onDelete?: (id: string) => void;
   onClose: () => void;
@@ -34,7 +35,7 @@ function parseTime(t: string) {
   return { hour: (h ?? '09').padStart(2, '0'), minute: (m ?? '00').padStart(2, '0') };
 }
 
-export default function MealModal({ visible, meal, onSave, onDelete, onClose }: Props) {
+export default function MealModal({ visible, meal, title, onSave, onDelete, onClose }: Props) {
   const isEdit = !!meal?.id;
 
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
@@ -63,7 +64,7 @@ export default function MealModal({ visible, meal, onSave, onDelete, onClose }: 
         <View style={styles.card}>
           <View style={styles.header}>
             <Text style={[typography.h3, { color: colors.text }]}>
-              {isEdit ? 'Edit meal' : 'Add meal'}
+              {title ?? (isEdit ? 'Edit meal' : 'Add meal')}
             </Text>
             {isEdit && (
               <TouchableOpacity

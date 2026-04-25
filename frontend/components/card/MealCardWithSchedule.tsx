@@ -13,7 +13,7 @@ export default function MealCardWithSchedule({ petId, petName }: Props) {
     <MealCard
       petName={petName}
       time={nextMeal?.time ?? '—'}
-      amount={nextMeal?.amount}
+      amount={nextMeal?.portionSize}
     />
   );
 }

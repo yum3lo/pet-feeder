@@ -20,14 +20,14 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
   const { petNames, currentIndex } = route.params;
   const insets = useSafeAreaInsets();
   const [capturing, setCapturing] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(8);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const petName = petNames[currentIndex];
   const total = petNames.length;
 
   const DURATION_INTERVAL_MS = 1000;
-  const COUNT_DOWN_S = 5;
+  const COUNT_DOWN_S = 8;
 
   const startCapture = () => {
     setCapturing(true);

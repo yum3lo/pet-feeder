@@ -5,7 +5,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomNavBar, FeedingHistoryList, PetSelectorDropdown } from '@/components';
 import { usePets } from '@/contexts';
 import { useGetFeedingHistory } from '@/services';
+import { useGetDevices } from '@/services/devices';
 import { colors, typography, spacing } from '@/style';
+import { toCapitalize } from '@/utils';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -19,6 +21,15 @@ function formatSectionTitle(isoDate: string): string {
   return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+function isoToDate(iso: string): string {
+  return iso.slice(0, 10); // "YYYY-MM-DD"
+}
+
+function isoToTime(iso: string): string {
+  const date = new Date(iso);
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
 export default function HistoryScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -28,19 +39,36 @@ export default function HistoryScreen({ navigation }: Props) {
   const { data: entries = [], isLoading, refetch } = useGetFeedingHistory(
     activePet ? Number(activePet.id) : undefined,
   );
+  const { data: devices = [], isLoading: isDevicesLoading } = useGetDevices();
 
-  // TODO: remove mock
-  const MOCK_ENTRIES = [{ id: '1', date: '2026-03-27', feedings: [{ time: '10:00', amount: 80 }, { time: '17:00', amount: 80 }] }];
+  const getDeviceName = (deviceId: string) => {
+    const device = devices.find((d) => d.deviceId === deviceId);
+    return toCapitalize(device?.name || deviceId);
+  };
 
-  const sections = (entries.length ? entries : MOCK_ENTRIES).map((e) => ({
-    title: formatSectionTitle(e.date),
-    date: e.date,
-    data: e.feedings.map((f, idx) => ({
-      id: `${e.id}-${idx}`,
-      time: f.time,
-      amount: `${f.amount} g`,
-    })),
-  }));
+  const grouped: Record<string, { title: string; date: string; data: { id: string; time: string; amount: string; deviceName: string }[] }> = {};
+
+  const MOCK_ENTRIES = devices.length > 0 ? [
+    { id: 1, deviceId: devices[0].deviceId, dispensedGrams: 80, timestamp: '2026-03-27T10:00:00.000Z' },
+    { id: 2, deviceId: devices[0].deviceId, dispensedGrams: 80, timestamp: '2026-03-27T17:00:00.000Z' },
+  ] : [];
+
+  const source = entries.length ? entries : MOCK_ENTRIES;
+
+  source.forEach((e) => {
+    const date = isoToDate(e.timestamp);
+    if (!grouped[date]) {
+      grouped[date] = { title: formatSectionTitle(e.timestamp), date, data: [] };
+    }
+    grouped[date].data.push({
+      id: String(e.id),
+      time: isoToTime(e.timestamp),
+      amount: `${e.dispensedGrams} g`,
+      deviceName: getDeviceName(e.deviceId),
+    });
+  });
+
+  const sections = Object.values(grouped).sort((a, b) => b.date.localeCompare(a.date));
 
   const markedDates: Record<string, object> = {};
   sections.forEach((s) => {
@@ -59,7 +87,7 @@ export default function HistoryScreen({ navigation }: Props) {
 
       <PetSelectorDropdown style={styles.petDropdown} />
 
-      {isLoading ? (
+      {isLoading || isDevicesLoading ? (
         <View style={styles.loadingState}>
           <ActivityIndicator color={colors.accent} size="large" />
           <Text style={[typography.bodyBold, { color: colors.accent, marginTop: spacing.md }]}>

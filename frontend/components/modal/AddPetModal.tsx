@@ -89,7 +89,7 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
             placeholder="Name"
             placeholderTextColor={colors.stroke}
             value={draft.name}
-            onChangeText={(v) => setDraft((p) => ({ ...p, name: v }))}
+            onChangeText={(v) => setDraft((p) => ({ ...p, name: v.trim() }))}
           />
 
           <View style={[styles.input, styles.speciesRow]}>
@@ -131,7 +131,7 @@ export default function AddPetModal({ visible, initialData, onSave, onClose }: P
               placeholder="Weight"
               placeholderTextColor={colors.stroke}
               value={draft.weight}
-              onChangeText={(v) => setDraft((p) => ({ ...p, weight: v }))}
+              onChangeText={(v) => setDraft((p) => ({ ...p, weight: v.trim() }))}
               keyboardType="numeric"
             />
             <Text style={styles.unit}>kg</Text>
