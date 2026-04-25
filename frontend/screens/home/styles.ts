@@ -18,6 +18,16 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.lg,
     gap: spacing.xl,
+    paddingBottom: 120,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 0,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.xl,
   },
   mealCardContainer: {
     position: 'absolute',
