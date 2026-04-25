@@ -22,8 +22,8 @@ CONTAINER_LOADCELL_SCK = 17   # GPIO17, pin 11
 TRAY_LOADCELL_REFERENCE_UNIT = 3978.9479
 CONTAINER_LOADCELL_REFERENCE_UNIT = -4137.6555
 
-# Distance sensor thresholds (mm)
-MIN_DETECTION_MM = 180
+# Distance sensor
+MIN_DETECTION_MM = 130
 MAX_DETECTION_MM = 320
 
 # Feeding
@@ -35,3 +35,27 @@ LOW_FOOD_THRESHOLD_GRAMS = 100
 # Camera
 CAMERA_WARMUP_FRAMES = 30
 TRAINING_CAPTURE_SECONDS = 8
+
+# MQQT topics
+def topics(device_id):
+    return {
+        # Backend -> Pi (commands)
+        "dispense":         f"feeder/{device_id}/commands/dispense",
+        "capture_photos":   f"feeder/{device_id}/commands/capture_photos",
+        "detection": f"feeder/{device_id}/commands/detection",
+
+        # Pi -> Backend (results)
+        "feeding_result":   f"feeder/{device_id}/results/feeding",
+        "training_photos":  f"feeder/{device_id}/results/photos",
+
+        # Pi -> Backend (data)
+        "movement_image":   f"feeder/{device_id}/data/movement_image",
+        "container_weight": f"feeder/{device_id}/data/container_weight",
+
+        # Backend -> Pi (recognition response)
+        "recognition_result": f"feeder/{device_id}/results/recognition",
+
+        # Status
+        "heartbeat":        f"feeder/{device_id}/status/heartbeat",
+        "error":            f"feeder/{device_id}/status/error",
+    }
