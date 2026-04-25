@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PagingCarousel, BottomNavBar, FeedButton, MealCardWithSchedule, FoodWeightInfo, DeviceSelectorDropdown, AddDeviceModal } from '@/components';
+import { PagingCarousel, BottomNavBar, FeedButton, MealCardWithSchedule, FoodWeightInfo, DeviceSelectorDropdown, AddDeviceModal, Stepper } from '@/components';
 import {SCREEN_WIDTH, NAVBAR_BASE} from "@/constants";
 import { usePets, useToast } from '@/contexts';
 import { useNotifications } from '@/hooks';
@@ -27,13 +27,17 @@ export default function HomeScreen({ navigation }: Props) {
   const [addDeviceVisible, setAddDeviceVisible] = useState(false);
   const carouselRef = useRef<PagingCarouselHandle>(null);
   const [foodWeight] = useState(244);
+  const [portionSize, setPortionSize] = useState(50);
+  const PORTION_STEP = 10;
+  const MIN_PORTION = 10;
+  const MAX_PORTION = 300;
 
   const activePet = pets[activePetIndex];
 
   const handleFeed = async () => {
     if (!activePet?.id || !selectedDeviceId) return;
     try {
-      await manualFeed({ petId: activePet.id, deviceId: selectedDeviceId, portionSize: 50 });
+      await manualFeed({ petId: activePet.id, deviceId: selectedDeviceId, portionSize });
       showToast('Feeding triggered!', 'success');
     } catch (err: any) {
       showToast(err?.response?.data?.message ?? 'Failed to trigger feeding', 'error');
@@ -63,6 +67,19 @@ export default function HomeScreen({ navigation }: Props) {
       <View style={styles.content}>
         <FeedButton onPress={handleFeed} />
         <FoodWeightInfo grams={foodWeight} />
+        <Stepper
+          label="Portion size"
+          value={portionSize}
+          onChange={setPortionSize}
+          step={PORTION_STEP}
+          min={MIN_PORTION}
+          max={MAX_PORTION}
+          iconColor={colors.background}
+          labelStyle={{ color: colors.background, fontSize: 16, fontWeight: '600' }}
+          valueStyle={{ color: colors.background }}
+          btnStyle={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)' }}
+          style={{ width: '80%' }}
+        />
       </View>
 
       <View style={[styles.mealCardContainer, { bottom: NAVBAR_BASE + Math.max(insets.bottom, spacing.md) }]}>

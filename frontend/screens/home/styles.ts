@@ -34,4 +34,35 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  portionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  portionLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.background,
+  },
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  stepBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepValue: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: colors.background,
+    minWidth: 60,
+    textAlign: 'center',
+  },
 });

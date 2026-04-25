@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 
 import { ActionButtons } from '@/components';
+import Stepper from '@/components/actions/Stepper';
 import DeleteModal from '@/components/modal/DeleteModal';
 import { colors, typography, spacing } from '@/style';
 
@@ -26,9 +27,6 @@ type Props = {
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
-const STEP = 10;
-const MIN_AMOUNT = 10;
-const MAX_AMOUNT = 300;
 
 function parseTime(t: string) {
   const [h, m] = t.split(':');
@@ -41,17 +39,14 @@ export default function MealModal({ visible, meal, title, onSave, onDelete, onCl
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [hour, setHour] = useState(() => parseTime(meal?.time ?? '09:00').hour);
   const [minute, setMinute] = useState(() => parseTime(meal?.time ?? '09:00').minute);
-  const [amount, setAmount] = useState(() => parseInt(meal?.amount ?? '80', 10));
+  const [amount, setAmount] = useState(() => parseInt(meal?.amount ?? '50', 10));
 
   useEffect(() => {
     const { hour: h, minute: min } = parseTime(meal?.time ?? '09:00');
     setHour(h);
     setMinute(min);
-    setAmount(parseInt(meal?.amount ?? '80', 10));
+    setAmount(parseInt(meal?.amount ?? '50', 10));
   }, [meal]);
-
-  const adjust = (delta: number) =>
-    setAmount((prev) => Math.min(MAX_AMOUNT, Math.max(MIN_AMOUNT, prev + delta)));
 
   const handleSave = () => {
     onSave({ id: meal?.id, time: `${hour}:${minute}`, amount: String(amount) });
@@ -100,18 +95,11 @@ export default function MealModal({ visible, meal, title, onSave, onDelete, onCl
 
           <View style={styles.divider} />
 
-          <View style={styles.portionRow}>
-            <Text style={[typography.bodySmall, { color: colors.stroke }]}>Portion</Text>
-            <View style={styles.stepper}>
-              <TouchableOpacity style={styles.stepBtn} onPress={() => adjust(-STEP)}>
-                <MaterialIcons name="remove" size={20} color={colors.text} />
-              </TouchableOpacity>
-              <Text style={styles.stepValue}>{amount} g</Text>
-              <TouchableOpacity style={styles.stepBtn} onPress={() => adjust(STEP)}>
-                <MaterialIcons name="add" size={20} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Stepper
+            label="Portion"
+            value={amount}
+            onChange={setAmount}
+          />
 
           <View style={styles.divider} />
 
