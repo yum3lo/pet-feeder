@@ -14,6 +14,11 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.lg,
   },
+  hint: {
+    fontSize: 10,
+    color: colors.stroke,
+    paddingHorizontal: spacing.xs,
+  },
   inputRow: {
     width: '90%',
     marginBottom: spacing.lg,

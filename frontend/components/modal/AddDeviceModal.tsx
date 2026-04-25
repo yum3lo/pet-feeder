@@ -9,9 +9,6 @@ import { useToast } from '@/contexts';
 import { registerDevice } from '@/services/devices';
 import { colors, spacing, typography, radius } from '@/style';
 
-const generateDeviceId = () =>
-  `feeder_${Math.random().toString(36).slice(2, 10)}${Math.random().toString(36).slice(2, 10)}`;
-
 type Props = {
   visible: boolean;
   onClose: () => void;
@@ -19,21 +16,24 @@ type Props = {
 
 export default function AddDeviceModal({ visible, onClose }: Props) {
   const [name, setName] = useState('');
+  const [deviceId, setDeviceId] = useState('');
   const [isPending, setIsPending] = useState(false);
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
   const handleClose = () => {
     setName('');
+    setDeviceId('');
     onClose();
   };
 
   const handleAdd = async () => {
-    const trimmed = name.trim();
-    if (!trimmed) return;
+    const trimmedName = name.trim();
+    const trimmedId = deviceId.trim();
+    if (!trimmedName || !trimmedId) return;
     setIsPending(true);
     try {
-      await registerDevice({ deviceId: generateDeviceId(), name: trimmed });
+      await registerDevice({ deviceId: trimmedId, name: trimmedName });
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       showToast('Device added!', 'success');
       handleClose();
@@ -67,19 +67,33 @@ export default function AddDeviceModal({ visible, onClose }: Props) {
               value={name}
               onChangeText={(v) => setName(v)}
               autoFocus
+              returnKeyType="next"
+            />
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Device ID"
+              placeholderTextColor={colors.stroke}
+              value={deviceId}
+              onChangeText={(v) => setDeviceId(v)}
+              autoCapitalize="none"
+              autoCorrect={false}
               returnKeyType="done"
               onSubmitEditing={handleAdd}
             />
           </View>
+          <Text style={styles.hint}>You can find it on the sticker on the back of your feeder.</Text>
 
           <View style={styles.buttons}>
             <TouchableOpacity style={[styles.btn, styles.cancelBtn]} onPress={handleClose}>
               <Text style={[typography.bodyBold, { color: colors.text }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.btn, styles.addBtn, !name.trim() && styles.addBtnDisabled]}
+              style={[styles.btn, styles.addBtn, (!name.trim() || !deviceId.trim()) && styles.addBtnDisabled]}
               onPress={handleAdd}
-              disabled={isPending || !name.trim()}
+              disabled={isPending || !name.trim() || !deviceId.trim()}
             >
               {isPending
                 ? <ActivityIndicator size="small" color={colors.background} />
@@ -131,6 +145,11 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 14,
     color: colors.text,
+  },
+  hint: {
+    fontSize: 10,
+    color: colors.stroke,
+    paddingHorizontal: spacing.xs,
   },
   buttons: {
     flexDirection: 'row',

@@ -4,7 +4,7 @@ import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 
 import { useToast } from '@/contexts';
 import { registerDevice } from '@/services/devices';
-import { colors, typography, common } from '@/style';
+import { colors, typography, common, spacing } from '@/style';
 
 import type { RootStackParamList } from '@/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,18 +13,15 @@ import { styles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddDevice'>;
 
-const generateDeviceId = () =>
-  `feeder_${Math.random().toString(36).slice(2, 10)}${Math.random().toString(36).slice(2, 10)}`;
-
 export default function AddDeviceScreen({ navigation }: Props) {
-  const [devices, setDevices] = useState([{ deviceId: generateDeviceId(), name: '' }]);
+  const [devices, setDevices] = useState([{ deviceId: '', name: '' }]);
   const [isPending, setIsPending] = useState(false);
   const { showToast } = useToast();
 
-  const addRow = () => setDevices((prev) => [...prev, { deviceId: generateDeviceId(), name: '' }]);
+  const addRow = () => setDevices((prev) => [...prev, { deviceId: '', name: '' }]);
 
-  const updateName = (index: number, value: string) => {
-    setDevices((prev) => prev.map((d, i) => (i === index ? { ...d, name: value } : d)));
+  const updateField = (index: number, field: 'name' | 'deviceId', value: string) => {
+    setDevices((prev) => prev.map((d, i) => (i === index ? { ...d, [field]: value } : d)));
   };
 
   const removeRow = (index: number) => {
@@ -32,14 +29,14 @@ export default function AddDeviceScreen({ navigation }: Props) {
   };
 
   const handleNext = async () => {
-    const filled = devices.filter((d) => d.name.trim());
+    const filled = devices.filter((d) => d.name.trim() && d.deviceId.trim());
     if (filled.length === 0) {
       navigation.navigate('AddPet');
       return;
     }
     setIsPending(true);
     try {
-      await Promise.all(filled.map((d) => registerDevice({ deviceId: d.deviceId, name: d.name.trim() })));
+      await Promise.all(filled.map((d) => registerDevice({ deviceId: d.deviceId.trim(), name: d.name.trim() })));
       navigation.navigate('AddPet');
     } catch (err: any) {
       showToast(err?.response?.data?.message ?? 'Failed to register device', 'error');
@@ -61,10 +58,10 @@ export default function AddDeviceScreen({ navigation }: Props) {
             <View style={[common.input, styles.inputInner]}>
               <TextInput
                 style={styles.inputText}
-                placeholder={index === 0 ? "Device Name (e.g. Living Room Feeder)" : "Add Another Device"}
+                placeholder={index === 0 ? 'Device Name (e.g. Living Room Feeder)' : 'Add Another Device'}
                 placeholderTextColor={colors.stroke}
                 value={device.name}
-                onChangeText={(v) => updateName(index, v)}
+                onChangeText={(v) => updateField(index, 'name', v)}
               />
               {devices.length > 1 && index === devices.length - 1 && (
                 <TouchableOpacity onPress={() => removeRow(index)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -72,6 +69,18 @@ export default function AddDeviceScreen({ navigation }: Props) {
                 </TouchableOpacity>
               )}
             </View>
+            <View style={[common.input, styles.inputInner, { marginTop: -spacing.md }]}>
+              <TextInput
+                style={styles.inputText}
+                placeholder="Device ID"
+                placeholderTextColor={colors.stroke}
+                value={device.deviceId}
+                onChangeText={(v) => updateField(index, 'deviceId', v)}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+            <Text style={styles.hint}>You can find it on the sticker on the back of your feeder.</Text>
           </View>
         ))}
 
