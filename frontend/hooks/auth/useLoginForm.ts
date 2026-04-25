@@ -34,7 +34,7 @@ export function useLoginForm(navigation: NavigationProp<RootStackParamList>) {
           attemptCount.current = 0;
           try {
             const { data: pets } = await api.get('/pets');
-            navigation.navigate(pets.length === 0 ? 'AddPet' : 'Home');
+            navigation.navigate(pets.length === 0 ? 'AddDevice' : 'Home');
           } catch {
             navigation.navigate('AddPet');
           }
