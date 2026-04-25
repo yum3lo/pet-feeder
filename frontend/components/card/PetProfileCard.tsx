@@ -92,29 +92,25 @@ export default function PetProfileCard({
       </View>
 
       {item.dietaryRestrictions && item.dietaryRestrictions.length > 0 && (
-        <View style={styles.dietSection}>
-          <Text style={[typography.bodyBold, { color: colors.stroke, marginBottom: spacing.sm }]}>Dietary Restrictions</Text>
-          <View style={styles.dietTags}>
-            {item.dietaryRestrictions.map((r) => (
-              <View key={r} style={styles.dietTag}>
-                <Text style={styles.dietTagText}>{getDietLabel(r)}</Text>
-              </View>
-            ))}
+        item.dietaryRestrictions.length === 1 ? (
+          <View style={styles.infoRow}>
+            <Text style={[typography.bodyBold, { color: colors.stroke }]}>Dietary Restrictions</Text>
+            <View style={styles.dietTag}>
+              <Text style={styles.dietTagText}>{getDietLabel(item.dietaryRestrictions[0])}</Text>
+            </View>
           </View>
-        </View>
-      )}
-
-      {item.dietaryRestrictions && item.dietaryRestrictions.length > 0 && (
-        <View style={styles.dietSection}>
-          <Text style={[typography.bodyBold, { color: colors.stroke, marginBottom: spacing.sm }]}>Dietary Restrictions</Text>
-          <View style={styles.dietTags}>
-            {item.dietaryRestrictions.map((r) => (
-              <View key={r} style={styles.dietTag}>
-                <Text style={styles.dietTagText}>{getDietLabel(r)}</Text>
-              </View>
-            ))}
+        ) : (
+          <View style={styles.dietSection}>
+            <Text style={[typography.bodyBold, { color: colors.stroke, marginBottom: spacing.sm }]}>Dietary Restrictions</Text>
+            <View style={styles.dietTags}>
+              {item.dietaryRestrictions.map((r) => (
+                <View key={r} style={styles.dietTag}>
+                  <Text style={styles.dietTagText}>{getDietLabel(r)}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        )
       )}
     </View>
   );
