@@ -11,9 +11,7 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
-  firstName String?
-  lastName  String?
-  createdAt DateTime @default(now())
+createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   pets     Pet[]
@@ -27,7 +25,7 @@ model Pet {
   species            String?
   breed              String?
   weight             Float?
-  dietaryRestrictions String?
+  dietaryRestrictions Json?
   imageUrl           String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

@@ -2,6 +2,7 @@ import {
   IsString,
   IsOptional,
   IsNumber,
+  IsArray,
   Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -27,8 +28,9 @@ export class CreatePetDto {
   @Min(0)
   weight?: number;
 
-  @ApiPropertyOptional({ example: 'No dairy' })
+  @ApiPropertyOptional({ example: ['No dairy', 'Low sodium'], type: [String] })
   @IsOptional()
-  @IsString()
-  dietaryRestrictions?: string;
+  @IsArray()
+  @IsString({ each: true })
+  dietaryRestrictions?: string[];
 }
