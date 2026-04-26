@@ -103,8 +103,19 @@ export class FeedingController {
     @Req() req,
     @Body() dto: CapturePhotosDto,
   ) {
-    this.mqttService.sendCapturePhotosCommand(dto.deviceId, dto.petId);
+    setTimeout(() => this.mqttService.sendCapturePhotosCommand(dto.deviceId, dto.petId), 5000);
     return { message: 'Photo capture command sent.' };
+  }
+
+  // ── Capture Background ───────────────────────────────
+  @Post('capture-background')
+  @ApiOperation({ summary: 'Capture background photos (empty bowl, no pet)' })
+  captureBackground(
+    @Req() req,
+    @Body() dto: CapturePhotosDto,
+  ) {
+    setTimeout(() => this.mqttService.sendCapturePhotosCommand(dto.deviceId, 0, 2), 5000);
+    return { message: 'Background capture command sent.' };
   }
 
   // ── Train Model ────────────────────────────────────────
@@ -112,6 +123,9 @@ export class FeedingController {
   @ApiOperation({ summary: 'Trigger model training for all pets of this user' })
   async trainModel(@Req() req, @Param('deviceId') deviceId: string) {
     const result = await this.recognitionService.trainModel(req.user.id);
+    if (result.success) {
+      this.mqttService.sendDetectionCommand(deviceId, true);
+    }
     return result;
   }
 }
