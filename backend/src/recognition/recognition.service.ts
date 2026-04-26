@@ -4,7 +4,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as path from 'path';
 import * as fs from 'fs';
 import { spawn } from 'child_process';
-import * as base64 from 'base64-js';
 
 @Injectable()
 export class RecognitionService {
@@ -14,12 +13,7 @@ export class RecognitionService {
   private readonly photosDir: string;
   private readonly pythonScriptsDir: string;
 
-  // storing training photos in memory per pet until all batches arrive
-  // key: userId, Value: { petId -> photos[] }
-  private trainingBuffers = new Map<number, Map<number, string[]>>();
-
   constructor(
-    private config: ConfigService,
     private prisma: PrismaService,
   ) {
     this.modelsDir = path.join(process.cwd(), 'models');
@@ -38,67 +32,57 @@ export class RecognitionService {
     batchIndex: number,
     totalBatches: number,
   ) {
-    const pet = await this.prisma.pet.findUnique({
-      where: { id: petId },
-      select: { userId: true },
-    });
-    if (!pet) {
-      this.logger.warn(`Pet ${petId} not found.`);
-      return;
+    const petIdNum = Number(petId);
+    const batchIndexNum = Number(batchIndex);
+    const totalBatchesNum = Number(totalBatches);
+
+    let userId: number;
+    let petDir: string;
+
+    if (petIdNum === 0) {
+      const device = await this.prisma.device.findFirst({
+        select: { userId: true },
+      });
+      if (!device) {
+        this.logger.warn(`No device found — dropping background batch.`);
+        return;
+      }
+      userId = device.userId;
+      petDir = path.join(this.photosDir, `user_${userId}`, 'background');
+    } else {
+      const pet = await this.prisma.pet.findUnique({
+        where: { id: petIdNum },
+        select: { userId: true },
+      });
+      if (!pet) {
+        this.logger.warn(`Pet ${petIdNum} not found — dropping batch ${batchIndexNum + 1}/${totalBatchesNum}.`);
+        return;
+      }
+      userId = pet.userId;
+      petDir = path.join(this.photosDir, `user_${userId}`, `pet_${petIdNum}`);
     }
 
-    const userId = pet.userId;
+    try {
+      if (batchIndexNum === 0) {
+        fs.mkdirSync(petDir, { recursive: true });
+        fs.readdirSync(petDir).forEach((f) => fs.unlinkSync(path.join(petDir, f)));
+      }
 
-    if (!this.trainingBuffers.has(userId)) {
-      this.trainingBuffers.set(userId, new Map());
-    }
-    const userBuffer = this.trainingBuffers.get(userId)!;
+      const existingCount = fs.readdirSync(petDir).length;
+      for (let i = 0; i < photos.length; i++) {
+        const buffer = Buffer.from(photos[i], 'base64');
+        fs.writeFileSync(path.join(petDir, `photo_${existingCount + i}.jpg`), buffer);
+      }
 
-    // initializing buffer for this pet
-    const existing = userBuffer.get(petId) ?? [];
-    const updated = [...existing, ...photos];
-    userBuffer.set(petId, updated);
-
-    this.logger.log(
-      `Stored batch ${batchIndex + 1}/${totalBatches} for pet ${petId}. ` +
-      `Total photos for this pet: ${updated.length}`,
-    );
-
-    // if last batch for this pet, saving to disk
-    if (batchIndex + 1 === totalBatches) {
-      await this.savePhotosToDisk(userId, petId, updated);
+      const totalSaved = fs.readdirSync(petDir).length;
+      this.logger.log(
+        `Saved batch ${batchIndexNum + 1}/${totalBatchesNum} for pet ${petIdNum}. Total on disk: ${totalSaved}`,
+      );
+    } catch (err) {
+      this.logger.error(`Failed to save batch ${batchIndexNum + 1} for pet ${petIdNum}: ${(err as Error).message}`);
     }
   }
 
-  // saving base64 photos to disk as JPEG files
-  private async savePhotosToDisk(
-    userId: number,
-    petId: number,
-    photos: string[],
-  ) {
-    const petDir = path.join(
-      this.photosDir,
-      `user_${userId}`,
-      `pet_${petId}`,
-    );
-    fs.mkdirSync(petDir, { recursive: true });
-
-    // clearing existing photos for this pet before saving new ones
-    fs.readdirSync(petDir).forEach((f) =>
-      fs.unlinkSync(path.join(petDir, f))
-    );
-
-    for (let i = 0; i < photos.length; i++) {
-      const buffer = Buffer.from(photos[i], 'base64');
-      fs.writeFileSync(path.join(petDir, `photo_${i}.jpg`), buffer);
-    }
-
-    this.logger.log(
-      `Saved ${photos.length} photos for pet ${petId} (user ${userId}).`
-    );
-  }
-
-  // training model for a user -> called after all pet photos are received
   async trainModel(userId: number): Promise<{
     success: boolean;
     accuracy?: number;
@@ -125,7 +109,7 @@ export class RecognitionService {
         errorOutput += data.toString();
       });
 
-      process.on('close', (code) => {
+      process.on('close', () => {
         if (errorOutput) {
           this.logger.debug(`Training stderr: ${errorOutput}`);
         }
@@ -142,7 +126,6 @@ export class RecognitionService {
           } else {
             this.logger.warn(`Training failed: ${result.error}`);
           }
-          this.trainingBuffers.delete(userId);
           resolve(result);
         } catch {
           this.logger.error(`Could not parse training output: ${output}`);
@@ -171,14 +154,10 @@ export class RecognitionService {
     }
 
     const userId = device.userId;
-    const modelPath = path.join(
-      this.modelsDir, `user_${userId}`, 'model.h5'
-    );
+    const modelPath = path.join(this.modelsDir, `user_${userId}`, 'model.h5');
 
     if (!fs.existsSync(modelPath)) {
-      this.logger.debug(
-        `No model for user ${userId} yet - skipping recognition.`
-      );
+      this.logger.debug(`No model for user ${userId} yet - skipping recognition.`);
       return { petId: null, confidence: 0, shouldFeed: false };
     }
 
@@ -220,15 +199,10 @@ export class RecognitionService {
             return;
           }
 
-          // petId from the model is stored as a string like "5"
           const petId = parseInt(result.petId, 10);
           const shouldFeed = await this.checkShouldFeed(petId);
 
-          resolve({
-            petId: petId,
-            confidence: result.confidence,
-            shouldFeed,
-          });
+          resolve({ petId, confidence: result.confidence, shouldFeed });
         } catch {
           this.logger.error(`Could not parse predict output: ${output}`);
           resolve({ petId: null, confidence: 0, shouldFeed: false });
