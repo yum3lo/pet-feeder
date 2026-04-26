@@ -16,6 +16,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   // if no feeding result arrives within 60s, marking as failed
   private feedingTimeouts = new Map<string, NodeJS.Timeout>();
   private lowFoodAlertCooldowns = new Map<string, number>();
+  private freeFeedingCooldowns = new Map<number, number>(); // petId -> last fed timestamp
 
   constructor(
     private config: ConfigService,
@@ -196,14 +197,23 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
     // if pet is on free-feeding mode, log and dispense
     if (result.petId && result.shouldFeed) {
-      const pet = await this.getPetWithSchedule(result.petId);
-      if (pet) {
-        await this.feedingService.executeFeeding(
-          deviceId,
-          result.petId,
-          pet.defaultPortionSize,
-          'free',
-        );
+      const FREE_FEEDING_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
+      const lastFed = this.freeFeedingCooldowns.get(result.petId) ?? 0;
+      const now = Date.now();
+
+      if (now - lastFed < FREE_FEEDING_COOLDOWN_MS) {
+        this.logger.debug(`Pet ${result.petId} was recently free-fed — skipping.`);
+      } else {
+        const pet = await this.getPetWithSchedule(result.petId);
+        if (pet) {
+          this.freeFeedingCooldowns.set(result.petId, now);
+          await this.feedingService.executeFeeding(
+            deviceId,
+            result.petId,
+            pet.defaultPortionSize,
+            'free',
+          );
+        }
       }
     }
   }
@@ -246,6 +256,13 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     } else {
       this.logger.log(`Device ${deviceId} connected.`);
       await this.devicesService.markOnline(deviceId);
+
+      const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
+      if (userId) {
+        const modelPath = require('path').join(process.cwd(), 'models', `user_${userId}`, 'model.h5');
+        const modelExists = require('fs').existsSync(modelPath);
+        this.sendDetectionCommand(deviceId, modelExists);
+      }
     }
   }
 
@@ -289,7 +306,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     // if no result arrives in 60s, marking feeding as failed
     this.clearFeedingTimeout(deviceId);
     const timeout = setTimeout(async () => {
-      this.logger.warn(`No feeding result from ${deviceId} after 60s.`);
       await this.feedingService.markFeedingFailed(deviceId);
 
       const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
@@ -313,6 +329,15 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       petId,
       durationSeconds,
     });
+  }
+
+  sendDetectionCommand(deviceId: string, enabled: boolean) {
+    this.logger.log(`Setting detection on ${deviceId} to ${enabled}`);
+    this.client.publish(
+      `feeder/${deviceId}/commands/detection`,
+      JSON.stringify({ enabled }),
+      { qos: 1, retain: true },
+    );
   }
 
   // ── Utilities ─────────────────────────────────────────────
