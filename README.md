@@ -228,6 +228,12 @@ npx prisma migrate dev
 npm run start:dev
 ```
 
+Once the server is running, the interactive API docs (Swagger UI) are available at:
+
+```
+http://<your-backend-host>:3000/api
+```
+
 Create a `.env` file in the `backend/` directory:
 
 ```
