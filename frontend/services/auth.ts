@@ -1,12 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import * as SecureStore from 'expo-secure-store';
 
+import { TOKEN_KEY } from '@/constants';
 
 import type { AuthResponse, AuthPayload } from '@/types';
 
 import { api, setAuthToken } from './api';
-
-const TOKEN_KEY = 'auth_token';
 
 export const restoreAuthToken = async (): Promise<string | null> => {
   const token = await SecureStore.getItemAsync(TOKEN_KEY);

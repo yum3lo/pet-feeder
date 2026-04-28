@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-import { togglePetSchedule } from '@/services/schedule';
+import { PETS_STORAGE_KEY } from '@/constants';
+import { togglePetSchedule } from '@/services';
 
 export type Meal = { id: string; time: string; amount: string };
 
@@ -41,8 +42,6 @@ type PetsContextValue = {
   updateSchedule: (petIndex: number, meals: Meal[]) => void;
   toggleSchedule: (petIndex: number, enabled: boolean) => Promise<void>;
 };
-
-const PETS_STORAGE_KEY = 'pets_context';
 
 const PetsContext = createContext<PetsContextValue | null>(null);
 

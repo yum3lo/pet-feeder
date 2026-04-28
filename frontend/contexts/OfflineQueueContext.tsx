@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { BackOnlineModal } from '@/components';
+import { QUEUE_KEY } from '@/constants';
 import { useSharedNetworkStatus, useToast  } from '@/contexts';
 import { createPet, deletePet, updatePet, uploadPetImage } from '@/services';
 
@@ -18,7 +19,6 @@ type OfflineQueueContextValue = {
   enqueue: (op: OfflineOp) => Promise<void>;
 };
 
-const QUEUE_KEY = 'offline_op_queue';
 
 async function readQueue(): Promise<OfflineOp[]> {
   const raw = await AsyncStorage.getItem(QUEUE_KEY);
