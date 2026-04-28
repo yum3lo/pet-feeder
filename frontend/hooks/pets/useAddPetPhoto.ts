@@ -3,6 +3,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useState, useEffect } from 'react';
 
+import { PENDING_UPLOAD_KEY } from '@/constants';
 import { useToast } from '@/contexts';
 import { useUploadPetImage } from '@/services';
 
@@ -11,7 +12,6 @@ import type { NavigationProp } from '@react-navigation/native';
 
 const MAX_DIMENSION = 800;
 const JPEG_QUALITY = 0.75;
-const PENDING_UPLOAD_KEY = 'pending_pet_photo';
 
 async function compressImage(uri: string): Promise<string> {
   const compressed = await ImageManipulator.manipulateAsync(
