@@ -7,6 +7,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useToast } from '@/contexts';
+import { capturePhotos } from '@/services/devices';
 import { colors, typography, spacing } from '@/style';
 
 import type { RootStackParamList } from "@/types";
@@ -17,8 +19,9 @@ import { styles } from './styles';
 type Props = NativeStackScreenProps<RootStackParamList, 'CatRecognition'>;
 
 export default function CatRecognitionScreen({ navigation, route }: Props) {
-  const { petNames, currentIndex } = route.params;
+  const { petNames, petIds, deviceId, currentIndex } = route.params;
   const insets = useSafeAreaInsets();
+  const { showToast } = useToast();
   const [capturing, setCapturing] = useState(false);
   const [countdown, setCountdown] = useState(8);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -29,7 +32,14 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
   const DURATION_INTERVAL_MS = 1000;
   const COUNT_DOWN_S = 8;
 
-  const startCapture = () => {
+  const startCapture = async () => {
+    try {
+      const result = await capturePhotos(deviceId, petIds[currentIndex]);
+      showToast(result.message, 'success');
+    } catch {
+      showToast('Failed to send capture command', 'error');
+    }
+
     setCapturing(true);
     setCountdown(COUNT_DOWN_S);
     let count = COUNT_DOWN_S;
@@ -42,17 +52,19 @@ export default function CatRecognitionScreen({ navigation, route }: Props) {
         if (currentIndex + 1 < total) {
           navigation.replace('CatRecognition', {
             petNames,
+            petIds,
+            deviceId,
             currentIndex: currentIndex + 1,
           });
         } else {
-          navigation.replace('TrainModel');
+          navigation.replace('TrainModel', { deviceId });
         }
       }
     }, DURATION_INTERVAL_MS);
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.xxl }]}>
+    <View style={[styles.container, { paddingTop: insets.top + spacing.xxl, paddingBottom: insets.top + spacing.xxl }]}>
       <View style={styles.content}>
         <Text style={[typography.h2, styles.catName]}>{petName}</Text>
 

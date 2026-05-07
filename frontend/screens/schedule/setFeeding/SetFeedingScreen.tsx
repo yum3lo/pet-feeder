@@ -2,7 +2,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Text, View, TouchableOpacity, TextInput } from 'react-native';
 
-import { ActionButtons } from '@/components';
+import { ActionButtons, Stepper } from '@/components';
+import { usePets, useToast } from '@/contexts';
+import { createSchedule, useGetPets } from '@/services';
+import { useGetDevices } from '@/services/devices';
 import { colors, typography, common } from '@/style';
 
 import type { RootStackParamList } from '@/types';
@@ -25,6 +28,14 @@ export default function SetFeedingScreen({ navigation }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const [customTime, setCustomTime] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [portionSize, setPortionSize] = useState(50);
+
+  const { activePetIndex } = usePets();
+  const { data: pets = [] } = useGetPets();
+  const { data: devices = [] } = useGetDevices();
+  const { showToast } = useToast();
+
+  const activePet = pets[activePetIndex];
 
   const isCustom = selected !== null && !presetTimes.includes(selected);
 
@@ -114,13 +125,14 @@ export default function SetFeedingScreen({ navigation }: Props) {
           </View>
         )}
 
-        {selected !== null && (
-          <View style={styles.selectedContainer}>
-            <Text style={[typography.bodySmall, { color: colors.stroke }]}>
-              Selected: {selected}
-            </Text>
-          </View>
-        )}
+        <Stepper
+          label="Portion size"
+          value={portionSize}
+          onChange={setPortionSize}
+          style={{ width: '90%', alignSelf: 'center', marginTop: 16, flexDirection: 'column', alignItems: 'center', gap: 8 }}
+          labelStyle={{ textAlign: 'center' }}
+          btnStyle={{ backgroundColor: 'rgba(232, 51, 6, 0.12)', borderRadius: 20, width: 40, height: 40 }}
+        />
 
       </View>
       <View style={styles.bottomContainer}>
@@ -129,7 +141,24 @@ export default function SetFeedingScreen({ navigation }: Props) {
           leftLabel="Skip"
           rightLabel="Set Time"
           onLeft={() => navigation.navigate('Home')}
-          onRight={() => navigation.navigate('Home')}
+          onRight={async () => {
+            if (!selected || !activePet?.id) {
+              navigation.navigate('Home');
+              return;
+            }
+            try {
+              await createSchedule({
+                petId: activePet.id,
+                time: selected,
+                portionSize: portionSize,
+                deviceId: devices[0]?.deviceId,
+              });
+              showToast('Feeding time set!', 'success');
+              navigation.navigate('Home');
+            } catch (err: any) {
+              showToast(err?.response?.data?.message ?? 'Failed to set feeding time', 'error');
+            }
+          }}
         />
       </View>
     </>

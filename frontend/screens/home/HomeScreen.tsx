@@ -7,6 +7,7 @@ import {SCREEN_WIDTH, NAVBAR_BASE} from "@/constants";
 import { usePets, useToast } from '@/contexts';
 import { useNotifications } from '@/hooks';
 import { useGetPets, manualFeed } from '@/services';
+import { useGetDevices } from '@/services/devices';
 import { typography, spacing, colors } from '@/style';
 
 import type { PagingCarouselHandle } from '@/components/list/types';
@@ -26,13 +27,15 @@ export default function HomeScreen({ navigation }: Props) {
   const [selectedDeviceId, setSelectedDeviceId] = useState('');
   const [addDeviceVisible, setAddDeviceVisible] = useState(false);
   const carouselRef = useRef<PagingCarouselHandle>(null);
-  const [foodWeight] = useState(244);
   const [portionSize, setPortionSize] = useState(50);
   const PORTION_STEP = 10;
   const MIN_PORTION = 10;
   const MAX_PORTION = 300;
 
+  const { data: devices = [] } = useGetDevices();
   const activePet = pets[activePetIndex];
+  const selectedDevice = devices.find((d) => d.deviceId === selectedDeviceId) ?? devices[0];
+  const foodWeight = selectedDevice?.containerWeight ?? 0;
 
   const handleFeed = async () => {
     if (!activePet?.id || !selectedDeviceId) return;
@@ -44,14 +47,14 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
-  useNotifications(foodWeight);
+  useNotifications();
 
   useEffect(() => {
-    if (activePetIndex > 0 && pets.length > activePetIndex) {
+    if (pets.length > activePetIndex) {
       const t = setTimeout(() => carouselRef.current?.scrollToIndex(activePetIndex), 50);
       return () => clearTimeout(t);
     }
-  }, [pets.length]);
+  }, [activePetIndex, pets.length]);
 
   const MEAL_CARDS_GAP = 28;
   const MEAL_CARD_WIDTH = pets.length > 1 ? SCREEN_WIDTH - MEAL_CARDS_GAP : SCREEN_WIDTH;
