@@ -1,22 +1,21 @@
-import RPi.GPIO as GPIO
+import pigpio
 import time
 from config import MOTOR_PIN
 
+SERVO_MIN_PW = 500
+SERVO_MAX_PW = 2500
+
 class Motor:
     def __init__(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(MOTOR_PIN, GPIO.OUT)
-        self.pwm = GPIO.PWM(MOTOR_PIN, 50)
-        self.pwm.start(0)
+        self.pi = pigpio.pi()
+        self.pi.set_mode(MOTOR_PIN, pigpio.OUTPUT)
         self._current_angle = 0
 
     def _set_angle(self, angle):
-        duty = 2 + (angle / 18)
-        GPIO.output(MOTOR_PIN, True)
-        self.pwm.ChangeDutyCycle(duty)
-        time.sleep(0.5)
-        GPIO.output(MOTOR_PIN, False)
-        self.pwm.ChangeDutyCycle(0)
+        pulse_width = SERVO_MIN_PW + int((angle / 180) * (SERVO_MAX_PW - SERVO_MIN_PW))
+        self.pi.set_servo_pulsewidth(MOTOR_PIN, pulse_width)
+        time.sleep(0.4)
+        self.pi.set_servo_pulsewidth(MOTOR_PIN, 0)
         self._current_angle = angle
 
     def dispense(self, target_grams, tray_load_cell):
@@ -48,5 +47,5 @@ class Motor:
         return dispensed
 
     def cleanup(self):
-        self.pwm.stop()
-        GPIO.cleanup()
+        self.pi.set_servo_pulsewidth(MOTOR_PIN, 0)
+        self.pi.stop()
