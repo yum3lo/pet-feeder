@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomNavBar, FeedingHistoryList, PetSelectorDropdown } from '@/components';
 import { usePets } from '@/contexts';
-import { useGetFeedingHistory } from '@/services';
+import { useGetFeedingHistory, useGetPets } from '@/services';
 import { useGetDevices } from '@/services/devices';
 import { colors, typography, spacing } from '@/style';
 import { toCapitalize } from '@/utils';
@@ -33,7 +33,8 @@ function isoToTime(iso: string): string {
 export default function HistoryScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const { pets, activePetIndex } = usePets();
+  const { activePetIndex } = usePets();
+  const { data: pets = [] } = useGetPets();
   const activePet = pets[activePetIndex];
 
   const { data: entries = [], isLoading, refetch } = useGetFeedingHistory(
@@ -46,16 +47,9 @@ export default function HistoryScreen({ navigation }: Props) {
     return toCapitalize(device?.name || deviceId);
   };
 
-  const grouped: Record<string, { title: string; date: string; data: { id: string; time: string; amount: string; deviceName: string; petName?: string; feedingType?: string }[] }> = {};
+  const grouped: Record<string, { title: string; date: string; data: { id: string; time: string; amount: string; deviceName: string; petName?: string; feedingType?: string; status?: string }[] }> = {};
 
-  const MOCK_ENTRIES = devices.length > 0 ? [
-    { id: 1, deviceId: devices[0].deviceId, dispensedGrams: 20, timestamp: '2026-03-27T10:00:00.000Z' },
-    { id: 2, deviceId: devices[0].deviceId, dispensedGrams: 30, timestamp: '2026-03-27T17:00:00.000Z' },
-  ] : [];
-
-  const source = entries.length ? entries : MOCK_ENTRIES;
-
-  source.forEach((e) => {
+  entries.forEach((e) => {
     const date = isoToDate(e.timestamp);
     if (!grouped[date]) {
       grouped[date] = { title: formatSectionTitle(e.timestamp), date, data: [] };
@@ -63,10 +57,11 @@ export default function HistoryScreen({ navigation }: Props) {
     grouped[date].data.push({
       id: String(e.id),
       time: isoToTime(e.timestamp),
-      amount: `${e.dispensedGrams} g`,
+      amount: `${e.consumedGrams} g`,
       deviceName: getDeviceName(e.deviceId),
       petName: (e as any).pet?.name,
       feedingType: (e as any).feedingType,
+      status: e.status,
     });
   });
 

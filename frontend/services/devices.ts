@@ -8,6 +8,7 @@ export interface Device {
   name: string | null;
   isOnline: boolean;
   lastSeen: string | null;
+  containerWeight: number | null;
   createdAt: string;
 }
 
@@ -22,6 +23,7 @@ export const useGetDevices = () =>
       const { data } = await api.get<Device[]>('/devices');
       return data;
     },
+    refetchInterval: 10_000,
   });
 
 export const useGetDeviceById = (deviceId: string | undefined) =>
@@ -32,7 +34,7 @@ export const useGetDeviceById = (deviceId: string | undefined) =>
       return data;
     },
     enabled: !!deviceId,
-    staleTime: 60_000,
+    refetchInterval: 10_000,
   });
 
 export const manualFeed = async (payload: {
@@ -45,4 +47,22 @@ export const manualFeed = async (payload: {
 
 export const deleteDevice = async (deviceId: string): Promise<void> => {
   await api.delete(`/devices/${deviceId}`);
+};
+
+export const trainModel = async (deviceId: string): Promise<{ success: boolean; accuracy: number; numClasses: number; classNames: string[]; modelPath: string }> => {
+  const { data } = await api.post(`/feeding/train/${deviceId}`);
+  return data;
+};
+
+export const capturePhotos = async (deviceId: string, petId: number): Promise<{ message: string }> => {
+  const { data } = await api.post<{ message: string }>('/feeding/capture-photos', { deviceId, petId });
+  return data;
+};
+
+export const captureBackground = async (deviceId: string): Promise<{ message: string }> => {
+  const { data } = await api.post<{ message: string }>('/feeding/capture-background', {
+    deviceId,
+    petId: 0,
+  });
+  return data;
 };

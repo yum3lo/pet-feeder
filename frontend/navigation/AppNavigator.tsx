@@ -1,12 +1,15 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { LoadingScreen, RegisterScreen, LoginScreen, AddDeviceScreen, AddPetScreen, AddPetPhotoScreen, SetFeedingScreen, HomeScreen, ScheduleScreen, HistoryScreen, SettingsScreen, CatRecognitionScreen, TrainModelScreen } from '@/screens';
+import { useNotificationStream } from '@/hooks';
+import { LoadingScreen, RegisterScreen, LoginScreen, AddDeviceScreen, AddPetScreen, AddPetPhotoScreen, SetFeedingScreen, HomeScreen, ScheduleScreen, HistoryScreen, SettingsScreen, CatRecognitionScreen, BackgroundCaptureScreen, TrainModelScreen } from '@/screens';
 
 import type { RootStackParamList } from '@/types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
+  useNotificationStream();
+
   return (
     <Stack.Navigator
       initialRouteName="Loading"
@@ -24,6 +27,7 @@ export default function AppNavigator() {
       <Stack.Screen name="History" component={HistoryScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="CatRecognition" component={CatRecognitionScreen} />
+      <Stack.Screen name="BackgroundCapture" component={BackgroundCaptureScreen} />
       <Stack.Screen name="TrainModel" component={TrainModelScreen} />
     </Stack.Navigator>
   );

@@ -14,7 +14,7 @@ export const useGetPetSchedules = (petId: number | undefined) =>
     queryKey: ['schedules', petId],
     queryFn: () => getPetSchedules(petId!),
     enabled: petId != null,
-    staleTime: 30_000,
+    refetchInterval: 10_000,
   });
 
 export const togglePetSchedule = async (scheduleId: number, isActive: boolean): Promise<void> => {
@@ -48,7 +48,7 @@ export const useGetFeedingHistory = (petId: number | undefined) =>
     queryKey: ['feeding-history', petId],
     queryFn: () => getFeedingHistory(petId!),
     enabled: petId != null,
-    staleTime: 30_000,
+    refetchInterval: 10_000,
   });
 
 // TODO: replace with real API call when the endpoint is ready ─────────────
