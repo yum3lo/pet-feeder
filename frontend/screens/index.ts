@@ -10,4 +10,5 @@ export { default as ScheduleScreen } from './schedule/schedule/ScheduleScreen';
 export { default as HistoryScreen } from './history/HistoryScreen';
 export { default as SettingsScreen } from './pet/settings/SettingsScreen';
 export { default as CatRecognitionScreen } from './model/catRecognition/CatRecognitionScreen';
+export { default as BackgroundCaptureScreen } from './model/backgroundCapture/BackgroundCaptureScreen';
 export { default as TrainModelScreen } from './model/trainModel/TrainModelScreen';

@@ -7,6 +7,12 @@ import { colors, typography, spacing } from '@/style';
 
 import type { FeedingProps } from './types';
 
+const STATUS_STYLES: Record<string, { label: string; color: string }> = {
+  completed: { label: 'Completed', color: '#34C759' },
+  failed:    { label: 'Failed',    color: '#FF3B30' },
+  pending:   { label: 'Pending',   color: '#FF9500' },
+};
+
 const TYPE_LABELS: Record<string, { icon: string; label: string }> = {
   scheduled: { icon: 'schedule', label: 'Scheduled feeding' },
   manual:    { icon: 'touch-app', label: 'Manual feeding' },
@@ -71,6 +77,11 @@ export default function FeedingHistoryList({ sections, selectedDate, onSelectDat
                 <View>
                   <Text style={[typography.bodySmall, { color: colors.stroke }]}>
                     {item.time} · {item.amount}
+                    {item.status ? (
+                      <Text style={{ fontWeight: '700', color: (STATUS_STYLES[item.status] ?? STATUS_STYLES.pending).color }}>
+                        {'  '}{(STATUS_STYLES[item.status] ?? STATUS_STYLES.pending).label}
+                      </Text>
+                    ) : null}
                   </Text>
                 </View>
               </View>

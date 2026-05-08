@@ -10,6 +10,7 @@ export type RootStackParamList = {
   Schedule: undefined;
   History: undefined;
   Settings: undefined;
-  CatRecognition: { petNames: string[]; currentIndex: number };
-  TrainModel: undefined;
+  CatRecognition: { petNames: string[]; petIds: number[]; deviceId: string; currentIndex: number };
+  BackgroundCapture: { petNames: string[]; petIds: number[] };
+  TrainModel: { deviceId?: string } | undefined;
 };

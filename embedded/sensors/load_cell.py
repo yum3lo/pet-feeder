@@ -23,6 +23,7 @@ class LoadCell:
         weight = self.hx.get_weight(readings)
         self.hx.power_down()
         self.hx.power_up()
+        time.sleep(1.0)
         return max(0, round(weight, 1))
 
     def tare(self):
@@ -50,7 +51,7 @@ class LoadCell:
                     print(f"[{self.name}] Stable at {current_weight}g")
                     return current_weight
             else:
-                # Weight changed — reset the stability timer
+                # Weight changed ? reset the stability timer
                 stable_start = None
 
             last_weight = current_weight

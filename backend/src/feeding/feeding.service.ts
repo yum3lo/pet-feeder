@@ -192,9 +192,15 @@ export class FeedingService {
     consumedGrams: number,
     leftoverGrams: number,
   ) {
-    // updating the most recent pending log for this device
+    // updating the most recent pending/failed log for this device
+    // (the 60s timeout may have already marked it failed before the result arrived)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const pendingLog = await this.prisma.feedingLog.findFirst({
-      where: { deviceId, status: 'pending' },
+      where: {
+        deviceId,
+        status: { in: ['pending', 'failed'] },
+        timestamp: { gte: fiveMinutesAgo },
+      },
       orderBy: { timestamp: 'desc' },
     });
 
@@ -239,10 +245,21 @@ export class FeedingService {
   }
 
   private async adjustNextPortion(petId: number, adjustmentGrams: number) {
-    const nextSchedule = await this.prisma.feedingSchedule.findFirst({
-      where: { petId, isActive: true },
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // find the next schedule after the current time, fall back to earliest (next day)
+    let nextSchedule = await this.prisma.feedingSchedule.findFirst({
+      where: { petId, isActive: true, time: { gt: currentTime } },
       orderBy: { time: 'asc' },
     });
+
+    if (!nextSchedule) {
+      nextSchedule = await this.prisma.feedingSchedule.findFirst({
+        where: { petId, isActive: true },
+        orderBy: { time: 'asc' },
+      });
+    }
 
     if (!nextSchedule) return;
 
