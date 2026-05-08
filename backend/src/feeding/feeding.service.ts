@@ -72,17 +72,21 @@ export class FeedingService {
     });
   }
 
-  async updatePortionSize(scheduleId: number, userId: number, portionSize: number) {
+  async updateSchedule(scheduleId: number, userId: number, time?: string, portionSize?: number) {
     const schedule = await this.prisma.feedingSchedule.findUnique({
       where: { id: scheduleId },
       include: { pet: true },
     });
     if (!schedule) throw new NotFoundException('Schedule not found.');
     if (schedule.pet.userId !== userId) throw new ForbiddenException('Access denied.');
+    if (!time && portionSize === undefined) throw new BadRequestException('Provide at least one field to update.');
 
     return this.prisma.feedingSchedule.update({
       where: { id: scheduleId },
-      data: { portionSize },
+      data: {
+        ...(time && { time }),
+        ...(portionSize !== undefined && { portionSize }),
+      },
     });
   }
 

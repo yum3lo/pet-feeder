@@ -26,6 +26,7 @@ import { CapturePhotosDto } from './dto/capture-photos.dto';
 import { UpdatePortionDto } from './dto/update-portion.dto';
 import { MqttService } from '../mqtt/mqtt.service';
 import { RecognitionService } from 'src/recognition/recognition.service';
+import { UpdatePortionDto } from './dto/update-portion.dto';
 
 @ApiTags('Feeding')
 @ApiBearerAuth()
@@ -65,14 +66,14 @@ export class FeedingController {
     return this.feedingService.toggleSchedule(id, req.user.id, dto.isActive);
   }
 
-  @Patch('schedules/:id/portion')
-  @ApiOperation({ summary: 'Update the portion size of a schedule' })
-  updatePortion(
+  @Patch('schedules/:id')
+  @ApiOperation({ summary: 'Update the time and/or portion size of a schedule' })
+  updateSchedule(
     @Req() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdatePortionDto,
   ) {
-    return this.feedingService.updatePortionSize(id, req.user.id, dto.portionSize);
+    return this.feedingService.updateSchedule(id, req.user.id, dto.time, dto.portionSize);
   }
 
   @Delete('schedules/:id')
