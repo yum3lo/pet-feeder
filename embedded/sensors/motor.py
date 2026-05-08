@@ -35,14 +35,18 @@ class Motor:
         initial_weight = tray_load_cell.get_weight()
         dispensed = 0
 
-        # Rotate in small increments, checking weight after each
+        # Rotate in small increments, checking weight after each.
+        # Use a smaller sweep angle when close to target for finer control.
         while dispensed < target_grams:
-            self._sweep_to(180)
+            remaining = target_grams - dispensed
+            sweep_angle = 8 if remaining > 10 else 5
+
+            self._sweep_to(sweep_angle)
             time.sleep(0.2)
             self._sweep_to(0)
             time.sleep(1.5)  # wait for food to settle before reading
 
-            current_weight = tray_load_cell.get_weight(readings=10)
+            current_weight = tray_load_cell.get_weight()
             dispensed = current_weight - initial_weight
             print(f"[MOTOR] Dispensed so far: {dispensed:.1f}g")
 
