@@ -26,7 +26,6 @@ import { CapturePhotosDto } from './dto/capture-photos.dto';
 import { UpdatePortionDto } from './dto/update-portion.dto';
 import { MqttService } from '../mqtt/mqtt.service';
 import { RecognitionService } from 'src/recognition/recognition.service';
-import { UpdatePortionDto } from './dto/update-portion.dto';
 
 @ApiTags('Feeding')
 @ApiBearerAuth()
