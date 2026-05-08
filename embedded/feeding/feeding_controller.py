@@ -44,8 +44,16 @@ class FeedingController:
             # recording tray weight before dispensing
             weight_before = self.tray.get_weight()
 
-            # dispensing
-            dispensed_g = self.motor.dispense(portion_grams, self.tray)
+            # subtract existing food so we only top up to the scheduled portion
+            portion_needed = max(0, round(portion_grams - weight_before, 1))
+            print(f"[FEEDING] Tray has {weight_before}g, dispensing {portion_needed}g "
+                  f"to reach {portion_grams}g")
+
+            if portion_needed <= 2:
+                print("[FEEDING] Tray already has enough food, skipping motor.")
+                dispensed_g = 0
+            else:
+                dispensed_g = self.motor.dispense(portion_needed, self.tray)
 
             # disabling distance sensor while pet is eating
             self.eating_in_progress = True
@@ -56,7 +64,7 @@ class FeedingController:
 
             # calculating consumption
             consumed_g = max(0, round(weight_before + dispensed_g - stable_weight, 1))
-            leftover_g = max(0, round(stable_weight - weight_before, 1))
+            leftover_g = max(0, round(stable_weight, 1))
 
             print(f"[FEEDING] Consumed: {consumed_g}g, Leftover: {leftover_g}g")
 
