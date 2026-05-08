@@ -303,9 +303,11 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       logId,
     });
 
-    // if no result arrives in 60s, marking feeding as failed
+    // if no result arrives in 120s, marking feeding as failed
+    // (dispensing + eating + 30s stability window can easily exceed 60s)
     this.clearFeedingTimeout(deviceId);
     const timeout = setTimeout(async () => {
+      this.logger.warn(`No feeding result from ${deviceId} after 120s.`);
       await this.feedingService.markFeedingFailed(deviceId);
 
       const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
@@ -318,7 +320,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       }
 
       await this.devicesService.markOffline(deviceId);
-    }, 60000);
+    }, 120000);
 
     this.feedingTimeouts.set(deviceId, timeout);
   }

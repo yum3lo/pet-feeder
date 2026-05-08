@@ -23,6 +23,7 @@ import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { ManualFeedDto } from './dto/manual-feed.dto';
 import { ToggleScheduleDto } from './dto/toggle-schedule.dto';
 import { CapturePhotosDto } from './dto/capture-photos.dto';
+import { UpdatePortionDto } from './dto/update-portion.dto';
 import { MqttService } from '../mqtt/mqtt.service';
 import { RecognitionService } from 'src/recognition/recognition.service';
 
@@ -62,6 +63,16 @@ export class FeedingController {
     @Body() dto: ToggleScheduleDto,
   ) {
     return this.feedingService.toggleSchedule(id, req.user.id, dto.isActive);
+  }
+
+  @Patch('schedules/:id/portion')
+  @ApiOperation({ summary: 'Update the portion size of a schedule' })
+  updatePortion(
+    @Req() req,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePortionDto,
+  ) {
+    return this.feedingService.updatePortionSize(id, req.user.id, dto.portionSize);
   }
 
   @Delete('schedules/:id')
