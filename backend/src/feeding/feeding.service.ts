@@ -72,6 +72,24 @@ export class FeedingService {
     });
   }
 
+  async updateSchedule(scheduleId: number, userId: number, time?: string, portionSize?: number) {
+    const schedule = await this.prisma.feedingSchedule.findUnique({
+      where: { id: scheduleId },
+      include: { pet: true },
+    });
+    if (!schedule) throw new NotFoundException('Schedule not found.');
+    if (schedule.pet.userId !== userId) throw new ForbiddenException('Access denied.');
+    if (!time && portionSize === undefined) throw new BadRequestException('Provide at least one field to update.');
+
+    return this.prisma.feedingSchedule.update({
+      where: { id: scheduleId },
+      data: {
+        ...(time && { time }),
+        ...(portionSize !== undefined && { portionSize }),
+      },
+    });
+  }
+
   async deleteSchedule(scheduleId: number, userId: number) {
     const schedule = await this.prisma.feedingSchedule.findUnique({
       where: { id: scheduleId },
