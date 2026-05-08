@@ -40,13 +40,12 @@ class Motor:
             self._sweep_to(180)
             time.sleep(0.2)
             self._sweep_to(0)
-            time.sleep(0.2)
+            time.sleep(1.5)  # wait for food to settle before reading
 
-            current_weight = tray_load_cell.get_weight()
+            current_weight = tray_load_cell.get_weight(readings=10)
             dispensed = current_weight - initial_weight
             print(f"[MOTOR] Dispensed so far: {dispensed:.1f}g")
 
-            # Safety: stop if we overshoot by more than 5g
             if dispensed >= target_grams - 2:
                 break
 
