@@ -30,7 +30,7 @@ export const createSchedule = async (payload: {
   await api.post('/feeding/schedules', { ...payload, feedingMode: 'scheduled', deviceId: payload.deviceId ?? 'feeder_01' });
 };
 
-export const updateSchedule = async (scheduleId: number, payload: { time: string; portionSize: number }): Promise<void> => {
+export const updateSchedule = async (scheduleId: number, payload: { time?: string; portionSize?: number }): Promise<void> => {
   await api.patch(`/feeding/schedules/${scheduleId}`, payload);
 };
 

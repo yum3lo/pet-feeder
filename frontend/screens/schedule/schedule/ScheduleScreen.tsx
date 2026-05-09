@@ -42,8 +42,19 @@ export default function ScheduleScreen({ navigation }: Props) {
     }));
 
   const handleToggle = async (scheduleId: string, val: boolean) => {
-    await togglePetSchedule(Number(scheduleId), val);
-    refetch();
+    try {
+      await togglePetSchedule(Number(scheduleId), val);
+      const schedule = schedules.find((s) => String(s.id) === scheduleId);
+      const petName = toCapitalize(activePet?.name ?? 'Pet');
+      const time = schedule?.time ?? '';
+      showToast(
+        `${petName}'s ${time} meal is ${val ? 'activated' : 'deactivated'}`,
+        'success',
+      );
+      refetch();
+    } catch (err: any) {
+      showToast(err?.response?.data?.message ?? 'Failed to update schedule', 'error');
+    }
   };
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -68,7 +79,12 @@ export default function ScheduleScreen({ navigation }: Props) {
     const portionSize = parseInt(data.amount, 10);
     try {
       if (data.id) {
-        await updateSchedule(Number(data.id), { time: data.time, portionSize });
+        const patch: { time?: string; portionSize?: number } = {};
+        if (data.time !== editingMeal?.time) patch.time = data.time;
+        if (String(portionSize) !== editingMeal?.amount) patch.portionSize = portionSize;
+        if (Object.keys(patch).length > 0) {
+          await updateSchedule(Number(data.id), patch);
+        }
         showToast('Meal updated!', 'success');
       } else {
         await createSchedule({ petId: activePet.id, time: data.time, portionSize, deviceId: activeDevice?.deviceId });

@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 import { PETS_STORAGE_KEY } from '@/constants';
-import { togglePetSchedule } from '@/services';
 
 export type Meal = { id: string; time: string; amount: string };
 
@@ -40,7 +39,6 @@ type PetsContextValue = {
   activePetIndex: number;
   setActivePetIndex: (index: number) => void;
   updateSchedule: (petIndex: number, meals: Meal[]) => void;
-  toggleSchedule: (petIndex: number, enabled: boolean) => Promise<void>;
 };
 
 const PetsContext = createContext<PetsContextValue | null>(null);
@@ -70,16 +68,8 @@ export function PetsProvider({ children }: { children: ReactNode }) {
   const updateSchedule = (petIndex: number, meals: Meal[]) =>
     setPets((prev) => prev.map((p, i) => (i === petIndex ? { ...p, meals } : p)));
 
-  const toggleSchedule = async (petIndex: number, enabled: boolean): Promise<void> => {
-    setPets((prev) => prev.map((p, i) => (i === petIndex ? { ...p, scheduleEnabled: enabled } : p)));
-    const pet = pets[petIndex];
-    if (pet) {
-      await togglePetSchedule(Number(pet.id), enabled);
-    }
-  };
-
   return (
-    <PetsContext.Provider value={{ pets, addPet, updatePet, activePetIndex, setActivePetIndex, updateSchedule, toggleSchedule }}>
+    <PetsContext.Provider value={{ pets, addPet, updatePet, activePetIndex, setActivePetIndex, updateSchedule }}>
       {children}
     </PetsContext.Provider>
   );
