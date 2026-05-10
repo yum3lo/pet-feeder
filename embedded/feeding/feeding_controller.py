@@ -79,7 +79,6 @@ class FeedingController:
 
             self.mqtt.publish_feeding_result(
                 scheduled_pet_id=scheduled_pet_id,
-                actual_pet_id=scheduled_pet_id,
                 dispensed_g=dispensed_g,
                 consumed_g=consumed_g,
                 leftover_g=leftover_g,
