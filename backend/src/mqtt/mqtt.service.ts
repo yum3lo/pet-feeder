@@ -5,7 +5,7 @@ import { FeedingService } from '../feeding/feeding.service';
 import { DevicesService } from '../devices/devices.service';
 import { RecognitionService } from '../recognition/recognition.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnModuleDestroy {
@@ -132,7 +132,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
     const {
       scheduledPetId,
-      actualPetId,
       dispensedGrams,
       consumedGrams,
       leftoverGrams,
@@ -141,7 +140,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     const log = await this.feedingService.handleFeedingResult(
       deviceId,
       scheduledPetId ?? null,
-      actualPetId ?? null,
       dispensedGrams ?? 0,
       consumedGrams ?? 0,
       leftoverGrams ?? 0,
@@ -154,10 +152,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
         ? await this.getPetName(log.petId)
         : 'Your pet';
 
-      const samepet = !actualPetId || actualPetId === scheduledPetId;
-      const message = samepet
-        ? `${petName} has eaten ${consumedGrams}g.`
-        : `A different pet ate ${consumedGrams}g from ${petName}'s bowl.`;
+      const message = `${petName} has eaten ${consumedGrams}g.`;
 
       await this.notificationsService.create(userId, message, 'feeding_complete');
     }
