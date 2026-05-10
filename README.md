@@ -105,7 +105,7 @@ The physical device is built around a Raspberry Pi 3 Model B+ and housed in a cu
 | Component | Purpose |
 |---|---|
 | Raspberry Pi 3 Model B+ | Central controller |
-| Stepper motor (MG995) | Food dispensing via auger screw |
+| Servo motor (MG995) | Food dispensing via auger screw |
 | 200g load cell + HX711 | Tray weight - measures dispensed and consumed food |
 | 750g load cell + HX711 | Container weight - monitors remaining food level |
 | VL53L0X distance sensor | Detects pet presence near the feeder |
@@ -152,17 +152,18 @@ embedded/
 ├── sensors/
 │   ├── load_cell.py       # HX711 driver for both load cells
 │   ├── distance_sensor.py # VL53L0X driver
-│   ├── motor.py           # Stepper motor control
+│   ├── motor.py           # Servo motor control
 │   └── camera.py          # Camera capture
 ├── tests/           # Component test scripts
-├── config.py        # Device ID, broker URL, credentials, pin numbers
+├── config.py        # Device ID, broker URL, credentials, pin numbers, hardware thresholds
 ├── main.py          # Entry point - starts both threads
-└── mqtt_client.py   # MQTT connection and message handling
+├── mqtt_client.py   # MQTT connection and message handling
+└── requirements.txt # Python dependencies
 ```
 
 ### Installation and Usage
 
-**Prerequisites:** Raspberry Pi OS, Python 3, I2C enabled via `raspi-config`.
+**Prerequisites:** Raspberry Pi OS, Python 3, I2C enabled via `raspi-config`, and the `pigpio` daemon running (`sudo pigpiod`).
 
 ```bash
 # Navigate to the embedded directory
