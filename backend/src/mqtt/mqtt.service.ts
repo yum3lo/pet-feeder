@@ -280,7 +280,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     }
 
     // if feeding was pending and device reports an error, marking it failed
-    if (errorCode === 'DISPENSE_ERROR' || errorCode === 'LOW_FOOD') {
+    if (errorCode === 'DISPENSE_ERROR' || errorCode === 'LOW_FOOD' || errorCode === 'MOTOR_STALL') {
       await this.feedingService.markFeedingFailed(deviceId);
     }
   }

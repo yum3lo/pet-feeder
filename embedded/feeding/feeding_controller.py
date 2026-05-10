@@ -1,5 +1,5 @@
-import time
 import threading
+from sensors.motor import MotorStallError
 
 class FeedingController:
     def __init__(self, motor, tray_load_cell, container_load_cell,
@@ -53,7 +53,12 @@ class FeedingController:
                 print("[FEEDING] Tray already has enough food, skipping motor.")
                 dispensed_g = 0
             else:
-                dispensed_g = self.motor.dispense(portion_needed, self.tray)
+                try:
+                    dispensed_g = self.motor.dispense(portion_needed, self.tray)
+                except MotorStallError as e:
+                    print(f"[FEEDING] Motor stall: {e}")
+                    self.mqtt.publish_error("MOTOR_STALL", str(e))
+                    return
 
             # disabling distance sensor while pet is eating
             self.eating_in_progress = True

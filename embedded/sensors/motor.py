@@ -1,11 +1,14 @@
 import pigpio
 import time
-from config import MOTOR_PIN
+from config import MOTOR_PIN, MOTOR_STALL_PROGRESS_THRESHOLD_GRAMS, MOTOR_STALL_MAX_ATTEMPTS
 
 SERVO_MIN_PW = 500
 SERVO_MAX_PW = 2500
 SWEEP_STEP_DEGREES = 3
 SWEEP_STEP_DELAY = 0.03
+
+class MotorStallError(Exception):
+    pass
 
 class Motor:
     def __init__(self):
@@ -34,6 +37,8 @@ class Motor:
         print(f"[MOTOR] Dispensing target: {target_grams}g")
         initial_weight = tray_load_cell.get_weight()
         dispensed = 0
+        prev_dispensed = 0
+        no_progress_count = 0
 
         # Rotate in small increments, checking weight after each.
         # Use a smaller sweep angle when close to target for finer control.
@@ -49,6 +54,17 @@ class Motor:
             current_weight = tray_load_cell.get_weight()
             dispensed = current_weight - initial_weight
             print(f"[MOTOR] Dispensed so far: {dispensed:.1f}g")
+
+            if dispensed - prev_dispensed < MOTOR_STALL_PROGRESS_THRESHOLD_GRAMS:
+                no_progress_count += 1
+                if no_progress_count >= MOTOR_STALL_MAX_ATTEMPTS:
+                    raise MotorStallError(
+                        f"Motor stall detected: tray weight did not change after "
+                        f"{MOTOR_STALL_MAX_ATTEMPTS} consecutive sweeps"
+                    )
+            else:
+                no_progress_count = 0
+                prev_dispensed = dispensed
 
             if dispensed >= target_grams - 2:
                 break
