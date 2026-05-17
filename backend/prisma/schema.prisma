@@ -69,7 +69,6 @@ model FeedingSchedule {
 model FeedingLog {
   id             Int      @id @default(autoincrement())
   petId          Int?     // who was scheduled to eat
-  actualPetId    Int?     // who actually ate (from recognition)
   deviceId       String
   scheduledGrams Float
   dispensedGrams Float

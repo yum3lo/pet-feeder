@@ -94,11 +94,9 @@ class MQTTClient:
         message = json.dumps(payload)
         self.client.publish(topic, message, qos=qos)
 
-    def publish_feeding_result(self, scheduled_pet_id, actual_pet_id,
-                               dispensed_g, consumed_g, leftover_g):
+    def publish_feeding_result(self, scheduled_pet_id, dispensed_g, consumed_g, leftover_g):
         self.publish(TOPICS["feeding_result"], {
             "scheduledPetId": scheduled_pet_id,
-            "actualPetId": actual_pet_id,
             "dispensedGrams": dispensed_g,
             "consumedGrams": consumed_g,
             "leftoverGrams": leftover_g,

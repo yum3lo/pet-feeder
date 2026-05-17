@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { MqttModule } from '../mqtt/mqtt.module';
 import { FeedingService } from './feeding.service';
 import { FeedingController } from './feeding.controller';
-import { RecognitionModule } from 'src/recognition/recognition.module';
+import { RecognitionModule } from '../recognition/recognition.module';
 
 @Module({
   imports: [
