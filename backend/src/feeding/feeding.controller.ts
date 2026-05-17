@@ -25,7 +25,7 @@ import { ToggleScheduleDto } from './dto/toggle-schedule.dto';
 import { CapturePhotosDto } from './dto/capture-photos.dto';
 import { UpdatePortionDto } from './dto/update-portion.dto';
 import { MqttService } from '../mqtt/mqtt.service';
-import { RecognitionService } from 'src/recognition/recognition.service';
+import { RecognitionService } from '../recognition/recognition.service';
 
 @ApiTags('Feeding')
 @ApiBearerAuth()

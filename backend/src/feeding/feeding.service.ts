@@ -187,7 +187,6 @@ export class FeedingService {
   async handleFeedingResult(
     deviceId: string,
     scheduledPetId: number | null,
-    actualPetId: number | null,
     dispensedGrams: number,
     consumedGrams: number,
     leftoverGrams: number,
@@ -209,18 +208,12 @@ export class FeedingService {
         where: { id: pendingLog.id },
         data: {
           petId: scheduledPetId,
-          actualPetId: actualPetId,
           dispensedGrams,
           consumedGrams,
           leftoverGrams,
           status: 'completed',
         },
       });
-    }
-
-    // if a different pet ate the food, adjust its next portion
-    if (actualPetId && actualPetId !== scheduledPetId && leftoverGrams > 0) {
-      await this.adjustNextPortion(actualPetId, leftoverGrams);
     }
 
     // adjusting scheduled pet's next portion by leftover
