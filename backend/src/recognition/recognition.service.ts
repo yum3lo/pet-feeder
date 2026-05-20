@@ -78,9 +78,11 @@ export class RecognitionService {
       this.logger.log(
         `Saved batch ${batchIndexNum + 1}/${totalBatchesNum} for pet ${petIdNum}. Total on disk: ${totalSaved}`,
       );
+      return { isComplete: totalSaved >= totalBatchesNum };
     } catch (err) {
       this.logger.error(`Failed to save batch ${batchIndexNum + 1} for pet ${petIdNum}: ${(err as Error).message}`);
     }
+    return { isComplete: false };
   }
 
   async trainModel(userId: number): Promise<{

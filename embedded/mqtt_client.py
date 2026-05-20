@@ -116,7 +116,7 @@ class MQTTClient:
                 "petId": pet_id,
                 "photos": batch,
                 "batchIndex": i,
-                "totalBatches": (total + BATCH_SIZE - 1),
+                "totalBatches": total,
             })
             time.sleep(1)
         print(f"[MQTT] Sent {total} training photos.")

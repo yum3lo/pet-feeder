@@ -165,14 +165,14 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       `for pet ${petId} from ${deviceId}`,
     );
 
-    await this.recognitionService.storeTrainingPhotos(
+    const result = await this.recognitionService.storeTrainingPhotos(
       petId,
       photos,
       batchIndex,
       totalBatches,
     );
 
-    if (batchIndex + 1 === totalBatches) {
+    if (result?.isComplete) {
       const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
       if (userId) {
         this.notificationsService.emit(userId, 'photos_received', { petId });
