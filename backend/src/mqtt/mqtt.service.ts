@@ -171,6 +171,13 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       batchIndex,
       totalBatches,
     );
+
+    if (batchIndex + 1 === totalBatches) {
+      const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
+      if (userId) {
+        this.notificationsService.emit(userId, 'photos_received', { petId });
+      }
+    }
   }
 
   private async handleMovementImage(deviceId: string, data: any) {

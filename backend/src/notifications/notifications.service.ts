@@ -16,6 +16,13 @@ export class NotificationsService {
     return this.subjects.get(userId)!;
   }
 
+  emit(userId: number, type: string, data: Record<string, unknown>) {
+    const subject = this.subjects.get(userId);
+    if (subject) {
+      subject.next({ data: { type, ...data } });
+    }
+  }
+
   async create(userId: number, message: string, type: string) {
     const notification = await this.prisma.notification.create({
       data: { userId, message, type },
