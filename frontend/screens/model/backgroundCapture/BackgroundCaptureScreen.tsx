@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/contexts';
 import { useGetDevices, captureBackground } from '@/services/devices';
 import { colors, typography, spacing } from '@/style';
-import { toCapitalize } from '@/utils';
+import { toCapitalize, notificationEmitter } from '@/utils';
 
 import Dropdown from '@/components/dropdown/Dropdown';
 
@@ -21,7 +21,6 @@ import { styles } from '../catRecognition/styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BackgroundCapture'>;
 
-const DURATION_INTERVAL_MS = 1000;
 const COUNT_DOWN_S = 8;
 
 export default function BackgroundCaptureScreen({ navigation, route }: Props) {
@@ -31,32 +30,33 @@ export default function BackgroundCaptureScreen({ navigation, route }: Props) {
   const { data: devices = [] } = useGetDevices();
   const [selectedDeviceId, setSelectedDeviceId] = useState('');
   const [capturing, setCapturing] = useState(false);
-  const [countdown, setCountdown] = useState(COUNT_DOWN_S);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      notificationEmitter.removeAllListeners('photos_received');
+    };
+  }, []);
 
   const startCapture = async () => {
     const deviceId = selectedDeviceId || devices[0]?.deviceId;
-    if (deviceId) {
-      try {
-        const result = await captureBackground(deviceId);
-        showToast(result.message, 'success');
-      } catch {
-        showToast('Failed to send capture command', 'error');
-      }
+    if (!deviceId) return;
+
+    try {
+      await captureBackground(deviceId);
+    } catch {
+      showToast('Failed to send capture command', 'error');
+      return;
     }
 
     setCapturing(true);
-    setCountdown(COUNT_DOWN_S);
-    let count = COUNT_DOWN_S;
-    intervalRef.current = setInterval(() => {
-      count -= 1;
-      setCountdown(count);
-      if (count <= 0) {
-        clearInterval(intervalRef.current!);
-        setCapturing(false);
-        navigation.replace('CatRecognition', { petNames, petIds, deviceId: selectedDeviceId || devices[0]?.deviceId, currentIndex: 0 });
-      }
-    }, DURATION_INTERVAL_MS);
+
+    const handler = () => {
+      notificationEmitter.off('photos_received', handler);
+      setCapturing(false);
+      navigation.replace('CatRecognition', { petNames, petIds, deviceId, currentIndex: 0 });
+    };
+
+    notificationEmitter.on('photos_received', handler);
   };
 
   return (
@@ -70,7 +70,7 @@ export default function BackgroundCaptureScreen({ navigation, route }: Props) {
         </Text>
 
         <Text style={[typography.bodySmall, styles.note]}>
-          Capturing background images for {COUNT_DOWN_S} seconds helps the model
+          Capturing background images helps the model
           distinguish your pet from the environment and improves recognition accuracy.
         </Text>
 
@@ -95,8 +95,7 @@ export default function BackgroundCaptureScreen({ navigation, route }: Props) {
         {capturing ? (
           <View style={styles.capturingContainer}>
             <ActivityIndicator size="large" color={colors.accent} />
-            <Text style={[typography.h1, styles.countdown]}>{countdown}</Text>
-            <Text style={[typography.body, { color: colors.stroke }]}>
+            <Text style={[typography.body, { color: colors.stroke, marginTop: spacing.lg }]}>
               Capturing…
             </Text>
           </View>
