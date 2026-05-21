@@ -17,6 +17,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   private feedingTimeouts = new Map<string, NodeJS.Timeout>();
   private lowFoodAlertCooldowns = new Map<string, number>();
   private freeFeedingCooldowns = new Map<number, number>(); // petId -> last fed timestamp
+  private recognitionWarmupCounts = new Map<string, number>(); // deviceId -> results seen since detection enabled
 
   constructor(
     private config: ConfigService,
@@ -184,6 +185,14 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     const { image } = data;
     if (!image) return;
 
+    const WARMUP_COUNT = 3;
+    const seen = this.recognitionWarmupCounts.get(deviceId) ?? WARMUP_COUNT;
+    if (seen < WARMUP_COUNT) {
+      this.recognitionWarmupCounts.set(deviceId, seen + 1);
+      this.logger.debug(`Recognition warmup ${seen + 1}/${WARMUP_COUNT} for ${deviceId} — skipping.`);
+      return;
+    }
+
     this.logger.log(`Movement image received from ${deviceId} — running recognition.`);
 
     const result = await this.recognitionService.recognizePet(deviceId, image);
@@ -337,6 +346,9 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   sendDetectionCommand(deviceId: string, enabled: boolean) {
     this.logger.log(`Setting detection on ${deviceId} to ${enabled}`);
+    if (enabled) {
+      this.recognitionWarmupCounts.set(deviceId, 0);
+    }
     this.client.publish(
       `feeder/${deviceId}/commands/detection`,
       JSON.stringify({ enabled }),
