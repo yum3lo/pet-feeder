@@ -176,6 +176,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
       if (userId) {
         this.notificationsService.emit(userId, 'photos_received', { petId });
+        this.logger.log(`photos_received event emitted for pet ${petId}, user ${userId}`);
       }
     }
   }

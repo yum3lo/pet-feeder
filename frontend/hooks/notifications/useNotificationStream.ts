@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect, useRef } from 'react';
 
 import { TOKEN_KEY } from '@/constants';
+import { notificationEmitter } from '@/utils';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 const RECONNECT_DELAY_MS = 5_000;
@@ -18,11 +19,12 @@ Notifications.setNotificationHandler({
 });
 
 export function useNotificationStream() {
-  const abortRef = useRef<AbortController | null>(null);
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let active = true;
+    let processedLength = 0;
 
     async function connect() {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
@@ -31,67 +33,66 @@ export function useNotificationStream() {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted' || !active) return;
 
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
+      xhrRef.current?.abort();
+      processedLength = 0;
 
-      try {
-        const response = await fetch(`${BASE_URL}/notifications/stream`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'text/event-stream',
-            'Cache-Control': 'no-cache',
-          },
-          signal: controller.signal,
-        });
+      const xhr = new XMLHttpRequest();
+      xhrRef.current = xhr;
 
-        if (!response.ok || !response.body) {
-          scheduleReconnect();
-          return;
-        }
+      let buffer = '';
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
+      function processChunk(newText: string) {
+        buffer += newText;
+        const messages = buffer.split('\n\n');
+        buffer = messages.pop() ?? '';
 
-        while (active) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        for (const message of messages) {
+          const dataLine = message
+            .split('\n')
+            .find((line) => line.startsWith('data:'));
 
-          buffer += decoder.decode(value, { stream: true });
+          if (!dataLine) continue;
 
-          // SSE messages are separated by double newlines
-          const messages = buffer.split('\n\n');
-          buffer = messages.pop() ?? '';
+          try {
+            const payload = JSON.parse(dataLine.slice(5).trim());
 
-          for (const message of messages) {
-            const dataLine = message
-              .split('\n')
-              .find((line) => line.startsWith('data:'));
-
-            if (!dataLine) continue;
-
-            try {
-              const payload = JSON.parse(dataLine.slice(5).trim());
-              await Notifications.scheduleNotificationAsync({
+            if (payload.type) {
+              notificationEmitter.emit(payload.type, payload);
+            } else {
+              Notifications.scheduleNotificationAsync({
                 content: {
                   title: 'Smart Pet Feeder',
                   body: payload.message ?? 'New notification',
                 },
                 trigger: null,
               });
-            } catch {
-              // ignore malformed events
             }
+          } catch {
+            // ignore malformed events
           }
         }
-
-        if (active) scheduleReconnect();
-      } catch (err: unknown) {
-        if (active && !(err instanceof Error && err.name === 'AbortError')) {
-          scheduleReconnect();
-        }
       }
+
+      xhr.open('GET', `${BASE_URL}/notifications/stream`, true);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.setRequestHeader('Accept', 'text/event-stream');
+      xhr.setRequestHeader('Cache-Control', 'no-cache');
+
+      xhr.onprogress = () => {
+        const newText = xhr.responseText.slice(processedLength);
+        processedLength = xhr.responseText.length;
+        if (newText) processChunk(newText);
+      };
+
+      xhr.onload = () => {
+        if (active) scheduleReconnect();
+      };
+
+      xhr.onerror = () => {
+        if (active) scheduleReconnect();
+      };
+
+      xhr.send();
     }
 
     function scheduleReconnect() {
@@ -103,7 +104,7 @@ export function useNotificationStream() {
 
     return () => {
       active = false;
-      abortRef.current?.abort();
+      xhrRef.current?.abort();
       if (reconnectTimer.current !== null) {
         clearTimeout(reconnectTimer.current);
       }

@@ -50,7 +50,7 @@ export const deleteDevice = async (deviceId: string): Promise<void> => {
 };
 
 export const trainModel = async (deviceId: string): Promise<{ success: boolean; accuracy: number; numClasses: number; classNames: string[]; modelPath: string }> => {
-  const { data } = await api.post(`/feeding/train/${deviceId}`);
+  const { data } = await api.post(`/feeding/train/${deviceId}`, undefined, { timeout: 300000 });
   return data;
 };
 
