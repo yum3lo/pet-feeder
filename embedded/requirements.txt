@@ -1,4 +1,4 @@
-RPi.GPIO
+pigpio
 hx711
 adafruit-circuitpython-vl53l0x
 adafruit-blinka

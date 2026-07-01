@@ -29,13 +29,17 @@ export const styles = StyleSheet.create({
   addPetButton: {
     marginTop: spacing.md,
   },
-  logoutButton: {
+  recognitionButton: {
     marginTop: spacing.lg,
-    width: CARD_WIDTH,
-    height: 48,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.outline,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutButton: {
+    position: 'absolute',
+    bottom: 110,
+    right: spacing.xl,
+    width: 52,
+    height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },

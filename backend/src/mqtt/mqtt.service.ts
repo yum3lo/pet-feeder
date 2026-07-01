@@ -5,7 +5,7 @@ import { FeedingService } from '../feeding/feeding.service';
 import { DevicesService } from '../devices/devices.service';
 import { RecognitionService } from '../recognition/recognition.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnModuleDestroy {
@@ -17,6 +17,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   private feedingTimeouts = new Map<string, NodeJS.Timeout>();
   private lowFoodAlertCooldowns = new Map<string, number>();
   private freeFeedingCooldowns = new Map<number, number>(); // petId -> last fed timestamp
+  private recognitionWarmupCounts = new Map<string, number>(); // deviceId -> results seen since detection enabled
 
   constructor(
     private config: ConfigService,
@@ -132,7 +133,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
     const {
       scheduledPetId,
-      actualPetId,
       dispensedGrams,
       consumedGrams,
       leftoverGrams,
@@ -141,7 +141,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     const log = await this.feedingService.handleFeedingResult(
       deviceId,
       scheduledPetId ?? null,
-      actualPetId ?? null,
       dispensedGrams ?? 0,
       consumedGrams ?? 0,
       leftoverGrams ?? 0,
@@ -154,10 +153,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
         ? await this.getPetName(log.petId)
         : 'Your pet';
 
-      const samepet = !actualPetId || actualPetId === scheduledPetId;
-      const message = samepet
-        ? `${petName} has eaten ${consumedGrams}g.`
-        : `A different pet ate ${consumedGrams}g from ${petName}'s bowl.`;
+      const message = `${petName} has eaten ${consumedGrams}g.`;
 
       await this.notificationsService.create(userId, message, 'feeding_complete');
     }
@@ -170,17 +166,33 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       `for pet ${petId} from ${deviceId}`,
     );
 
-    await this.recognitionService.storeTrainingPhotos(
+    const result = await this.recognitionService.storeTrainingPhotos(
       petId,
       photos,
       batchIndex,
       totalBatches,
     );
+
+    if (result?.isComplete) {
+      const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
+      if (userId) {
+        this.notificationsService.emit(userId, 'photos_received', { petId });
+        this.logger.log(`photos_received event emitted for pet ${petId}, user ${userId}`);
+      }
+    }
   }
 
   private async handleMovementImage(deviceId: string, data: any) {
     const { image } = data;
     if (!image) return;
+
+    const WARMUP_COUNT = 3;
+    const seen = this.recognitionWarmupCounts.get(deviceId) ?? WARMUP_COUNT;
+    if (seen < WARMUP_COUNT) {
+      this.recognitionWarmupCounts.set(deviceId, seen + 1);
+      this.logger.debug(`Recognition warmup ${seen + 1}/${WARMUP_COUNT} for ${deviceId} — skipping.`);
+      return;
+    }
 
     this.logger.log(`Movement image received from ${deviceId} — running recognition.`);
 
@@ -280,7 +292,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     }
 
     // if feeding was pending and device reports an error, marking it failed
-    if (errorCode === 'DISPENSE_ERROR' || errorCode === 'LOW_FOOD') {
+    if (errorCode === 'DISPENSE_ERROR' || errorCode === 'LOW_FOOD' || errorCode === 'MOTOR_STALL') {
       await this.feedingService.markFeedingFailed(deviceId);
     }
   }
@@ -303,9 +315,11 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       logId,
     });
 
-    // if no result arrives in 60s, marking feeding as failed
+    // if no result arrives in 120s, marking feeding as failed
+    // (dispensing + eating + 30s stability window can easily exceed 60s)
     this.clearFeedingTimeout(deviceId);
     const timeout = setTimeout(async () => {
+      this.logger.warn(`No feeding result from ${deviceId} after 120s.`);
       await this.feedingService.markFeedingFailed(deviceId);
 
       const userId = await this.devicesService.getUserIdByDeviceId(deviceId);
@@ -318,7 +332,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       }
 
       await this.devicesService.markOffline(deviceId);
-    }, 60000);
+    }, 120000);
 
     this.feedingTimeouts.set(deviceId, timeout);
   }
@@ -333,6 +347,9 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   sendDetectionCommand(deviceId: string, enabled: boolean) {
     this.logger.log(`Setting detection on ${deviceId} to ${enabled}`);
+    if (enabled) {
+      this.recognitionWarmupCounts.set(deviceId, 0);
+    }
     this.client.publish(
       `feeder/${deviceId}/commands/detection`,
       JSON.stringify({ enabled }),

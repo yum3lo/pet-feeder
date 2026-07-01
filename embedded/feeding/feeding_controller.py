@@ -1,5 +1,5 @@
-import time
 import threading
+from sensors.motor import MotorStallError
 
 class FeedingController:
     def __init__(self, motor, tray_load_cell, container_load_cell,
@@ -13,19 +13,7 @@ class FeedingController:
         self._feeding_lock = threading.Lock()
         self.eating_in_progress = False
         self.capturing_photos = False
-        self.eating_in_progress = False
-        self.awaiting_recognition = False
         self._processed_log_ids = set()
-
-        # recognition result is set by mqtt callback
-        self._recognition_result = {"petId": None}
-        self._recognition_event = threading.Event()
-
-    def on_recognition_result(self, pet_id, confidence):
-        """Called by MQTT client when backend sends recognition response."""
-        self._recognition_result["petId"] = pet_id
-        self._recognition_result["confidence"] = confidence
-        self._recognition_event.set()
 
     def handle_dispense_command(self, scheduled_pet_id, portion_grams, log_id=None):
         """Called when backend sends a scheduled or manual dispense command."""
@@ -56,8 +44,21 @@ class FeedingController:
             # recording tray weight before dispensing
             weight_before = self.tray.get_weight()
 
-            # dispensing
-            dispensed_g = self.motor.dispense(portion_grams, self.tray)
+            # subtract existing food so we only top up to the scheduled portion
+            portion_needed = max(0, round(portion_grams - weight_before, 1))
+            print(f"[FEEDING] Tray has {weight_before}g, dispensing {portion_needed}g "
+                  f"to reach {portion_grams}g")
+
+            if portion_needed <= 2:
+                print("[FEEDING] Tray already has enough food, skipping motor.")
+                dispensed_g = 0
+            else:
+                try:
+                    dispensed_g = self.motor.dispense(portion_needed, self.tray)
+                except MotorStallError as e:
+                    print(f"[FEEDING] Motor stall: {e}")
+                    self.mqtt.publish_error("MOTOR_STALL", str(e))
+                    return
 
             # disabling distance sensor while pet is eating
             self.eating_in_progress = True
@@ -68,7 +69,7 @@ class FeedingController:
 
             # calculating consumption
             consumed_g = max(0, round(weight_before + dispensed_g - stable_weight, 1))
-            leftover_g = max(0, round(stable_weight - weight_before, 1))
+            leftover_g = max(0, round(stable_weight, 1))
 
             print(f"[FEEDING] Consumed: {consumed_g}g, Leftover: {leftover_g}g")
 
@@ -76,23 +77,8 @@ class FeedingController:
             self.eating_in_progress = False
             print("[FEEDING] Eating done - distance sensor re-enabled.")
 
-            print("[FEEDING] Waiting for pet recognition...")
-            self._recognition_event.clear()
-            self.awaiting_recognition = True
-
-            recognised = self._recognition_event.wait(timeout=15)
-            self.awaiting_recognition = False
-
-            if recognised:
-                actual_pet_id = self._recognition_result["petId"]
-                print(f"[FEEDING] Recognised: {actual_pet_id}")
-            else:
-                print("[FEEDING] No recognition within timeout.")
-                actual_pet_id = scheduled_pet_id
-
             self.mqtt.publish_feeding_result(
                 scheduled_pet_id=scheduled_pet_id,
-                actual_pet_id=actual_pet_id,
                 dispensed_g=dispensed_g,
                 consumed_g=consumed_g,
                 leftover_g=leftover_g,
@@ -102,7 +88,6 @@ class FeedingController:
             print(f"[FEEDING] Error: {e}")
             self.mqtt.publish_error("DISPENSE_ERROR", str(e))
             self.eating_in_progress = False
-            self.awaiting_recognition = False
 
         finally:
             self._feeding_lock.release()

@@ -1,9 +1,12 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AddPetModal, BottomNavBar, DeleteModal, PagingCarousel, PetProfileCard, RecognitionPromptModal } from '@/components';
+import { RECOGNITION_TRAINED_KEY } from '@/constants';
 import { usePets } from '@/contexts';
 import { useSettingsPets } from '@/hooks';
 import { useGetPets, logoutUser } from '@/services';
@@ -35,6 +38,13 @@ export default function SettingsScreen({ navigation }: Props) {
   } = useSettingsPets({ pets, currentIndex, setCurrentIndex });
 
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [recognitionTrained, setRecognitionTrained] = useState(true);
+
+  useEffect(() => {
+    AsyncStorage.getItem(RECOGNITION_TRAINED_KEY).then((val) => {
+      setRecognitionTrained(val === 'true');
+    });
+  }, []);
 
   const currentPet = pets[currentIndex];
 
@@ -89,13 +99,26 @@ export default function SettingsScreen({ navigation }: Props) {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={() => setLogoutModalVisible(true)}
-        >
-          <Text style={[typography.body, { color: colors.text }]}>Logout</Text>
-        </TouchableOpacity>
+        {!recognitionTrained && (
+          <TouchableOpacity
+            style={styles.recognitionButton}
+            onPress={() => setRecognitionModalVisible(true)}
+          >
+            <Text style={{ fontSize: 14, fontWeight: '400', color: colors.stroke }}>
+              Ready for pet recognition?{' '}
+              <Text style={{ marginLeft: 8, color: colors.accent, textDecorationLine: 'underline' }}>Try now</Text>
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
+
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() => setLogoutModalVisible(true)}
+      >
+        <MaterialIcons name="logout" size={28} color={colors.stroke} />
+        <Text style={[typography.caption, { color: colors.stroke, marginTop: 2 }]}>Log out</Text>
+      </TouchableOpacity>
 
       <BottomNavBar
         activeTab="settings"
@@ -155,9 +178,9 @@ export default function SettingsScreen({ navigation }: Props) {
         onClose={() => setRecognitionModalVisible(false)}
         onStart={() => {
           setRecognitionModalVisible(false);
-          navigation.navigate('CatRecognition', {
+          navigation.navigate('BackgroundCapture', {
             petNames: pets.map((p) => p.name),
-            currentIndex: 0,
+            petIds: pets.map((p) => p.id),
           });
         }}
       />

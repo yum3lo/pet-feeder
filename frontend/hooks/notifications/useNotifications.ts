@@ -1,30 +1,31 @@
 import * as Notifications from 'expo-notifications';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
-import { getMockAllSchedules } from '@/services';
+import { api } from '@/services/api';
+import { useGetPets } from '@/services';
+import { type Schedule } from '@/types';
 import { toCapitalize } from '@/utils';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
-const LOW_FOOD_THRESHOLD_G = 20;
-
-async function scheduleFeeedingReminders() {
+async function scheduleRealFeedingReminders(pets: { id: number; name: string }[]) {
   const { status } = await Notifications.requestPermissionsAsync();
   if (status !== 'granted') return;
 
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  const schedules = await getMockAllSchedules();
+  const allSchedules = await Promise.all(
+    pets.map(async (pet) => {
+      try {
+        const { data } = await api.get<Schedule[]>(`/feeding/schedules/pet/${pet.id}`);
+        return data
+          .filter((s) => s.isActive)
+          .map((s) => ({ petName: pet.name, time: s.time }));
+      } catch {
+        return [];
+      }
+    }),
+  );
 
-  for (const { petName, time } of schedules) {
+  for (const { petName, time } of allSchedules.flat()) {
     const [hStr, mStr] = time.split(':');
     let hour = parseInt(hStr, 10);
     let minute = parseInt(mStr, 10) - 10;
@@ -48,25 +49,12 @@ async function scheduleFeeedingReminders() {
   }
 }
 
-export function useNotifications(foodWeightGrams: number) {
-  const lowFoodNotified = useRef(false);
+export function useNotifications() {
+  const { data: pets = [] } = useGetPets();
 
   useEffect(() => {
-    scheduleFeeedingReminders();
-  }, []);
-
-  useEffect(() => {
-    if (foodWeightGrams < LOW_FOOD_THRESHOLD_G && !lowFoodNotified.current) {
-      lowFoodNotified.current = true;
-      Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Smart Pet Feeder',
-          body: 'Food tank low. Please refill soon',
-        },
-        trigger: null,
-      });
-    } else if (foodWeightGrams >= LOW_FOOD_THRESHOLD_G) {
-      lowFoodNotified.current = false;
+    if (pets.length > 0) {
+      scheduleRealFeedingReminders(pets);
     }
-  }, [foodWeightGrams]);
+  }, [pets]);
 }

@@ -72,6 +72,24 @@ export class FeedingService {
     });
   }
 
+  async updateSchedule(scheduleId: number, userId: number, time?: string, portionSize?: number) {
+    const schedule = await this.prisma.feedingSchedule.findUnique({
+      where: { id: scheduleId },
+      include: { pet: true },
+    });
+    if (!schedule) throw new NotFoundException('Schedule not found.');
+    if (schedule.pet.userId !== userId) throw new ForbiddenException('Access denied.');
+    if (!time && portionSize === undefined) throw new BadRequestException('Provide at least one field to update.');
+
+    return this.prisma.feedingSchedule.update({
+      where: { id: scheduleId },
+      data: {
+        ...(time && { time }),
+        ...(portionSize !== undefined && { portionSize }),
+      },
+    });
+  }
+
   async deleteSchedule(scheduleId: number, userId: number) {
     const schedule = await this.prisma.feedingSchedule.findUnique({
       where: { id: scheduleId },
@@ -169,14 +187,19 @@ export class FeedingService {
   async handleFeedingResult(
     deviceId: string,
     scheduledPetId: number | null,
-    actualPetId: number | null,
     dispensedGrams: number,
     consumedGrams: number,
     leftoverGrams: number,
   ) {
-    // updating the most recent pending log for this device
+    // updating the most recent pending/failed log for this device
+    // (the 60s timeout may have already marked it failed before the result arrived)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const pendingLog = await this.prisma.feedingLog.findFirst({
-      where: { deviceId, status: 'pending' },
+      where: {
+        deviceId,
+        status: { in: ['pending', 'failed'] },
+        timestamp: { gte: fiveMinutesAgo },
+      },
       orderBy: { timestamp: 'desc' },
     });
 
@@ -185,18 +208,12 @@ export class FeedingService {
         where: { id: pendingLog.id },
         data: {
           petId: scheduledPetId,
-          actualPetId: actualPetId,
           dispensedGrams,
           consumedGrams,
           leftoverGrams,
           status: 'completed',
         },
       });
-    }
-
-    // if a different pet ate the food, adjust its next portion
-    if (actualPetId && actualPetId !== scheduledPetId && leftoverGrams > 0) {
-      await this.adjustNextPortion(actualPetId, leftoverGrams);
     }
 
     // adjusting scheduled pet's next portion by leftover
@@ -221,10 +238,21 @@ export class FeedingService {
   }
 
   private async adjustNextPortion(petId: number, adjustmentGrams: number) {
-    const nextSchedule = await this.prisma.feedingSchedule.findFirst({
-      where: { petId, isActive: true },
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // find the next schedule after the current time, fall back to earliest (next day)
+    let nextSchedule = await this.prisma.feedingSchedule.findFirst({
+      where: { petId, isActive: true, time: { gt: currentTime } },
       orderBy: { time: 'asc' },
     });
+
+    if (!nextSchedule) {
+      nextSchedule = await this.prisma.feedingSchedule.findFirst({
+        where: { petId, isActive: true },
+        orderBy: { time: 'asc' },
+      });
+    }
 
     if (!nextSchedule) return;
 

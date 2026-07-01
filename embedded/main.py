@@ -13,16 +13,6 @@ from feeding.feeding_controller import FeedingController
 
 TOPICS = topics(DEVICE_ID)
 
-_recognition_result = {"petId": None, "confidence": 0.0}
-_recognition_event = threading.Event()
-
-
-def on_recognition_result(pet_id, confidence):
-    _recognition_result["petId"] = pet_id
-    _recognition_result["confidence"] = confidence
-    _recognition_event.set()
-
-
 def sensor_loop(distance_sensor, camera, mqtt_client, feeding_controller):
     print("[SENSOR THREAD] Starting.")
 
@@ -89,7 +79,6 @@ def main():
     mqtt_client = MQTTClient(
         on_dispense=lambda pet_id, grams: feeding_controller_ref[0].handle_dispense_command(pet_id, grams),
         on_capture_photos=lambda pet_id, dur: feeding_controller_ref[0].handle_capture_photos(pet_id, dur),
-        on_recognition_result=on_recognition_result,
     )
 
     feeding_controller = FeedingController(
